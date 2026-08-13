@@ -12,29 +12,31 @@
 *
 *   Copyright 2020 - 2026 NXP
 *
-*   NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be
-*   used strictly in accordance with the applicable license terms. By expressly
-*   accepting such terms or by downloading, installing, activating and/or otherwise
-*   using the software, you are agreeing that you have read, and that you agree to
-*   comply with and are bound by, such license terms. If you do not agree to be
+*   NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be 
+*   used strictly in accordance with the applicable license terms. By expressly 
+*   accepting such terms or by downloading, installing, activating and/or otherwise 
+*   using the software, you are agreeing that you have read, and that you agree to 
+*   comply with and are bound by, such license terms. If you do not agree to be 
 *   bound by the applicable license terms, then you may not retain, install,
 *   activate or otherwise use the software.
 ==================================================================================================*/
-
-#ifndef SOC_IPS_H
-#define SOC_IPS_H
-
 /**
-*   @file   Soc_Ips.h
+*   @file Soc_Ips.h
+*   @version 7.0.1
+*
+*   @brief   BaseNXP - Driver header file.
+*   @details Specific driver header file.
 *
 *   @addtogroup BASENXP_COMPONENT
 *   @{
 */
 
+#ifndef SOC_IPS_H
+#define SOC_IPS_H
+
 #ifdef __cplusplus
 extern "C"{
 #endif
-
 
 /*==================================================================================================
 *                                         INCLUDE FILES
@@ -145,13 +147,13 @@ extern "C"{
 * @brief GMAC IP Version: D_IP_3P_ENET_MAC_SYN_017 [v02.00.00.08]
 * @details S32K3XX IP Versions
 */
-#define IPV_GMAC                (0x28220201UL)
+#define IPV_GMAC                (0x28220201UL)  
 
 /**
 * @brief C40ASF IP Version: M_IP_c40asf_spec [v00.00.00.04]
 * @details S32K3XX IP Versions
 */
-#define IPV_C40ASF              (0x28220201UL)
+#define IPV_C40ASF              (0x28220201UL) 
 
 /**
 * @brief PFLASH IP Version: pflash_c40asf_s32k_spec [v00.00.00.11]
@@ -163,31 +165,31 @@ extern "C"{
 * @brief C40ASF IP Version: M_IP_c40asf_spec [v00.00.00.04]
 * @details S32K3XX IP Versions
 */
-#define IPV_FLASH_ARRAY         (0x28220201UL)
+#define IPV_FLASH_ARRAY         (0x28220201UL) 
 
 /**
 * @brief PFLASH IP Version: pflash_c40asf_s32k_spec [v00.00.00.11]
 * @details S32K3XX IP Versions
 */
-#define IPV_FLASH_CONTROLLER    (0x28220201UL)
+#define IPV_FLASH_CONTROLLER    (0x28220201UL)  
 
 /**
 * @brief QSPI IP Version: QSPI d_ip_quadspi_v2_sync_spec.025
 * @details S32K3XX IP Versions
 */
-#define IPV_QSPI                (0x28220201UL)
+#define IPV_QSPI                (0x28220201UL)          
 
 /**
 * @brief Clock Monitoring Unit Frequency Check (CMU_FC) IP Version
 * @details S32K3XX IP Versions
 */
-#define IPV_CMU_FC              (0x28220201UL)
+#define IPV_CMU_FC              (0x28220201UL) 
 
 /**
 * @brief Flexible I/O (FLEXIO) IP Version
 * @details S32K3XX IP Versions
 */
-#define IPV_FLEXIO              (0x28220201UL)
+#define IPV_FLEXIO              (0x28220201UL) 
 
 /*==================================================================================================
 *                              REGISTER PROTECTION (REG_PROT)
@@ -197,7 +199,7 @@ extern "C"{
 * @details S32K3XX IP Versions
 */
 #define IPV_REG_PROT                  (0x28220201UL)
-
+ 
 /*==================================================================================================
 *                              Software Erratas for Hardware Erratas
 ==================================================================================================*/
@@ -206,6 +208,7 @@ extern "C"{
 * @details ERR050456 LPSPI: Reset to fifo does not work as expected
 */
 #define ERR_IPV_LPSPIV2_E050456         (STD_ON)
+
 
 /**
 * @brief Hardware errata for LPSPI: (ERR051588)
@@ -219,18 +222,21 @@ extern "C"{
 */
 #define ERR_IPV_GMAC_E050705    (STD_ON)
 
+
 /**
 * @brief Hardware errata for MCU: (ERR050583)
 * @details ERR050583: The functional reset sources can be made source of functional reset
 */
 #define ERR_IPV_MC_CGM_E050583         (STD_ON)
 
+
+  
 /**
 * @brief Hardware errata for SAI applicable only for S32K148: (e050476)
 * @details e050476 SAI: FCONT must be disabled when TMR is higher than 0.
 */
-#define ERR_IPV_SAI_ERR050476           (STD_OFF)
-
+#define ERR_IPV_SAI_ERR050476         (STD_OFF)
+  
 /*==================================================================================================
 *                                       DEFINES AND MACROS
 ==================================================================================================*/
@@ -275,7 +281,8 @@ extern "C"{
 }
 #endif
 
+#endif /* SOC_IPS_H */
 
 /** @} */
 
-#endif /* SOC_IPS_H */
+

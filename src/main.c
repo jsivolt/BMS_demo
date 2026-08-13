@@ -28,38 +28,45 @@
 *   @{
 */
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include "Siul2_Port_Ip.h"
+#include "Siul2_Port_Ip_Cfg.h"
+#include "Bms_Led.h"
 
-/* Including necessary configuration files. */
-#include "Mcal.h"
+static void delay(volatile unsigned int count)
+{
+    while (count--)
+    {
+        __asm("nop");
+    }
+}
 
-volatile int exit_code = 0;
-/* User includes */
-
-/*!
-  \brief The main function for the project.
-  \details The startup initialization sequence is the following:
- * - startup asm routine
- * - main()
-*/
 int main(void)
 {
-    /* Write your code here */
+    Siul2_Port_Ip_Init(
+        NUM_OF_CONFIGURED_PINS_PortContainer_0_BOARD_InitPeripherals,
+        g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
+    );
 
-    for(;;)
+    Bms_Led_Init();
+
+    while (1)
     {
-        if(exit_code != 0)
-        {
-            break;
-        }
-    }
-    return exit_code;
-}
+        Bms_Led_On(BMS_LED_GREEN);
+        delay(2000000U);
+        Bms_Led_Off(BMS_LED_GREEN);
 
-#ifdef __cplusplus
+        Bms_Led_On(BMS_LED_YELLOW);
+        delay(2000000U);
+        Bms_Led_Off(BMS_LED_YELLOW);
+
+        Bms_Led_On(BMS_LED_RED);
+        delay(2000000U);
+        Bms_Led_Off(BMS_LED_RED);
+
+        Bms_Led_On(BMS_LED_BLUE);
+        delay(2000000U);
+        Bms_Led_Off(BMS_LED_BLUE);
+    }
 }
-#endif
 
 /** @} */

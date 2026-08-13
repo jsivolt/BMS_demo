@@ -12,18 +12,22 @@
 *
 * Copyright 2020 - 2026 NXP
 *
-* NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be
-*   used strictly in accordance with the applicable license terms. By expressly
-*   accepting such terms or by downloading, installing, activating and/or otherwise
-*   using the software, you are agreeing that you have read, and that you agree to
-*   comply with and are bound by, such license terms. If you do not agree to be
+* NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be 
+*   used strictly in accordance with the applicable license terms. By expressly 
+*   accepting such terms or by downloading, installing, activating and/or otherwise 
+*   using the software, you are agreeing that you have read, and that you agree to 
+*   comply with and are bound by, such license terms. If you do not agree to be 
 *   bound by the applicable license terms, then you may not retain, install,
 *   activate or otherwise use the software.
 ==================================================================================================*/
 /**
-*   @file
+*   @file OsIf_ArchCfg.h
+*   @version 7.0.1
 *
-*   @addtogroup OSIF_DRIVER
+*   @brief   BaseNXP - Driver header file.
+*   @details Specific driver header file.
+*
+*   @addtogroup osif_drv
 *   @{
 */
 
@@ -63,16 +67,17 @@ extern "C"{
 #define MCAL_ARM_AARCH32    (32)  /* for ARM ARCH32         */
 #define MCAL_ARM_AARCH64    (64)  /* for ARM ARCH64         */
 #define MCAL_ARM_RARCH      (52)  /* for ARM R platform     */
+#define MCAL_ZENV_ZV2790    (27)  /* for ZENV ZV2790        */
 
 /*==================================================================================================
 *                                      DEFINES AND MACROS
 ==================================================================================================*/
 /* ARM_MARCH - is used to specify the ARM architecture MCAL_MARCH, MCAL_RARCH, MCAL_AARCH32, MCAL_AARCH64 */
 #define MCAL_PLATFORM_ARM  MCAL_ARM_MARCH
+        
+    
 
-
-
-
+ 
 /*==================================================================================================
 *                                             ENUMS
 ==================================================================================================*/
@@ -97,6 +102,8 @@ extern "C"{
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 #endif /* OSIF_ARCHCFG_H */
+
 /** @} */
 
