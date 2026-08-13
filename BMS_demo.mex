@@ -593,7 +593,7 @@
                                        <setting name="Name" value="PitChannel_0"/>
                                        <setting name="GptPitChannel" value="CH_0"/>
                                        <setting name="ChainMode" value="false"/>
-                                       <setting name="PitNotification" value="NULL_PTR"/>
+                                       <setting name="PitNotification" value="Bms_Pit10msCallback"/>
                                        <setting name="PitChannelMode" value="PIT_IP_CH_MODE_CONTINUOUS"/>
                                     </struct>
                                  </array>
