@@ -29,7 +29,7 @@ src/main.o: ../src/main.c ../RTD/include/Siul2_Port_Ip.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_SCB.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_MPU.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_MemMap.h \
- C\:/S32K344/workspace/BMS_demo/src/drivers/Bms_Led.h
+ C\:/S32K344/workspace/BMS_demo/src/app/Bms_App.h
 ../RTD/include/Siul2_Port_Ip.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_Types.h:
@@ -61,4 +61,4 @@ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/Platform_TS_T40D34M70I
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_SCB.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_MPU.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_MemMap.h:
-C\:/S32K344/workspace/BMS_demo/src/drivers/Bms_Led.h:
+C\:/S32K344/workspace/BMS_demo/src/app/Bms_App.h:

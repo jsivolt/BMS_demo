@@ -3701,7 +3701,19 @@ Discarded input sections
  .debug_macro   0x00000000       0x34 ./generate/src/OsIf_Cfg.o
  .debug_macro   0x00000000       0x88 ./generate/src/OsIf_Cfg.o
  .group         0x00000000        0xc ./src/app/Bms_App.o
+ .group         0x00000000        0xc ./src/app/Bms_App.o
+ .group         0x00000000        0xc ./src/app/Bms_App.o
+ .group         0x00000000        0xc ./src/app/Bms_App.o
+ .group         0x00000000        0xc ./src/app/Bms_App.o
+ .group         0x00000000        0xc ./src/app/Bms_App.o
+ .group         0x00000000        0xc ./src/app/Bms_App.o
  .debug_macro   0x00000000      0xa90 ./src/app/Bms_App.o
+ .debug_macro   0x00000000       0x22 ./src/app/Bms_App.o
+ .debug_macro   0x00000000       0x56 ./src/app/Bms_App.o
+ .debug_macro   0x00000000       0x51 ./src/app/Bms_App.o
+ .debug_macro   0x00000000      0x103 ./src/app/Bms_App.o
+ .debug_macro   0x00000000       0x6a ./src/app/Bms_App.o
+ .debug_macro   0x00000000      0x1df ./src/app/Bms_App.o
  .group         0x00000000        0xc ./src/battery/Battery_Monitor.o
  .group         0x00000000        0xc ./src/battery/Battery_Monitor.o
  .group         0x00000000        0xc ./src/battery/Battery_Monitor.o
@@ -4084,7 +4096,7 @@ END GROUP
                 0x00032000                __HSE_CODE_SIZE = 0x32000
                 0x00010000                __HSE_DATA_SIZE = 0x10000
 
-.pflash         0x00400000     0x8734
+.pflash         0x00400000     0x8764
  *(.boot_header)
  .boot_header   0x00400000      0x100 ./Project_Settings/Startup_Code/startup_cm7.o
                 0x00402000                . = ALIGN (0x2000)
@@ -4111,420 +4123,422 @@ END GROUP
  *(.systeminit)
                 0x00402634                . = ALIGN (0x4)
  *(.text.startup)
- .text.startup  0x00402634       0x54 ./src/main.o
+ .text.startup  0x00402634       0x28 ./src/main.o
                 0x00402634                main
-                0x00402688                . = ALIGN (0x4)
+                0x0040265c                . = ALIGN (0x4)
  *(.text)
- .text          0x00402688        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
- .text          0x00402688        0x0 ./Project_Settings/Startup_Code/exceptions.o
- .text          0x00402688        0x0 ./Project_Settings/Startup_Code/nvic.o
- .text          0x00402688        0x0 ./Project_Settings/Startup_Code/startup.o
- .text          0x00402688        0x0 ./Project_Settings/Startup_Code/startup_cm7.o
- .text          0x00402688        0x0 ./Project_Settings/Startup_Code/system.o
- .text          0x00402688        0x0 ./RTD/src/Clock_Ip.o
- .text          0x00402688        0x0 ./RTD/src/Clock_Ip_Data.o
- .text          0x00402688        0x0 ./RTD/src/Clock_Ip_Divider.o
- .text          0x00402688       0x28 ./RTD/src/Clock_Ip_DividerTrigger.o
-                0x00402688                Clock_Ip_SetFerd_TrustedCall
-                0x0040269c                Clock_Ip_ResetFerd_TrustedCall
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_ExtOsc.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_FracDiv.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Frequency.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Gate.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_IntOsc.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Irq.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Monitor.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Pll.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Selector.o
- .text          0x004026b0        0x0 ./RTD/src/Clock_Ip_Specific.o
- .text          0x004026b0        0x0 ./RTD/src/Det.o
- .text          0x004026b0        0x0 ./RTD/src/Det_stub.o
- .text          0x004026b0        0x0 ./RTD/src/Igf_Port_Ip.o
- .text          0x004026b0        0x0 ./RTD/src/OsIf_Interrupts.o
- .text          0x004026b0        0x0 ./RTD/src/OsIf_Software_Semaphore.o
- .text          0x004026b0        0x0 ./RTD/src/OsIf_Timer.o
- .text          0x004026b0        0x0 ./RTD/src/OsIf_Timer_System.o
- .text          0x004026b0        0x0 ./RTD/src/OsIf_Timer_System_Internal_Systick.o
- .text          0x004026b0        0x6 ./RTD/src/SchM_BaseNXP.o
-                0x004026b0                BaseNXP_schm_read_msr
- .text          0x004026b6        0x6 ./RTD/src/SchM_Dio.o
-                0x004026b6                Dio_schm_read_msr
- .text          0x004026bc        0x6 ./RTD/src/SchM_Mcu.o
-                0x004026bc                Mcu_schm_read_msr
- .text          0x004026c2        0x6 ./RTD/src/SchM_Port.o
-                0x004026c2                Port_schm_read_msr
- .text          0x004026c8       0x14 ./RTD/src/Siul2_Dio_Ip.o
- .text          0x004026dc       0x14 ./RTD/src/Siul2_Port_Ip.o
- .text          0x004026f0        0x0 ./RTD/src/Tspc_Port_Ip.o
- .text          0x004026f0        0x0 ./board/Siul2_Port_Ip_Cfg.o
- .text          0x004026f0        0x0 ./board/Tspc_Port_Ip_Cfg.o
- .text          0x004026f0        0x0 ./generate/src/Clock_Ip_Cfg.o
- .text          0x004026f0        0x0 ./generate/src/Igf_Port_Ip_Cfg.o
- .text          0x004026f0        0x0 ./generate/src/OsIf_Cfg.o
- .text          0x004026f0        0x0 ./src/app/Bms_App.o
- .text          0x004026f0       0xa8 ./src/battery/Battery_Monitor.o
-                0x004026f0                Battery_Monitor_Init
-                0x00402704                Battery_Monitor_Update
-                0x00402784                Battery_Monitor_GetData
- .text          0x00402798        0xc ./src/drivers/Bms_Can.o
-                0x00402798                Bms_Can_Init
-                0x0040279c                Bms_Can_Transmit
-                0x004027a0                Bms_Can_Receive
- .text          0x004027a4       0x34 ./src/drivers/Bms_Gpio.o
-                0x004027a4                Bms_Gpio_Init
-                0x004027b4                Bms_Gpio_WritePin
-                0x004027c4                Bms_Gpio_ReadPin
- .text          0x004027d8       0x5c ./src/drivers/Bms_Led.o
-                0x00402808                Bms_Led_On
-                0x0040280c                Bms_Led_Off
-                0x00402810                Bms_Led_AllOff
-                0x0040282e                Bms_Led_Init
- .text          0x00402834       0x14 ./src/main.o
- .text          0x00402848       0x60 ./src/safety/Fault_Manager.o
-                0x00402848                Fault_Manager_Init
-                0x00402860                Fault_Manager_ReportFault
-                0x00402870                Fault_Manager_ClearFault
-                0x00402880                Fault_Manager_IsFaultActive
-                0x00402890                Fault_Manager_HasActiveFaults
- .text          0x004028a8        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
- .text          0x004028a8        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
- .text          0x004028a8       0xa0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
-                0x004028a8                __aeabi_ldivmod
- .text          0x00402948       0x30 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
-                0x00402948                __aeabi_uldivmod
- .text          0x00402978      0x2d8 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
-                0x00402978                __udivmoddi4
- .text          0x00402c50        0x4 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
-                0x00402c50                __aeabi_idiv0
-                0x00402c50                __aeabi_ldiv0
+ .text          0x0040265c        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
+ .text          0x0040265c        0x0 ./Project_Settings/Startup_Code/exceptions.o
+ .text          0x0040265c        0x0 ./Project_Settings/Startup_Code/nvic.o
+ .text          0x0040265c        0x0 ./Project_Settings/Startup_Code/startup.o
+ .text          0x0040265c        0x0 ./Project_Settings/Startup_Code/startup_cm7.o
+ .text          0x0040265c        0x0 ./Project_Settings/Startup_Code/system.o
+ .text          0x0040265c        0x0 ./RTD/src/Clock_Ip.o
+ .text          0x0040265c        0x0 ./RTD/src/Clock_Ip_Data.o
+ .text          0x0040265c        0x0 ./RTD/src/Clock_Ip_Divider.o
+ .text          0x0040265c       0x28 ./RTD/src/Clock_Ip_DividerTrigger.o
+                0x0040265c                Clock_Ip_SetFerd_TrustedCall
+                0x00402670                Clock_Ip_ResetFerd_TrustedCall
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_ExtOsc.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_FracDiv.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Frequency.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Gate.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_IntOsc.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Irq.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Monitor.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Pll.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Selector.o
+ .text          0x00402684        0x0 ./RTD/src/Clock_Ip_Specific.o
+ .text          0x00402684        0x0 ./RTD/src/Det.o
+ .text          0x00402684        0x0 ./RTD/src/Det_stub.o
+ .text          0x00402684        0x0 ./RTD/src/Igf_Port_Ip.o
+ .text          0x00402684        0x0 ./RTD/src/OsIf_Interrupts.o
+ .text          0x00402684        0x0 ./RTD/src/OsIf_Software_Semaphore.o
+ .text          0x00402684        0x0 ./RTD/src/OsIf_Timer.o
+ .text          0x00402684        0x0 ./RTD/src/OsIf_Timer_System.o
+ .text          0x00402684        0x0 ./RTD/src/OsIf_Timer_System_Internal_Systick.o
+ .text          0x00402684        0x6 ./RTD/src/SchM_BaseNXP.o
+                0x00402684                BaseNXP_schm_read_msr
+ .text          0x0040268a        0x6 ./RTD/src/SchM_Dio.o
+                0x0040268a                Dio_schm_read_msr
+ .text          0x00402690        0x6 ./RTD/src/SchM_Mcu.o
+                0x00402690                Mcu_schm_read_msr
+ .text          0x00402696        0x6 ./RTD/src/SchM_Port.o
+                0x00402696                Port_schm_read_msr
+ .text          0x0040269c       0x14 ./RTD/src/Siul2_Dio_Ip.o
+ .text          0x004026b0       0x14 ./RTD/src/Siul2_Port_Ip.o
+ .text          0x004026c4        0x0 ./RTD/src/Tspc_Port_Ip.o
+ .text          0x004026c4        0x0 ./board/Siul2_Port_Ip_Cfg.o
+ .text          0x004026c4        0x0 ./board/Tspc_Port_Ip_Cfg.o
+ .text          0x004026c4        0x0 ./generate/src/Clock_Ip_Cfg.o
+ .text          0x004026c4        0x0 ./generate/src/Igf_Port_Ip_Cfg.o
+ .text          0x004026c4        0x0 ./generate/src/OsIf_Cfg.o
+ .text          0x004026c4       0x70 ./src/app/Bms_App.o
+                0x004026c4                Bms_Init
+                0x004026d8                Bms_MainFunction
+ .text          0x00402734       0xa8 ./src/battery/Battery_Monitor.o
+                0x00402734                Battery_Monitor_Init
+                0x00402748                Battery_Monitor_Update
+                0x004027c8                Battery_Monitor_GetData
+ .text          0x004027dc        0xc ./src/drivers/Bms_Can.o
+                0x004027dc                Bms_Can_Init
+                0x004027e0                Bms_Can_Transmit
+                0x004027e4                Bms_Can_Receive
+ .text          0x004027e8       0x34 ./src/drivers/Bms_Gpio.o
+                0x004027e8                Bms_Gpio_Init
+                0x004027f8                Bms_Gpio_WritePin
+                0x00402808                Bms_Gpio_ReadPin
+ .text          0x0040281c       0x5c ./src/drivers/Bms_Led.o
+                0x0040284c                Bms_Led_On
+                0x00402850                Bms_Led_Off
+                0x00402854                Bms_Led_AllOff
+                0x00402872                Bms_Led_Init
+ .text          0x00402878        0x0 ./src/main.o
+ .text          0x00402878       0x60 ./src/safety/Fault_Manager.o
+                0x00402878                Fault_Manager_Init
+                0x00402890                Fault_Manager_ReportFault
+                0x004028a0                Fault_Manager_ClearFault
+                0x004028b0                Fault_Manager_IsFaultActive
+                0x004028c0                Fault_Manager_HasActiveFaults
+ .text          0x004028d8        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+ .text          0x004028d8        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+ .text          0x004028d8       0xa0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+                0x004028d8                __aeabi_ldivmod
+ .text          0x00402978       0x30 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+                0x00402978                __aeabi_uldivmod
+ .text          0x004029a8      0x2d8 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+                0x004029a8                __udivmoddi4
+ .text          0x00402c80        0x4 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+                0x00402c80                __aeabi_idiv0
+                0x00402c80                __aeabi_ldiv0
  *(.text*)
- .text.memmove  0x00402c54       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
-                0x00402c54                memmove
- .text.memset   0x00402c88       0x10 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
-                0x00402c88                memset
-                0x00402c98                . = ALIGN (0x4)
+ .text.memmove  0x00402c84       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+                0x00402c84                memmove
+ .text.memset   0x00402cb8       0x10 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+                0x00402cb8                memset
+                0x00402cc8                . = ALIGN (0x4)
  *(.mcal_text)
- .mcal_text     0x00402c98       0x14 ./Project_Settings/Startup_Code/exceptions.o
-                0x00402c98                NMI_Handler
-                0x00402c9a                HardFault_Handler
-                0x00402c9c                MemManage_Handler
-                0x00402c9e                BusFault_Handler
-                0x00402ca0                UsageFault_Handler
-                0x00402ca2                SVC_Handler
-                0x00402ca4                DebugMon_Handler
-                0x00402ca6                PendSV_Handler
-                0x00402ca8                SysTick_Handler
-                0x00402caa                undefined_handler
- .mcal_text     0x00402cac       0x52 ./Project_Settings/Startup_Code/nvic.o
-                0x00402cac                NVIC_SetPriorityGrouping
-                0x00402cc0                NVIC_EnableIRQ
-                0x00402cd8                NVIC_DisableIRQ
-                0x00402cf0                NVIC_SetPriority
- *fill*         0x00402cfe        0x2 
- .mcal_text     0x00402d00       0xe8 ./Project_Settings/Startup_Code/startup.o
-                0x00402d00                init_data_bss
-                0x00402d8c                init_data_bss_core2
- .mcal_text     0x00402de8      0x338 ./Project_Settings/Startup_Code/system.o
-                0x00402de8                startup_go_to_user_mode
-                0x00402dea                default_interrupt_routine
-                0x00402dec                Sys_GetCoreID
-                0x00402dfc                SystemInit
-                0x00403104                Enable_FPU
- .mcal_text     0x00403120      0x884 ./RTD/src/Clock_Ip.o
-                0x00403122                Clock_Ip_InitClock
-                0x004036c8                Clock_Ip_GetPllStatus
-                0x0040376c                Clock_Ip_DistributePll
-                0x00403858                Clock_Ip_Init
-                0x0040387c                Clock_Ip_DisableClockMonitor
-                0x004038a0                Clock_Ip_InstallNotificationsCallback
-                0x004038ac                Clock_Ip_DisableModuleClock
-                0x004038d4                Clock_Ip_EnableModuleClock
-                0x004038fc                Clock_Ip_DisableFircInStandby
-                0x00403914                Clock_Ip_EnableFircInStandby
-                0x0040392c                Clock_Ip_DisableSircInStandby
-                0x00403944                Clock_Ip_EnableSircInStandby
-                0x0040395c                Clock_Ip_ReportClockErrors
-                0x00403968                Clock_Ip_StartTimeout
-                0x00403988                Clock_Ip_TimeoutExpired
- .mcal_text     0x004039a4      0x1e4 ./RTD/src/Clock_Ip_Divider.o
- .mcal_text     0x00403b88       0xb0 ./RTD/src/Clock_Ip_DividerTrigger.o
- .mcal_text     0x00403c38      0x234 ./RTD/src/Clock_Ip_ExtOsc.o
- .mcal_text     0x00403e6c        0x6 ./RTD/src/Clock_Ip_FracDiv.o
- .mcal_text     0x00403e72        0x2 ./RTD/src/Clock_Ip_Frequency.o
-                0x00403e72                Clock_Ip_SetExternalSignalFrequency
- .mcal_text     0x00403e74      0x154 ./RTD/src/Clock_Ip_Gate.o
- .mcal_text     0x00403fc8      0x104 ./RTD/src/Clock_Ip_IntOsc.o
- .mcal_text     0x004040cc        0x4 ./RTD/src/Clock_Ip_Irq.o
-                0x004040cc                Mcu_Cmu_ClockFail_IRQHandler
- .mcal_text     0x004040d0      0x288 ./RTD/src/Clock_Ip_Monitor.o
-                0x00404310                Clock_Ip_CMU_ClockFailInt
- .mcal_text     0x00404358      0x184 ./RTD/src/Clock_Ip_Pll.o
- .mcal_text     0x004044dc      0x1f0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
- .mcal_text     0x004046cc      0x3dc ./RTD/src/Clock_Ip_Selector.o
-                0x00404a7c                Clock_Ip_SetRtcRtccClksel_TrustedCall
- .mcal_text     0x00404aa8      0x344 ./RTD/src/Clock_Ip_Specific.o
-                0x00404aa8                Clock_Ip_SetFlashWaitStates
-                0x00404aac                Clock_Ip_McMeEnterKey
-                0x00404ac0                Clock_Ip_PowerClockIpModules
-                0x00404d40                DisableFircInStandbyMode
-                0x00404d50                EnableFircInStandbyMode
-                0x00404d6c                DisableSircInStandbyMode
-                0x00404d7c                EnableSircInStandbyMode
-                0x00404d98                Clock_Ip_Command
-                0x00404de8                Clock_Ip_SetRamWaitStates
- .mcal_text     0x00404dec      0x504 ./RTD/src/Det.o
-                0x00404dec                Det_Start
-                0x00404dee                Det_InitDataNode
-                0x00404e74                Det_LinkNodeToHead
-                0x00404ea4                Det_DelAllNodesSameId
-                0x00404fa2                Det_FreeNodesInLinkedList
-                0x00404fd8                Det_Init
-                0x004051d0                Det_ReportError
-                0x00405230                Det_ReportRuntimeError
-                0x00405290                Det_ReportTransientFault
- .mcal_text     0x004052f0      0x1e0 ./RTD/src/Det_stub.o
-                0x004052f0                Det_TestLastReportError
-                0x00405340                Det_TestLastReportRuntimeError
-                0x00405390                Det_TestLastReportTransientFault
-                0x004053e0                Det_TestNoError
-                0x00405430                Det_TestNoRuntimeError
-                0x00405480                Det_TestNoTransientFault
- .mcal_text     0x004054d0       0x1e ./RTD/src/OsIf_Timer.o
-                0x004054d0                OsIf_Init
-                0x004054d8                OsIf_GetCounter
-                0x004054dc                OsIf_GetElapsed
-                0x004054e4                OsIf_SetTimerFrequency
-                0x004054e6                OsIf_MicrosToTicks
- .mcal_text     0x004054ee       0x4c ./RTD/src/OsIf_Timer_System_Internal_Systick.o
-                0x004054ee                OsIf_Timer_System_Internal_Init
-                0x00405504                OsIf_Timer_System_Internal_GetCounter
-                0x00405510                OsIf_Timer_System_Internal_GetElapsed
- *fill*         0x0040553a        0x2 
- .mcal_text     0x0040553c       0xc8 ./RTD/src/SchM_BaseNXP.o
-                0x0040553c                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
-                0x00405570                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
-                0x004055a0                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
-                0x004055d4                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
- .mcal_text     0x00405604       0xc8 ./RTD/src/SchM_Dio.o
-                0x00405604                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_00
-                0x00405638                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_00
-                0x00405668                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_01
-                0x0040569c                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_01
- .mcal_text     0x004056cc      0x12c ./RTD/src/SchM_Mcu.o
-                0x004056cc                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_00
-                0x00405700                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_00
-                0x00405730                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_01
-                0x00405764                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_01
-                0x00405794                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_02
-                0x004057c8                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_02
- .mcal_text     0x004057f8      0xaf0 ./RTD/src/SchM_Port.o
-                0x004057f8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_00
-                0x0040582c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_00
-                0x0040585c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_01
-                0x00405890                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_01
-                0x004058c0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_02
-                0x004058f4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_02
-                0x00405924                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_03
-                0x00405958                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_03
-                0x00405988                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_04
-                0x004059bc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_04
-                0x004059ec                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_05
-                0x00405a20                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_05
-                0x00405a50                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_06
-                0x00405a84                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_06
-                0x00405ab4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_07
-                0x00405ae8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_07
-                0x00405b18                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_08
-                0x00405b4c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_08
-                0x00405b7c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_09
-                0x00405bb0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_09
-                0x00405be0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_10
-                0x00405c14                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_10
-                0x00405c44                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_11
-                0x00405c78                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_11
-                0x00405ca8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_12
-                0x00405cdc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_12
-                0x00405d0c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_13
-                0x00405d40                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_13
-                0x00405d70                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_14
-                0x00405da4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_14
-                0x00405dd4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_15
-                0x00405e08                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_15
-                0x00405e38                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_16
-                0x00405e6c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_16
-                0x00405e9c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_17
-                0x00405ed0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_17
-                0x00405f00                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_18
-                0x00405f34                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_18
-                0x00405f64                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_19
-                0x00405f98                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_19
-                0x00405fc8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_20
-                0x00405ffc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_20
-                0x0040602c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_21
-                0x00406060                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_21
-                0x00406090                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_22
-                0x004060c4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_22
-                0x004060f4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_23
-                0x00406128                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_23
-                0x00406158                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_24
-                0x0040618c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_24
-                0x004061bc                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_25
-                0x004061f0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_25
-                0x00406220                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_26
-                0x00406254                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_26
-                0x00406284                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_27
-                0x004062b8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_27
- .mcal_text     0x004062e8      0x1fc ./RTD/src/Siul2_Dio_Ip.o
-                0x0040631c                Siul2_Dio_Ip_WritePin
-                0x00406388                Siul2_Dio_Ip_SetGPDO
-                0x004063a4                Siul2_Dio_Ip_ClearGPDO
-                0x004063c0                Siul2_Dio_Ip_WritePins
-                0x004063d8                Siul2_Dio_Ip_GetPinsOutput
-                0x004063f0                Siul2_Dio_Ip_SetPins
-                0x0040640e                Siul2_Dio_Ip_ClearPins
-                0x0040642e                Siul2_Dio_Ip_TogglePins
-                0x0040644c                Siul2_Dio_Ip_ReadPins
-                0x00406466                Siul2_Dio_Ip_ReadPin
-                0x00406498                Siul2_Dio_Ip_MaskedWritePins
- .mcal_text     0x004064e4      0x458 ./RTD/src/Siul2_Port_Ip.o
-                0x00406638                Siul2_Port_Ip_Init
-                0x00406668                Siul2_Port_Ip_SetPullSel
-                0x004066c4                Siul2_Port_Ip_SetOutputBuffer
-                0x0040672a                Siul2_Port_Ip_SetInputBuffer
-                0x0040679a                Siul2_Port_Ip_SetPinDirection
-                0x00406812                Siul2_Port_Ip_RevertPinConfiguration
-                0x00406874                Siul2_Port_Ip_GetPinConfiguration
- .mcal_text     0x0040693c      0x11c ./RTD/src/Tspc_Port_Ip.o
-                0x0040693c                Tspc_Port_Ip_EnableObeGroup
-                0x0040696c                Tspc_Port_Ip_DisableObeGroup
-                0x0040699c                Tspc_Port_Ip_MaskObeGroup
-                0x004069ba                Tspc_Port_Ip_ConfigureObeGroup
-                0x00406a58                . = ALIGN (0x4)
+ .mcal_text     0x00402cc8       0x14 ./Project_Settings/Startup_Code/exceptions.o
+                0x00402cc8                NMI_Handler
+                0x00402cca                HardFault_Handler
+                0x00402ccc                MemManage_Handler
+                0x00402cce                BusFault_Handler
+                0x00402cd0                UsageFault_Handler
+                0x00402cd2                SVC_Handler
+                0x00402cd4                DebugMon_Handler
+                0x00402cd6                PendSV_Handler
+                0x00402cd8                SysTick_Handler
+                0x00402cda                undefined_handler
+ .mcal_text     0x00402cdc       0x52 ./Project_Settings/Startup_Code/nvic.o
+                0x00402cdc                NVIC_SetPriorityGrouping
+                0x00402cf0                NVIC_EnableIRQ
+                0x00402d08                NVIC_DisableIRQ
+                0x00402d20                NVIC_SetPriority
+ *fill*         0x00402d2e        0x2 
+ .mcal_text     0x00402d30       0xe8 ./Project_Settings/Startup_Code/startup.o
+                0x00402d30                init_data_bss
+                0x00402dbc                init_data_bss_core2
+ .mcal_text     0x00402e18      0x338 ./Project_Settings/Startup_Code/system.o
+                0x00402e18                startup_go_to_user_mode
+                0x00402e1a                default_interrupt_routine
+                0x00402e1c                Sys_GetCoreID
+                0x00402e2c                SystemInit
+                0x00403134                Enable_FPU
+ .mcal_text     0x00403150      0x884 ./RTD/src/Clock_Ip.o
+                0x00403152                Clock_Ip_InitClock
+                0x004036f8                Clock_Ip_GetPllStatus
+                0x0040379c                Clock_Ip_DistributePll
+                0x00403888                Clock_Ip_Init
+                0x004038ac                Clock_Ip_DisableClockMonitor
+                0x004038d0                Clock_Ip_InstallNotificationsCallback
+                0x004038dc                Clock_Ip_DisableModuleClock
+                0x00403904                Clock_Ip_EnableModuleClock
+                0x0040392c                Clock_Ip_DisableFircInStandby
+                0x00403944                Clock_Ip_EnableFircInStandby
+                0x0040395c                Clock_Ip_DisableSircInStandby
+                0x00403974                Clock_Ip_EnableSircInStandby
+                0x0040398c                Clock_Ip_ReportClockErrors
+                0x00403998                Clock_Ip_StartTimeout
+                0x004039b8                Clock_Ip_TimeoutExpired
+ .mcal_text     0x004039d4      0x1e4 ./RTD/src/Clock_Ip_Divider.o
+ .mcal_text     0x00403bb8       0xb0 ./RTD/src/Clock_Ip_DividerTrigger.o
+ .mcal_text     0x00403c68      0x234 ./RTD/src/Clock_Ip_ExtOsc.o
+ .mcal_text     0x00403e9c        0x6 ./RTD/src/Clock_Ip_FracDiv.o
+ .mcal_text     0x00403ea2        0x2 ./RTD/src/Clock_Ip_Frequency.o
+                0x00403ea2                Clock_Ip_SetExternalSignalFrequency
+ .mcal_text     0x00403ea4      0x154 ./RTD/src/Clock_Ip_Gate.o
+ .mcal_text     0x00403ff8      0x104 ./RTD/src/Clock_Ip_IntOsc.o
+ .mcal_text     0x004040fc        0x4 ./RTD/src/Clock_Ip_Irq.o
+                0x004040fc                Mcu_Cmu_ClockFail_IRQHandler
+ .mcal_text     0x00404100      0x288 ./RTD/src/Clock_Ip_Monitor.o
+                0x00404340                Clock_Ip_CMU_ClockFailInt
+ .mcal_text     0x00404388      0x184 ./RTD/src/Clock_Ip_Pll.o
+ .mcal_text     0x0040450c      0x1f0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
+ .mcal_text     0x004046fc      0x3dc ./RTD/src/Clock_Ip_Selector.o
+                0x00404aac                Clock_Ip_SetRtcRtccClksel_TrustedCall
+ .mcal_text     0x00404ad8      0x344 ./RTD/src/Clock_Ip_Specific.o
+                0x00404ad8                Clock_Ip_SetFlashWaitStates
+                0x00404adc                Clock_Ip_McMeEnterKey
+                0x00404af0                Clock_Ip_PowerClockIpModules
+                0x00404d70                DisableFircInStandbyMode
+                0x00404d80                EnableFircInStandbyMode
+                0x00404d9c                DisableSircInStandbyMode
+                0x00404dac                EnableSircInStandbyMode
+                0x00404dc8                Clock_Ip_Command
+                0x00404e18                Clock_Ip_SetRamWaitStates
+ .mcal_text     0x00404e1c      0x504 ./RTD/src/Det.o
+                0x00404e1c                Det_Start
+                0x00404e1e                Det_InitDataNode
+                0x00404ea4                Det_LinkNodeToHead
+                0x00404ed4                Det_DelAllNodesSameId
+                0x00404fd2                Det_FreeNodesInLinkedList
+                0x00405008                Det_Init
+                0x00405200                Det_ReportError
+                0x00405260                Det_ReportRuntimeError
+                0x004052c0                Det_ReportTransientFault
+ .mcal_text     0x00405320      0x1e0 ./RTD/src/Det_stub.o
+                0x00405320                Det_TestLastReportError
+                0x00405370                Det_TestLastReportRuntimeError
+                0x004053c0                Det_TestLastReportTransientFault
+                0x00405410                Det_TestNoError
+                0x00405460                Det_TestNoRuntimeError
+                0x004054b0                Det_TestNoTransientFault
+ .mcal_text     0x00405500       0x1e ./RTD/src/OsIf_Timer.o
+                0x00405500                OsIf_Init
+                0x00405508                OsIf_GetCounter
+                0x0040550c                OsIf_GetElapsed
+                0x00405514                OsIf_SetTimerFrequency
+                0x00405516                OsIf_MicrosToTicks
+ .mcal_text     0x0040551e       0x4c ./RTD/src/OsIf_Timer_System_Internal_Systick.o
+                0x0040551e                OsIf_Timer_System_Internal_Init
+                0x00405534                OsIf_Timer_System_Internal_GetCounter
+                0x00405540                OsIf_Timer_System_Internal_GetElapsed
+ *fill*         0x0040556a        0x2 
+ .mcal_text     0x0040556c       0xc8 ./RTD/src/SchM_BaseNXP.o
+                0x0040556c                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
+                0x004055a0                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
+                0x004055d0                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
+                0x00405604                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
+ .mcal_text     0x00405634       0xc8 ./RTD/src/SchM_Dio.o
+                0x00405634                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_00
+                0x00405668                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_00
+                0x00405698                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_01
+                0x004056cc                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_01
+ .mcal_text     0x004056fc      0x12c ./RTD/src/SchM_Mcu.o
+                0x004056fc                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_00
+                0x00405730                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_00
+                0x00405760                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_01
+                0x00405794                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_01
+                0x004057c4                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_02
+                0x004057f8                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_02
+ .mcal_text     0x00405828      0xaf0 ./RTD/src/SchM_Port.o
+                0x00405828                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_00
+                0x0040585c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_00
+                0x0040588c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_01
+                0x004058c0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_01
+                0x004058f0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_02
+                0x00405924                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_02
+                0x00405954                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_03
+                0x00405988                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_03
+                0x004059b8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_04
+                0x004059ec                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_04
+                0x00405a1c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_05
+                0x00405a50                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_05
+                0x00405a80                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_06
+                0x00405ab4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_06
+                0x00405ae4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_07
+                0x00405b18                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_07
+                0x00405b48                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_08
+                0x00405b7c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_08
+                0x00405bac                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_09
+                0x00405be0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_09
+                0x00405c10                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_10
+                0x00405c44                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_10
+                0x00405c74                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_11
+                0x00405ca8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_11
+                0x00405cd8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_12
+                0x00405d0c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_12
+                0x00405d3c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_13
+                0x00405d70                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_13
+                0x00405da0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_14
+                0x00405dd4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_14
+                0x00405e04                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_15
+                0x00405e38                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_15
+                0x00405e68                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_16
+                0x00405e9c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_16
+                0x00405ecc                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_17
+                0x00405f00                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_17
+                0x00405f30                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_18
+                0x00405f64                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_18
+                0x00405f94                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_19
+                0x00405fc8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_19
+                0x00405ff8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_20
+                0x0040602c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_20
+                0x0040605c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_21
+                0x00406090                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_21
+                0x004060c0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_22
+                0x004060f4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_22
+                0x00406124                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_23
+                0x00406158                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_23
+                0x00406188                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_24
+                0x004061bc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_24
+                0x004061ec                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_25
+                0x00406220                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_25
+                0x00406250                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_26
+                0x00406284                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_26
+                0x004062b4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_27
+                0x004062e8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_27
+ .mcal_text     0x00406318      0x1fc ./RTD/src/Siul2_Dio_Ip.o
+                0x0040634c                Siul2_Dio_Ip_WritePin
+                0x004063b8                Siul2_Dio_Ip_SetGPDO
+                0x004063d4                Siul2_Dio_Ip_ClearGPDO
+                0x004063f0                Siul2_Dio_Ip_WritePins
+                0x00406408                Siul2_Dio_Ip_GetPinsOutput
+                0x00406420                Siul2_Dio_Ip_SetPins
+                0x0040643e                Siul2_Dio_Ip_ClearPins
+                0x0040645e                Siul2_Dio_Ip_TogglePins
+                0x0040647c                Siul2_Dio_Ip_ReadPins
+                0x00406496                Siul2_Dio_Ip_ReadPin
+                0x004064c8                Siul2_Dio_Ip_MaskedWritePins
+ .mcal_text     0x00406514      0x458 ./RTD/src/Siul2_Port_Ip.o
+                0x00406668                Siul2_Port_Ip_Init
+                0x00406698                Siul2_Port_Ip_SetPullSel
+                0x004066f4                Siul2_Port_Ip_SetOutputBuffer
+                0x0040675a                Siul2_Port_Ip_SetInputBuffer
+                0x004067ca                Siul2_Port_Ip_SetPinDirection
+                0x00406842                Siul2_Port_Ip_RevertPinConfiguration
+                0x004068a4                Siul2_Port_Ip_GetPinConfiguration
+ .mcal_text     0x0040696c      0x11c ./RTD/src/Tspc_Port_Ip.o
+                0x0040696c                Tspc_Port_Ip_EnableObeGroup
+                0x0040699c                Tspc_Port_Ip_DisableObeGroup
+                0x004069cc                Tspc_Port_Ip_MaskObeGroup
+                0x004069ea                Tspc_Port_Ip_ConfigureObeGroup
+                0x00406a88                . = ALIGN (0x4)
  *(.acmcu_code_rom)
-                0x00406a58                . = ALIGN (0x4)
-                0x00406a58                __acfls_code_rom_start = .
+                0x00406a88                . = ALIGN (0x4)
+                0x00406a88                __acfls_code_rom_start = .
  *(.acfls_code_rom)
  .acfls_code_rom
-                0x00406a58       0x5c ./RTD/src/Clock_Ip_Specific.o
-                0x00406a58                Clock_Ip_PRAMCSetRamIWS
- *fill*         0x00406ab4        0x4 
+                0x00406a88       0x5c ./RTD/src/Clock_Ip_Specific.o
+                0x00406a88                Clock_Ip_PRAMCSetRamIWS
+ *fill*         0x00406ae4        0x4 
  .acfls_code_rom.__stub
-                0x00406ab8        0x8 linker stubs
-                0x00406ac0                . = ALIGN (0x4)
-                0x00406ac0                __acfls_code_rom_end = .
-                0x00406ac0                __acmem_43_infls_code_rom_start = .
+                0x00406ae8        0x8 linker stubs
+                0x00406af0                . = ALIGN (0x4)
+                0x00406af0                __acfls_code_rom_end = .
+                0x00406af0                __acmem_43_infls_code_rom_start = .
  *(.acmem_43_infls_code_rom)
-                0x00406ac0                . = ALIGN (0x4)
-                0x00406ac0                __acmem_43_infls_code_rom_end = .
+                0x00406af0                . = ALIGN (0x4)
+                0x00406af0                __acmem_43_infls_code_rom_end = .
  *(.init)
-                0x00406ac0                . = ALIGN (0x4)
+                0x00406af0                . = ALIGN (0x4)
  *(.fini)
-                0x00406ac0                . = ALIGN (0x4)
+                0x00406af0                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x00406ac0        0x3 ./RTD/src/Clock_Ip_IntOsc.o
- *fill*         0x00406ac3        0x1 
- .rodata        0x00406ac4        0x4 ./RTD/src/Siul2_Port_Ip.o
-                0x00406ac4                Port_au32Siul2BaseAddr
+ .rodata        0x00406af0        0x3 ./RTD/src/Clock_Ip_IntOsc.o
+ *fill*         0x00406af3        0x1 
+ .rodata        0x00406af4        0x4 ./RTD/src/Siul2_Port_Ip.o
+                0x00406af4                Port_au32Siul2BaseAddr
  *(.rodata*)
-                0x00406ac8                . = ALIGN (0x4)
+                0x00406af8                . = ALIGN (0x4)
  *(.mcal_const_cfg)
  .mcal_const_cfg
-                0x00406ac8      0x3c0 ./board/Siul2_Port_Ip_Cfg.o
-                0x00406ac8                g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
- *fill*         0x00406e88        0x0 
+                0x00406af8      0x3c0 ./board/Siul2_Port_Ip_Cfg.o
+                0x00406af8                g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
+ *fill*         0x00406eb8        0x0 
  .mcal_const_cfg
-                0x00406e88      0x5fc ./generate/src/Clock_Ip_Cfg.o
-                0x00406e88                Clock_Ip_aClockConfig
-                0x00407484                . = ALIGN (0x4)
+                0x00406eb8      0x5fc ./generate/src/Clock_Ip_Cfg.o
+                0x00406eb8                Clock_Ip_aClockConfig
+                0x004074b4                . = ALIGN (0x4)
  *(.mcal_const)
- .mcal_const    0x00407484     0x1130 ./RTD/src/Clock_Ip_Data.o
-                0x00407484                Clock_Ip_axGateInfo
-                0x00407b6c                Clock_Ip_axFeatureExtensions
-                0x00407dbc                Clock_Ip_aeHwDfsName
-                0x00407dc0                Clock_Ip_aeHwPllName
-                0x00407dc4                Clock_Ip_aeSourceTypeClockName
-                0x00407e1c                Clock_Ip_apxMcMeTriggerPartitions
-                0x00407e2c                Clock_Ip_apxMcMeGetPartitions
-                0x00407e3c                Clock_Ip_apxMcMeSetPartitions
-                0x00407e4c                Clock_Ip_axCmuInfo
-                0x00407ed8                Clock_Ip_aeCmuNames
-                0x00407ef4                Clock_Ip_apxCmu
-                0x00407f10                Clock_Ip_apxPll
-                0x00407f20                Clock_Ip_apxXosc
-                0x00407f28                Clock_Ip_apxCgmPcfs
-                0x00407f2c                Clock_Ip_apxCgm
-                0x00407f80                Clock_Ip_au16SelectorEntryRtcHardwareValue
-                0x00407fac                Clock_Ip_au16SelectorEntryHardwareValue
-                0x00407fd8                Clock_Ip_au8SoftwareMuxResetValue
-                0x00408064                Clock_Ip_au8ClockFeatures
-                0x00408550                Clock_Ip_au8CmuCallbackIndex
-                0x0040855a                Clock_Ip_au8PcfsCallbackIndex
-                0x00408564                Clock_Ip_au8SelectorCallbackIndex
-                0x0040856e                Clock_Ip_au8PllCallbackIndex
-                0x00408578                Clock_Ip_au8FractionalDividerCallbackIndex
-                0x00408582                Clock_Ip_au8GateCallbackIndex
-                0x0040858c                Clock_Ip_au8IrcoscCallbackIndex
-                0x00408596                Clock_Ip_au8XoscCallbackIndex
-                0x004085a0                Clock_Ip_au8DividerTriggerCallbackIndex
-                0x004085aa                Clock_Ip_au8DividerCallbackIndex
- .mcal_const    0x004085b4       0x14 ./RTD/src/Clock_Ip_Divider.o
-                0x004085b4                Clock_Ip_axDividerCallbacks
- .mcal_const    0x004085c8       0x10 ./RTD/src/Clock_Ip_DividerTrigger.o
-                0x004085c8                Clock_Ip_axDividerTriggerCallbacks
- .mcal_const    0x004085d8       0x30 ./RTD/src/Clock_Ip_ExtOsc.o
-                0x004085d8                Clock_Ip_axExtOscCallbacks
- .mcal_const    0x00408608        0xc ./RTD/src/Clock_Ip_FracDiv.o
-                0x00408608                Clock_Ip_axFracDivCallbacks
- .mcal_const    0x00408614       0x10 ./RTD/src/Clock_Ip_Gate.o
-                0x00408614                Clock_Ip_axGateCallbacks
- .mcal_const    0x00408624       0x30 ./RTD/src/Clock_Ip_IntOsc.o
-                0x00408624                Clock_Ip_axIntOscCallbacks
- .mcal_const    0x00408654       0x20 ./RTD/src/Clock_Ip_Monitor.o
-                0x00408654                Clock_Ip_axCmuCallbacks
- .mcal_const    0x00408674       0x28 ./RTD/src/Clock_Ip_Pll.o
-                0x00408674                Clock_Ip_axPllCallbacks
- .mcal_const    0x0040869c        0x8 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
-                0x0040869c                Clock_Ip_axPcfsCallbacks
- .mcal_const    0x004086a4       0x28 ./RTD/src/Clock_Ip_Selector.o
-                0x004086a4                Clock_Ip_axSelectorCallbacks
-                0x004086cc                . = ALIGN (0x4)
-                0x004086cc                __init_table = .
+ .mcal_const    0x004074b4     0x1130 ./RTD/src/Clock_Ip_Data.o
+                0x004074b4                Clock_Ip_axGateInfo
+                0x00407b9c                Clock_Ip_axFeatureExtensions
+                0x00407dec                Clock_Ip_aeHwDfsName
+                0x00407df0                Clock_Ip_aeHwPllName
+                0x00407df4                Clock_Ip_aeSourceTypeClockName
+                0x00407e4c                Clock_Ip_apxMcMeTriggerPartitions
+                0x00407e5c                Clock_Ip_apxMcMeGetPartitions
+                0x00407e6c                Clock_Ip_apxMcMeSetPartitions
+                0x00407e7c                Clock_Ip_axCmuInfo
+                0x00407f08                Clock_Ip_aeCmuNames
+                0x00407f24                Clock_Ip_apxCmu
+                0x00407f40                Clock_Ip_apxPll
+                0x00407f50                Clock_Ip_apxXosc
+                0x00407f58                Clock_Ip_apxCgmPcfs
+                0x00407f5c                Clock_Ip_apxCgm
+                0x00407fb0                Clock_Ip_au16SelectorEntryRtcHardwareValue
+                0x00407fdc                Clock_Ip_au16SelectorEntryHardwareValue
+                0x00408008                Clock_Ip_au8SoftwareMuxResetValue
+                0x00408094                Clock_Ip_au8ClockFeatures
+                0x00408580                Clock_Ip_au8CmuCallbackIndex
+                0x0040858a                Clock_Ip_au8PcfsCallbackIndex
+                0x00408594                Clock_Ip_au8SelectorCallbackIndex
+                0x0040859e                Clock_Ip_au8PllCallbackIndex
+                0x004085a8                Clock_Ip_au8FractionalDividerCallbackIndex
+                0x004085b2                Clock_Ip_au8GateCallbackIndex
+                0x004085bc                Clock_Ip_au8IrcoscCallbackIndex
+                0x004085c6                Clock_Ip_au8XoscCallbackIndex
+                0x004085d0                Clock_Ip_au8DividerTriggerCallbackIndex
+                0x004085da                Clock_Ip_au8DividerCallbackIndex
+ .mcal_const    0x004085e4       0x14 ./RTD/src/Clock_Ip_Divider.o
+                0x004085e4                Clock_Ip_axDividerCallbacks
+ .mcal_const    0x004085f8       0x10 ./RTD/src/Clock_Ip_DividerTrigger.o
+                0x004085f8                Clock_Ip_axDividerTriggerCallbacks
+ .mcal_const    0x00408608       0x30 ./RTD/src/Clock_Ip_ExtOsc.o
+                0x00408608                Clock_Ip_axExtOscCallbacks
+ .mcal_const    0x00408638        0xc ./RTD/src/Clock_Ip_FracDiv.o
+                0x00408638                Clock_Ip_axFracDivCallbacks
+ .mcal_const    0x00408644       0x10 ./RTD/src/Clock_Ip_Gate.o
+                0x00408644                Clock_Ip_axGateCallbacks
+ .mcal_const    0x00408654       0x30 ./RTD/src/Clock_Ip_IntOsc.o
+                0x00408654                Clock_Ip_axIntOscCallbacks
+ .mcal_const    0x00408684       0x20 ./RTD/src/Clock_Ip_Monitor.o
+                0x00408684                Clock_Ip_axCmuCallbacks
+ .mcal_const    0x004086a4       0x28 ./RTD/src/Clock_Ip_Pll.o
+                0x004086a4                Clock_Ip_axPllCallbacks
+ .mcal_const    0x004086cc        0x8 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
+                0x004086cc                Clock_Ip_axPcfsCallbacks
+ .mcal_const    0x004086d4       0x28 ./RTD/src/Clock_Ip_Selector.o
+                0x004086d4                Clock_Ip_axSelectorCallbacks
+                0x004086fc                . = ALIGN (0x4)
+                0x004086fc                __init_table = .
  *(.init_table)
- .init_table    0x004086cc       0x4c ./Project_Settings/Startup_Code/startup_cm7.o
-                0x00408718                . = ALIGN (0x4)
-                0x00408718                __zero_table = .
+ .init_table    0x004086fc       0x4c ./Project_Settings/Startup_Code/startup_cm7.o
+                0x00408748                . = ALIGN (0x4)
+                0x00408748                __zero_table = .
  *(.zero_table)
- .zero_table    0x00408718       0x1c ./Project_Settings/Startup_Code/startup_cm7.o
+ .zero_table    0x00408748       0x1c ./Project_Settings/Startup_Code/startup_cm7.o
 
-.ARM.extab      0x00408734        0x0
- .ARM.extab     0x00408734        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+.ARM.extab      0x00408764        0x0
+ .ARM.extab     0x00408764        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
 
-.ARM.exidx      0x00408734        0x8
- .ARM.exidx     0x00408734        0x8 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+.ARM.exidx      0x00408764        0x8
+ .ARM.exidx     0x00408764        0x8 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
 
-.glue_7         0x0040873c        0x0
- .glue_7        0x0040873c        0x0 linker stubs
+.glue_7         0x0040876c        0x0
+ .glue_7        0x0040876c        0x0 linker stubs
 
-.glue_7t        0x0040873c        0x0
- .glue_7t       0x0040873c        0x0 linker stubs
+.glue_7t        0x0040876c        0x0
+ .glue_7t       0x0040876c        0x0 linker stubs
 
-.vfp11_veneer   0x0040873c        0x0
- .vfp11_veneer  0x0040873c        0x0 linker stubs
+.vfp11_veneer   0x0040876c        0x0
+ .vfp11_veneer  0x0040876c        0x0 linker stubs
 
-.v4_bx          0x0040873c        0x0
- .v4_bx         0x0040873c        0x0 linker stubs
+.v4_bx          0x0040876c        0x0
+ .v4_bx         0x0040876c        0x0 linker stubs
 
-.iplt           0x0040873c        0x0
- .iplt          0x0040873c        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
+.iplt           0x0040876c        0x0
+ .iplt          0x0040876c        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
 
-.rel.dyn        0x0040873c        0x0
- .rel.iplt      0x0040873c        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
-                0x0040873c                . = ALIGN (0x4)
-                0x0040873c                __text_end = .
-                0x0040873c                __sram_data_rom = __text_end
+.rel.dyn        0x0040876c        0x0
+ .rel.iplt      0x0040876c        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
+                0x0040876c                . = ALIGN (0x4)
+                0x0040876c                __text_end = .
+                0x0040876c                __sram_data_rom = __text_end
 
-.sram_bss       0x20400000      0x164
+.sram_bss       0x20400000      0x174
                 0x20400000                . = ALIGN (0x8)
                 0x20400000                __standby_ram_begin__ = .
  *(.standby_data)
@@ -4576,115 +4590,115 @@ END GROUP
  .bss           0x20400080        0x0 ./generate/src/Clock_Ip_Cfg.o
  .bss           0x20400080        0x0 ./generate/src/Igf_Port_Ip_Cfg.o
  .bss           0x20400080        0x0 ./generate/src/OsIf_Cfg.o
- .bss           0x20400080        0x0 ./src/app/Bms_App.o
- .bss           0x20400080        0xc ./src/battery/Battery_Monitor.o
- .bss           0x2040008c        0x0 ./src/drivers/Bms_Can.o
- .bss           0x2040008c        0xc ./src/drivers/Bms_Gpio.o
- .bss           0x20400098        0x0 ./src/drivers/Bms_Led.o
- .bss           0x20400098        0x0 ./src/main.o
- .bss           0x20400098        0x6 ./src/safety/Fault_Manager.o
- .bss           0x2040009e        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
- .bss           0x2040009e        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
- .bss           0x2040009e        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .bss           0x2040009e        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .bss           0x2040009e        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
- .bss           0x2040009e        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .bss           0x20400080        0x8 ./src/app/Bms_App.o
+ .bss           0x20400088        0xc ./src/battery/Battery_Monitor.o
+ .bss           0x20400094        0x0 ./src/drivers/Bms_Can.o
+ .bss           0x20400094        0xc ./src/drivers/Bms_Gpio.o
+ .bss           0x204000a0        0x0 ./src/drivers/Bms_Led.o
+ .bss           0x204000a0        0x0 ./src/main.o
+ .bss           0x204000a0        0x6 ./src/safety/Fault_Manager.o
+ .bss           0x204000a6        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+ .bss           0x204000a6        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+ .bss           0x204000a6        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .bss           0x204000a6        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .bss           0x204000a6        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .bss           0x204000a6        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
  *(.bss*)
-                0x204000a0                . = ALIGN (0x10)
- *fill*         0x2040009e        0x2 
+                0x204000b0                . = ALIGN (0x10)
+ *fill*         0x204000a6        0xa 
  *(.mcal_bss)
- .mcal_bss      0x204000a0        0x4 ./Project_Settings/Startup_Code/system.o
-                0x204000a0                RESET_CATCH_CORE
- .mcal_bss      0x204000a4       0x95 ./RTD/src/Clock_Ip.o
-                0x204000a8                Clock_Ip_FreqIds
-                0x20400134                Clock_Ip_pxConfig
- *fill*         0x20400139        0x3 
- .mcal_bss      0x2040013c        0xc ./RTD/src/Clock_Ip_Monitor.o
- .mcal_bss      0x20400148        0x8 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
- .mcal_bss      0x20400150        0xc ./RTD/src/Clock_Ip_Specific.o
- .mcal_bss      0x2040015c        0x8 ./RTD/src/Siul2_Port_Ip.o
-                0x20400164                . = ALIGN (0x4)
-                0x20400164                __sram_bss_end = .
+ .mcal_bss      0x204000b0        0x4 ./Project_Settings/Startup_Code/system.o
+                0x204000b0                RESET_CATCH_CORE
+ .mcal_bss      0x204000b4       0x95 ./RTD/src/Clock_Ip.o
+                0x204000b8                Clock_Ip_FreqIds
+                0x20400144                Clock_Ip_pxConfig
+ *fill*         0x20400149        0x3 
+ .mcal_bss      0x2040014c        0xc ./RTD/src/Clock_Ip_Monitor.o
+ .mcal_bss      0x20400158        0x8 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
+ .mcal_bss      0x20400160        0xc ./RTD/src/Clock_Ip_Specific.o
+ .mcal_bss      0x2040016c        0x8 ./RTD/src/Siul2_Port_Ip.o
+                0x20400174                . = ALIGN (0x4)
+                0x20400174                __sram_bss_end = .
 
-.sram_data      0x20400164       0xa0 load address 0x0040873c
-                0x20400164                . = ALIGN (0x4)
-                0x20400164                __sram_data_begin__ = .
-                0x20400164                . = ALIGN (0x4)
+.sram_data      0x20400174       0xa0 load address 0x0040876c
+                0x20400174                . = ALIGN (0x4)
+                0x20400174                __sram_data_begin__ = .
+                0x20400174                . = ALIGN (0x4)
  *(.ramcode)
- .ramcode       0x20400164       0x98 ./RTD/src/Clock_Ip_Specific.o
-                0x204001fc                . = ALIGN (0x4)
+ .ramcode       0x20400174       0x98 ./RTD/src/Clock_Ip_Specific.o
+                0x2040020c                . = ALIGN (0x4)
  *(.data)
- .data          0x204001fc        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
- .data          0x204001fc        0x0 ./Project_Settings/Startup_Code/exceptions.o
- .data          0x204001fc        0x0 ./Project_Settings/Startup_Code/nvic.o
- .data          0x204001fc        0x0 ./Project_Settings/Startup_Code/startup.o
- .data          0x204001fc        0x0 ./Project_Settings/Startup_Code/startup_cm7.o
- .data          0x204001fc        0x0 ./Project_Settings/Startup_Code/system.o
- .data          0x204001fc        0x4 ./RTD/src/Clock_Ip.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Data.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Divider.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_DividerTrigger.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_ExtOsc.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_FracDiv.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Frequency.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Gate.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_IntOsc.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Irq.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Monitor.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Pll.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Selector.o
- .data          0x20400200        0x0 ./RTD/src/Clock_Ip_Specific.o
- .data          0x20400200        0x0 ./RTD/src/Det.o
- .data          0x20400200        0x0 ./RTD/src/Det_stub.o
- .data          0x20400200        0x0 ./RTD/src/Igf_Port_Ip.o
- .data          0x20400200        0x0 ./RTD/src/OsIf_Interrupts.o
- .data          0x20400200        0x0 ./RTD/src/OsIf_Software_Semaphore.o
- .data          0x20400200        0x0 ./RTD/src/OsIf_Timer.o
- .data          0x20400200        0x0 ./RTD/src/OsIf_Timer_System.o
- .data          0x20400200        0x0 ./RTD/src/OsIf_Timer_System_Internal_Systick.o
- .data          0x20400200        0x0 ./RTD/src/SchM_BaseNXP.o
- .data          0x20400200        0x0 ./RTD/src/SchM_Dio.o
- .data          0x20400200        0x0 ./RTD/src/SchM_Mcu.o
- .data          0x20400200        0x0 ./RTD/src/SchM_Port.o
- .data          0x20400200        0x0 ./RTD/src/Siul2_Dio_Ip.o
- .data          0x20400200        0x0 ./RTD/src/Siul2_Port_Ip.o
- .data          0x20400200        0x0 ./RTD/src/Tspc_Port_Ip.o
- .data          0x20400200        0x0 ./board/Siul2_Port_Ip_Cfg.o
- .data          0x20400200        0x0 ./board/Tspc_Port_Ip_Cfg.o
- .data          0x20400200        0x0 ./generate/src/Clock_Ip_Cfg.o
- .data          0x20400200        0x0 ./generate/src/Igf_Port_Ip_Cfg.o
- .data          0x20400200        0x0 ./generate/src/OsIf_Cfg.o
- .data          0x20400200        0x0 ./src/app/Bms_App.o
- .data          0x20400200        0x0 ./src/battery/Battery_Monitor.o
- .data          0x20400200        0x0 ./src/drivers/Bms_Can.o
- .data          0x20400200        0x0 ./src/drivers/Bms_Gpio.o
- .data          0x20400200        0x0 ./src/drivers/Bms_Led.o
- .data          0x20400200        0x0 ./src/main.o
- .data          0x20400200        0x0 ./src/safety/Fault_Manager.o
- .data          0x20400200        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
- .data          0x20400200        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
- .data          0x20400200        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .data          0x20400200        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .data          0x20400200        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
- .data          0x20400200        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .data          0x2040020c        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
+ .data          0x2040020c        0x0 ./Project_Settings/Startup_Code/exceptions.o
+ .data          0x2040020c        0x0 ./Project_Settings/Startup_Code/nvic.o
+ .data          0x2040020c        0x0 ./Project_Settings/Startup_Code/startup.o
+ .data          0x2040020c        0x0 ./Project_Settings/Startup_Code/startup_cm7.o
+ .data          0x2040020c        0x0 ./Project_Settings/Startup_Code/system.o
+ .data          0x2040020c        0x4 ./RTD/src/Clock_Ip.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Data.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Divider.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_DividerTrigger.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_ExtOsc.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_FracDiv.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Frequency.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Gate.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_IntOsc.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Irq.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Monitor.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Pll.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Selector.o
+ .data          0x20400210        0x0 ./RTD/src/Clock_Ip_Specific.o
+ .data          0x20400210        0x0 ./RTD/src/Det.o
+ .data          0x20400210        0x0 ./RTD/src/Det_stub.o
+ .data          0x20400210        0x0 ./RTD/src/Igf_Port_Ip.o
+ .data          0x20400210        0x0 ./RTD/src/OsIf_Interrupts.o
+ .data          0x20400210        0x0 ./RTD/src/OsIf_Software_Semaphore.o
+ .data          0x20400210        0x0 ./RTD/src/OsIf_Timer.o
+ .data          0x20400210        0x0 ./RTD/src/OsIf_Timer_System.o
+ .data          0x20400210        0x0 ./RTD/src/OsIf_Timer_System_Internal_Systick.o
+ .data          0x20400210        0x0 ./RTD/src/SchM_BaseNXP.o
+ .data          0x20400210        0x0 ./RTD/src/SchM_Dio.o
+ .data          0x20400210        0x0 ./RTD/src/SchM_Mcu.o
+ .data          0x20400210        0x0 ./RTD/src/SchM_Port.o
+ .data          0x20400210        0x0 ./RTD/src/Siul2_Dio_Ip.o
+ .data          0x20400210        0x0 ./RTD/src/Siul2_Port_Ip.o
+ .data          0x20400210        0x0 ./RTD/src/Tspc_Port_Ip.o
+ .data          0x20400210        0x0 ./board/Siul2_Port_Ip_Cfg.o
+ .data          0x20400210        0x0 ./board/Tspc_Port_Ip_Cfg.o
+ .data          0x20400210        0x0 ./generate/src/Clock_Ip_Cfg.o
+ .data          0x20400210        0x0 ./generate/src/Igf_Port_Ip_Cfg.o
+ .data          0x20400210        0x0 ./generate/src/OsIf_Cfg.o
+ .data          0x20400210        0x0 ./src/app/Bms_App.o
+ .data          0x20400210        0x0 ./src/battery/Battery_Monitor.o
+ .data          0x20400210        0x0 ./src/drivers/Bms_Can.o
+ .data          0x20400210        0x0 ./src/drivers/Bms_Gpio.o
+ .data          0x20400210        0x0 ./src/drivers/Bms_Led.o
+ .data          0x20400210        0x0 ./src/main.o
+ .data          0x20400210        0x0 ./src/safety/Fault_Manager.o
+ .data          0x20400210        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+ .data          0x20400210        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+ .data          0x20400210        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .data          0x20400210        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .data          0x20400210        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .data          0x20400210        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
  *(.data*)
-                0x20400200                . = ALIGN (0x4)
+                0x20400210                . = ALIGN (0x4)
  *(.mcal_data)
- .mcal_data     0x20400200        0x4 ./RTD/src/Siul2_Dio_Ip.o
-                0x20400200                Siul2_Dio_Ip_au32BaseAdresses
-                0x20400204                . = ALIGN (0x4)
-                0x20400204                __sram_data_end__ = .
-                0x004087dc                __sram_data_rom_end = (__sram_data_rom + (__sram_data_end__ - __sram_data_begin__))
+ .mcal_data     0x20400210        0x4 ./RTD/src/Siul2_Dio_Ip.o
+                0x20400210                Siul2_Dio_Ip_au32BaseAdresses
+                0x20400214                . = ALIGN (0x4)
+                0x20400214                __sram_data_end__ = .
+                0x0040880c                __sram_data_rom_end = (__sram_data_rom + (__sram_data_end__ - __sram_data_begin__))
 
-.heap           0x20400204     0x2000 load address 0x004087dc
+.heap           0x20400214     0x2000 load address 0x0040880c
                 0x00000000                . = (. + ALIGN (0x4))
-                0x20400204                _end = .
-                0x20400204                end = .
-                0x20400204                _heap_start = .
+                0x20400214                _end = .
+                0x20400214                end = .
+                0x20400214                _heap_start = .
                 0x00002000                . = (. + HEAP_SIZE)
- *fill*         0x20400204     0x2000 
-                0x20402204                _heap_end = .
+ *fill*         0x20400214     0x2000 
+                0x20402214                _heap_end = .
 
 .acfls_code_ram
                 0x2042ff00        0x0
@@ -4694,10 +4708,10 @@ END GROUP
                 0x2042ff00                __acmem_43_infls_code_ram_start = .
  *(.acmem_43_infls_code_ram)
                 0x2042ff00                __acmem_43_infls_code_ram_end = .
-                0x004087dc                __non_cacheable_data_rom = __sram_data_rom_end
+                0x0040880c                __non_cacheable_data_rom = __sram_data_rom_end
 
 .non_cacheable_data
-                0x20430000        0x4 load address 0x004087dc
+                0x20430000        0x4 load address 0x0040880c
                 0x20430000                . = ALIGN (0x4)
                 0x20430000                __non_cacheable_data_start__ = .
  *(.mcal_data_no_cacheable)
@@ -4707,13 +4721,13 @@ END GROUP
                 0x20430000                HSE_LOOP_ADDR = .
                 0x20430000        0x4 LONG 0x0
                 0x20430004                __non_cacheable_data_end__ = .
-                0x004087e0                __non_cacheable_data_rom_end = (__non_cacheable_data_rom + (__non_cacheable_data_end__ - __non_cacheable_data_start__))
+                0x00408810                __non_cacheable_data_rom_end = (__non_cacheable_data_rom + (__non_cacheable_data_end__ - __non_cacheable_data_start__))
 
-.igot.plt       0x20430004        0x0 load address 0x004087e0
+.igot.plt       0x20430004        0x0 load address 0x00408810
  .igot.plt      0x20430004        0x0 ./Project_Settings/Startup_Code/Vector_Table.o
 
 .non_cacheable_bss
-                0x20430004      0xc0c load address 0x004087e0
+                0x20430004      0xc0c load address 0x00408810
                 0x20430010                . = ALIGN (0x10)
  *fill*         0x20430004        0xc 
                 0x20430010                __non_cacheable_bss_start = .
@@ -4767,16 +4781,16 @@ END GROUP
  *(.int_results)
                 0x20440000                . = (. + 0x100)
  *fill*         0x2043ff00      0x100 
-                0x004087e0                __shareable_data_rom = __non_cacheable_data_rom_end
+                0x00408810                __shareable_data_rom = __non_cacheable_data_rom_end
 
 .shareable_data
-                0x20440000        0x0 load address 0x004087e0
+                0x20440000        0x0 load address 0x00408810
                 0x20440000                . = ALIGN (0x4)
                 0x20440000                __shareable_data_start__ = .
  *(.mcal_shared_data)
                 0x20440000                . = ALIGN (0x4)
                 0x20440000                __shareable_data_end__ = .
-                0x004087e0                __shareable_data_rom_end = (__shareable_data_rom + (__shareable_data_end__ - __shareable_data_start__))
+                0x00408810                __shareable_data_rom_end = (__shareable_data_rom + (__shareable_data_end__ - __shareable_data_start__))
 
 .int_vector     0x20000000      0x408
                 0x20000000                . = ALIGN (0x800)
@@ -4785,15 +4799,15 @@ END GROUP
  *fill*         0x20000000      0x408 
                 0x20000408                . = ALIGN (0x4)
                 0x20000408                __interrupts_ram_end = .
-                0x004087e0                __tcm_data_rom = __shareable_data_rom_end
+                0x00408810                __tcm_data_rom = __shareable_data_rom_end
 
-.data_tcm_data  0x20000408        0x0 load address 0x004087e0
+.data_tcm_data  0x20000408        0x0 load address 0x00408810
                 0x20000408                . = ALIGN (0x4)
                 0x20000408                __dtcm_data_start__ = .
  *(.dtcm_data*)
                 0x20000408                . = ALIGN (0x4)
                 0x20000408                __dtcm_data_end__ = .
-                0x004087e0                __tcm_data_rom_end = (__tcm_data_rom + (__dtcm_data_end__ - __dtcm_data_start__))
+                0x00408810                __tcm_data_rom_end = (__tcm_data_rom + (__dtcm_data_end__ - __dtcm_data_start__))
 
 .bss_tcm_data   0x20000408        0x0
                 0x20000408                . = ALIGN (0x4)
@@ -4801,15 +4815,15 @@ END GROUP
  *(.dtcm_bss*)
                 0x20000408                . = ALIGN (0x4)
                 0x20000408                __dtcm_bss_end__ = .
-                0x004087e0                __tcm_code_rom_start = __tcm_data_rom_end
+                0x00408810                __tcm_code_rom_start = __tcm_data_rom_end
 
-.itcm_text      0x00000000        0x0 load address 0x004087e0
+.itcm_text      0x00000000        0x0 load address 0x00408810
                 0x00000000                . = ALIGN (0x4)
                 0x00000000                __itcm_start__ = .
  *(.itcm_text*)
                 0x00000000                . = ALIGN (0x4)
                 0x00000000                __itcm_end__ = .
-                0x004087e0                __tcm_code_rom_end = (__tcm_code_rom_start + (__itcm_end__ - __itcm_start__))
+                0x00408810                __tcm_code_rom_end = (__tcm_code_rom_start + (__itcm_end__ - __itcm_start__))
 
 .shareable_bss  0x20440000        0x0
                 0x20440000                . = ALIGN (0x10)
@@ -4827,21 +4841,21 @@ END GROUP
                 0x20020000                __INT_DTCM_END = ((ORIGIN (int_dtcm) + LENGTH (int_dtcm)) + LENGTH (int_stack_dtcm))
                 0x20440000                __RAM_SHAREABLE_START = __shareable_data_start__
                 0x0000000e                __RAM_SHAREABLE_SIZE = 0xe
-                0x004087e0                __ROM_SHAREABLE_START = __shareable_data_rom
-                0x004087e0                __ROM_SHAREABLE_END = __shareable_data_rom_end
+                0x00408810                __ROM_SHAREABLE_START = __shareable_data_rom
+                0x00408810                __ROM_SHAREABLE_END = __shareable_data_rom_end
                 0x20430000                __RAM_NO_CACHEABLE_START = __non_cacheable_data_start__
                 0x00000010                __RAM_NO_CACHEABLE_SIZE = 0x10
-                0x004087dc                __ROM_NO_CACHEABLE_START = __non_cacheable_data_rom
-                0x004087e0                __ROM_NO_CACHEABLE_END = __non_cacheable_data_rom_end
-                0x20400164                __RAM_CACHEABLE_START = __sram_data_begin__
+                0x0040880c                __ROM_NO_CACHEABLE_START = __non_cacheable_data_rom
+                0x00408810                __ROM_NO_CACHEABLE_END = __non_cacheable_data_rom_end
+                0x20400174                __RAM_CACHEABLE_START = __sram_data_begin__
                 0x00000012                __RAM_CACHEABLE_SIZE = 0x12
-                0x0040873c                __ROM_CACHEABLE_START = __sram_data_rom
-                0x004087dc                __ROM_CACHEABLE_END = __sram_data_rom_end
+                0x0040876c                __ROM_CACHEABLE_START = __sram_data_rom
+                0x0040880c                __ROM_CACHEABLE_END = __sram_data_rom_end
                 0x00400000                __ROM_CODE_START = ORIGIN (int_pflash)
                 0x10000000                __ROM_DATA_START = ORIGIN (int_dflash)
                 0x20400000                __BSS_SRAM_START = __sram_bss_start
-                0x20400164                __BSS_SRAM_END = __sram_bss_end
-                0x00000164                __BSS_SRAM_SIZE = (__sram_bss_end - __sram_bss_start)
+                0x20400174                __BSS_SRAM_END = __sram_bss_end
+                0x00000174                __BSS_SRAM_SIZE = (__sram_bss_end - __sram_bss_start)
                 0x20430010                __BSS_SRAM_NC_START = __non_cacheable_bss_start
                 0x00000c00                __BSS_SRAM_NC_SIZE = (__non_cacheable_bss_end - __non_cacheable_bss_start)
                 0x20430c10                __BSS_SRAM_NC_END = __non_cacheable_bss_end
@@ -4852,29 +4866,29 @@ END GROUP
                 0x00402000                __INIT_INTERRUPT_START = __interrupts_init_start
                 0x00402408                __INIT_INTERRUPT_END = __interrupts_init_end
                 0x00000000                __RAM_ITCM_START = __itcm_start__
-                0x004087e0                __ROM_ITCM_START = __tcm_code_rom_start
-                0x004087e0                __ROM_ITCM_END = __tcm_code_rom_end
+                0x00408810                __ROM_ITCM_START = __tcm_code_rom_start
+                0x00408810                __ROM_ITCM_END = __tcm_code_rom_end
                 0x20000408                __RAM_DTCM_DATA_START = __dtcm_data_start__
-                0x004087e0                __ROM_DTCM_DATA_START = __tcm_data_rom
-                0x004087e0                __ROM_DTCM_END = __tcm_data_rom_end
-                0x004086cc                __INIT_TABLE = __init_table
-                0x00408718                __ZERO_TABLE = __zero_table
+                0x00408810                __ROM_DTCM_DATA_START = __tcm_data_rom
+                0x00408810                __ROM_DTCM_END = __tcm_data_rom_end
+                0x004086fc                __INIT_TABLE = __init_table
+                0x00408748                __ZERO_TABLE = __zero_table
                 0x00000001                __RAM_INIT = 0x1
                 0x00000001                __ITCM_INIT = 0x1
                 0x00000001                __DTCM_INIT = 0x1
-                0x00406a58                Fls_ACEraseRomStart = __acfls_code_rom_start
-                0x00406ac0                Fls_ACEraseRomEnd = __acfls_code_rom_end
+                0x00406a88                Fls_ACEraseRomStart = __acfls_code_rom_start
+                0x00406af0                Fls_ACEraseRomEnd = __acfls_code_rom_end
                 0x0000001a                Fls_ACEraseSize = ((__acfls_code_rom_end - __acfls_code_rom_start) / 0x4)
-                0x00406a58                Fls_ACWriteRomStart = __acfls_code_rom_start
-                0x00406ac0                Fls_ACWriteRomEnd = __acfls_code_rom_end
+                0x00406a88                Fls_ACWriteRomStart = __acfls_code_rom_start
+                0x00406af0                Fls_ACWriteRomEnd = __acfls_code_rom_end
                 0x0000001a                Fls_ACWriteSize = ((__acfls_code_rom_end - __acfls_code_rom_start) / 0x4)
                 0x2042ff00                _ERASE_FUNC_ADDRESS_ = __acfls_code_ram_start
                 0x2042ff00                _WRITE_FUNC_ADDRESS_ = __acfls_code_ram_start
-                0x00406ac0                Mem_43_INFLS_ACEraseRomStart = __acmem_43_infls_code_rom_start
-                0x00406ac0                Mem_43_INFLS_ACEraseRomEnd = __acmem_43_infls_code_rom_end
+                0x00406af0                Mem_43_INFLS_ACEraseRomStart = __acmem_43_infls_code_rom_start
+                0x00406af0                Mem_43_INFLS_ACEraseRomEnd = __acmem_43_infls_code_rom_end
                 0x00000000                Mem_43_INFLS_ACEraseSize = (((__acmem_43_infls_code_rom_end - __acmem_43_infls_code_rom_start) + 0x3) / 0x4)
-                0x00406ac0                Mem_43_INFLS_ACWriteRomStart = __acmem_43_infls_code_rom_start
-                0x00406ac0                Mem_43_INFLS_ACWriteRomEnd = __acmem_43_infls_code_rom_end
+                0x00406af0                Mem_43_INFLS_ACWriteRomStart = __acmem_43_infls_code_rom_start
+                0x00406af0                Mem_43_INFLS_ACWriteRomEnd = __acmem_43_infls_code_rom_end
                 0x00000000                Mem_43_INFLS_ACWriteSize = (((__acmem_43_infls_code_rom_end - __acmem_43_infls_code_rom_start) + 0x3) / 0x4)
                 0x2042ff00                _MEM_43_INFLS_ERASE_FUNC_ADDRESS_ = __acmem_43_infls_code_ram_start
                 0x2042ff00                _MEM_43_INFLS_WRITE_FUNC_ADDRESS_ = __acmem_43_infls_code_ram_start
@@ -4973,31 +4987,31 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000824       0x39 ./generate/src/OsIf_Cfg.o
  .ARM.attributes
-                0x0000085d       0x39 ./src/app/Bms_App.o
+                0x0000085d       0x34 ./src/app/Bms_App.o
  .ARM.attributes
-                0x00000896       0x34 ./src/battery/Battery_Monitor.o
+                0x00000891       0x34 ./src/battery/Battery_Monitor.o
  .ARM.attributes
-                0x000008ca       0x34 ./src/drivers/Bms_Can.o
+                0x000008c5       0x34 ./src/drivers/Bms_Can.o
  .ARM.attributes
-                0x000008fe       0x34 ./src/drivers/Bms_Gpio.o
+                0x000008f9       0x34 ./src/drivers/Bms_Gpio.o
  .ARM.attributes
-                0x00000932       0x34 ./src/drivers/Bms_Led.o
+                0x0000092d       0x34 ./src/drivers/Bms_Led.o
  .ARM.attributes
-                0x00000966       0x34 ./src/main.o
+                0x00000961       0x34 ./src/main.o
  .ARM.attributes
-                0x0000099a       0x34 ./src/safety/Fault_Manager.o
+                0x00000995       0x34 ./src/safety/Fault_Manager.o
  .ARM.attributes
-                0x000009ce       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+                0x000009c9       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
  .ARM.attributes
-                0x00000a02       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+                0x000009fd       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
  .ARM.attributes
-                0x00000a36       0x1e c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+                0x00000a31       0x1e c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
  .ARM.attributes
-                0x00000a54       0x1e c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+                0x00000a4f       0x1e c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
  .ARM.attributes
-                0x00000a72       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+                0x00000a6d       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
  .ARM.attributes
-                0x00000aa6       0x1e c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+                0x00000aa1       0x1e c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
 .comment        0x00000000       0x88
  .comment       0x00000000       0x88 ./Project_Settings/Startup_Code/exceptions.o
@@ -5050,7 +5064,7 @@ LOAD linker stubs
  .comment       0x00000088       0x89 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
  .comment       0x00000088       0x89 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
 
-.debug_info     0x00000000    0x1fea9
+.debug_info     0x00000000    0x1ff1f
  .debug_info    0x00000000      0x139 ./Project_Settings/Startup_Code/exceptions.o
  .debug_info    0x00000139      0x76c ./Project_Settings/Startup_Code/nvic.o
  .debug_info    0x000008a5      0x371 ./Project_Settings/Startup_Code/startup.o
@@ -5091,19 +5105,19 @@ LOAD linker stubs
  .debug_info    0x000199b5     0x1059 ./generate/src/Clock_Ip_Cfg.o
  .debug_info    0x0001aa0e       0x7d ./generate/src/Igf_Port_Ip_Cfg.o
  .debug_info    0x0001aa8b       0x7d ./generate/src/OsIf_Cfg.o
- .debug_info    0x0001ab08       0x21 ./src/app/Bms_App.o
- .debug_info    0x0001ab29      0x308 ./src/battery/Battery_Monitor.o
- .debug_info    0x0001ae31      0x1ce ./src/drivers/Bms_Can.o
- .debug_info    0x0001afff      0x1e8 ./src/drivers/Bms_Gpio.o
- .debug_info    0x0001b1e7     0x2045 ./src/drivers/Bms_Led.o
- .debug_info    0x0001d22c     0x24b0 ./src/main.o
- .debug_info    0x0001f6dc      0x23a ./src/safety/Fault_Manager.o
- .debug_info    0x0001f916       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .debug_info    0x0001f93c       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_info    0x0001f962      0x521 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
- .debug_info    0x0001fe83       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_info    0x0001ab08      0x173 ./src/app/Bms_App.o
+ .debug_info    0x0001ac7b      0x308 ./src/battery/Battery_Monitor.o
+ .debug_info    0x0001af83      0x1ce ./src/drivers/Bms_Can.o
+ .debug_info    0x0001b151      0x1e8 ./src/drivers/Bms_Gpio.o
+ .debug_info    0x0001b339     0x2045 ./src/drivers/Bms_Led.o
+ .debug_info    0x0001d37e     0x23d4 ./src/main.o
+ .debug_info    0x0001f752      0x23a ./src/safety/Fault_Manager.o
+ .debug_info    0x0001f98c       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_info    0x0001f9b2       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_info    0x0001f9d8      0x521 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_info    0x0001fef9       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
-.debug_abbrev   0x00000000     0x46b5
+.debug_abbrev   0x00000000     0x474e
  .debug_abbrev  0x00000000       0x47 ./Project_Settings/Startup_Code/exceptions.o
  .debug_abbrev  0x00000047      0x111 ./Project_Settings/Startup_Code/nvic.o
  .debug_abbrev  0x00000158      0x128 ./Project_Settings/Startup_Code/startup.o
@@ -5144,17 +5158,17 @@ LOAD linker stubs
  .debug_abbrev  0x00003b75      0x10c ./generate/src/Clock_Ip_Cfg.o
  .debug_abbrev  0x00003c81       0x29 ./generate/src/Igf_Port_Ip_Cfg.o
  .debug_abbrev  0x00003caa       0x29 ./generate/src/OsIf_Cfg.o
- .debug_abbrev  0x00003cd3       0x13 ./src/app/Bms_App.o
- .debug_abbrev  0x00003ce6      0x1a8 ./src/battery/Battery_Monitor.o
- .debug_abbrev  0x00003e8e      0x129 ./src/drivers/Bms_Can.o
- .debug_abbrev  0x00003fb7      0x117 ./src/drivers/Bms_Gpio.o
- .debug_abbrev  0x000040ce      0x187 ./src/drivers/Bms_Led.o
- .debug_abbrev  0x00004255      0x1eb ./src/main.o
- .debug_abbrev  0x00004440      0x117 ./src/safety/Fault_Manager.o
- .debug_abbrev  0x00004557       0x14 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .debug_abbrev  0x0000456b       0x14 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_abbrev  0x0000457f      0x122 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
- .debug_abbrev  0x000046a1       0x14 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_abbrev  0x00003cd3       0xb1 ./src/app/Bms_App.o
+ .debug_abbrev  0x00003d84      0x1a8 ./src/battery/Battery_Monitor.o
+ .debug_abbrev  0x00003f2c      0x129 ./src/drivers/Bms_Can.o
+ .debug_abbrev  0x00004055      0x117 ./src/drivers/Bms_Gpio.o
+ .debug_abbrev  0x0000416c      0x187 ./src/drivers/Bms_Led.o
+ .debug_abbrev  0x000042f3      0x1e6 ./src/main.o
+ .debug_abbrev  0x000044d9      0x117 ./src/safety/Fault_Manager.o
+ .debug_abbrev  0x000045f0       0x14 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_abbrev  0x00004604       0x14 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_abbrev  0x00004618      0x122 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_abbrev  0x0000473a       0x14 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
 .debug_aranges  0x00000000      0xbe0
  .debug_aranges
@@ -5238,21 +5252,21 @@ LOAD linker stubs
  .debug_aranges
                 0x00000ae8       0x18 ./generate/src/OsIf_Cfg.o
  .debug_aranges
-                0x00000b00       0x18 ./src/app/Bms_App.o
+                0x00000b00       0x20 ./src/app/Bms_App.o
  .debug_aranges
-                0x00000b18       0x20 ./src/battery/Battery_Monitor.o
+                0x00000b20       0x20 ./src/battery/Battery_Monitor.o
  .debug_aranges
-                0x00000b38       0x20 ./src/drivers/Bms_Can.o
+                0x00000b40       0x20 ./src/drivers/Bms_Can.o
  .debug_aranges
-                0x00000b58       0x20 ./src/drivers/Bms_Gpio.o
+                0x00000b60       0x20 ./src/drivers/Bms_Gpio.o
  .debug_aranges
-                0x00000b78       0x20 ./src/drivers/Bms_Led.o
+                0x00000b80       0x20 ./src/drivers/Bms_Led.o
  .debug_aranges
-                0x00000b98       0x28 ./src/main.o
+                0x00000ba0       0x20 ./src/main.o
  .debug_aranges
                 0x00000bc0       0x20 ./src/safety/Fault_Manager.o
 
-.debug_ranges   0x00000000      0xc50
+.debug_ranges   0x00000000      0xc48
  .debug_ranges  0x00000000       0x58 ./Project_Settings/Startup_Code/exceptions.o
  .debug_ranges  0x00000058       0x28 ./Project_Settings/Startup_Code/nvic.o
  .debug_ranges  0x00000080       0x18 ./Project_Settings/Startup_Code/startup.o
@@ -5284,10 +5298,10 @@ LOAD linker stubs
  .debug_ranges  0x00000a20       0x80 ./RTD/src/Siul2_Port_Ip.o
  .debug_ranges  0x00000aa0       0x70 ./RTD/src/Tspc_Port_Ip.o
  .debug_ranges  0x00000b10       0x38 ./src/battery/Battery_Monitor.o
- .debug_ranges  0x00000b48       0x18 ./src/main.o
- .debug_ranges  0x00000b60       0xf0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_ranges  0x00000b48       0x10 ./src/main.o
+ .debug_ranges  0x00000b58       0xf0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
 
-.debug_macro    0x00000000    0x29271
+.debug_macro    0x00000000    0x292d7
  .debug_macro   0x00000000      0x199 ./Project_Settings/Startup_Code/exceptions.o
  .debug_macro   0x00000199      0xa90 ./Project_Settings/Startup_Code/exceptions.o
  .debug_macro   0x00000c29       0x22 ./Project_Settings/Startup_Code/exceptions.o
@@ -5480,15 +5494,15 @@ LOAD linker stubs
  .debug_macro   0x0002822e      0x46e ./generate/src/Clock_Ip_Cfg.o
  .debug_macro   0x0002869c      0x230 ./generate/src/Igf_Port_Ip_Cfg.o
  .debug_macro   0x000288cc      0x1c1 ./generate/src/OsIf_Cfg.o
- .debug_macro   0x00028a8d       0x11 ./src/app/Bms_App.o
- .debug_macro   0x00028a9e       0xe6 ./src/battery/Battery_Monitor.o
- .debug_macro   0x00028b84       0xc4 ./src/drivers/Bms_Can.o
- .debug_macro   0x00028c48      0x217 ./src/drivers/Bms_Gpio.o
- .debug_macro   0x00028e5f      0x13d ./src/drivers/Bms_Led.o
- .debug_macro   0x00028f9c      0x217 ./src/main.o
- .debug_macro   0x000291b3       0xbe ./src/safety/Fault_Manager.o
+ .debug_macro   0x00028a8d       0x77 ./src/app/Bms_App.o
+ .debug_macro   0x00028b04       0xe6 ./src/battery/Battery_Monitor.o
+ .debug_macro   0x00028bea       0xc4 ./src/drivers/Bms_Can.o
+ .debug_macro   0x00028cae      0x217 ./src/drivers/Bms_Gpio.o
+ .debug_macro   0x00028ec5      0x13d ./src/drivers/Bms_Led.o
+ .debug_macro   0x00029002      0x217 ./src/main.o
+ .debug_macro   0x00029219       0xbe ./src/safety/Fault_Manager.o
 
-.debug_line     0x00000000    0x162c2
+.debug_line     0x00000000    0x16516
  .debug_line    0x00000000      0x634 ./Project_Settings/Startup_Code/exceptions.o
  .debug_line    0x00000634      0x4d0 ./Project_Settings/Startup_Code/nvic.o
  .debug_line    0x00000b04      0x59f ./Project_Settings/Startup_Code/startup.o
@@ -5529,19 +5543,19 @@ LOAD linker stubs
  .debug_line    0x00012d3c      0x6af ./generate/src/Clock_Ip_Cfg.o
  .debug_line    0x000133eb      0x5eb ./generate/src/Igf_Port_Ip_Cfg.o
  .debug_line    0x000139d6      0x516 ./generate/src/OsIf_Cfg.o
- .debug_line    0x00013eec       0x35 ./src/app/Bms_App.o
- .debug_line    0x00013f21      0x448 ./src/battery/Battery_Monitor.o
- .debug_line    0x00014369      0x32b ./src/drivers/Bms_Can.o
- .debug_line    0x00014694      0x630 ./src/drivers/Bms_Gpio.o
- .debug_line    0x00014cc4      0x46c ./src/drivers/Bms_Led.o
- .debug_line    0x00015130      0x69f ./src/main.o
- .debug_line    0x000157cf      0x401 ./src/safety/Fault_Manager.o
- .debug_line    0x00015bd0       0x86 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .debug_line    0x00015c56       0x68 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_line    0x00015cbe      0x59c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
- .debug_line    0x0001625a       0x68 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_line    0x00013eec      0x303 ./src/app/Bms_App.o
+ .debug_line    0x000141ef      0x448 ./src/battery/Battery_Monitor.o
+ .debug_line    0x00014637      0x32b ./src/drivers/Bms_Can.o
+ .debug_line    0x00014962      0x630 ./src/drivers/Bms_Gpio.o
+ .debug_line    0x00014f92      0x46c ./src/drivers/Bms_Led.o
+ .debug_line    0x000153fe      0x625 ./src/main.o
+ .debug_line    0x00015a23      0x401 ./src/safety/Fault_Manager.o
+ .debug_line    0x00015e24       0x86 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_line    0x00015eaa       0x68 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_line    0x00015f12      0x59c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_line    0x000164ae       0x68 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
-.debug_str      0x00000000    0xb5600
+.debug_str      0x00000000    0xb568e
  .debug_str     0x00000000    0x14d8e ./Project_Settings/Startup_Code/exceptions.o
                               0x14faf (size before relaxing)
  .debug_str     0x00014d8e     0xb89a ./Project_Settings/Startup_Code/nvic.o
@@ -5622,29 +5636,29 @@ LOAD linker stubs
                               0x64d6d (size before relaxing)
  .debug_str     0x000b4bd4      0x102 ./generate/src/OsIf_Cfg.o
                               0x15372 (size before relaxing)
- .debug_str     0x000b4cd6       0x15 ./src/app/Bms_App.o
-                               0x2df1 (size before relaxing)
- .debug_str     0x000b4ceb      0x32a ./src/battery/Battery_Monitor.o
+ .debug_str     0x000b4cd6      0x10b ./src/app/Bms_App.o
+                               0x3d86 (size before relaxing)
+ .debug_str     0x000b4de1      0x32a ./src/battery/Battery_Monitor.o
                                0x618a (size before relaxing)
- .debug_str     0x000b5015       0x97 ./src/drivers/Bms_Can.o
+ .debug_str     0x000b510b       0x97 ./src/drivers/Bms_Can.o
                                0x5f16 (size before relaxing)
- .debug_str     0x000b50ac      0x123 ./src/drivers/Bms_Gpio.o
+ .debug_str     0x000b51a2      0x123 ./src/drivers/Bms_Gpio.o
                               0x64f40 (size before relaxing)
- .debug_str     0x000b51cf       0xce ./src/drivers/Bms_Led.o
+ .debug_str     0x000b52c5       0x66 ./src/drivers/Bms_Led.o
                               0x4016e (size before relaxing)
- .debug_str     0x000b529d       0x1f ./src/main.o
-                              0x66757 (size before relaxing)
- .debug_str     0x000b52bc       0xb9 ./src/safety/Fault_Manager.o
+ .debug_str     0x000b532b       0x1f ./src/main.o
+                              0x66717 (size before relaxing)
+ .debug_str     0x000b534a       0xb9 ./src/safety/Fault_Manager.o
                                0x6014 (size before relaxing)
- .debug_str     0x000b5375       0x96 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_str     0x000b5403       0x96 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
                                  0xa2 (size before relaxing)
- .debug_str     0x000b540b       0xa2 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_str     0x000b540b      0x1bd c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_str     0x000b5499       0xa2 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_str     0x000b5499      0x1bd c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
                                 0x2c3 (size before relaxing)
- .debug_str     0x000b55c8       0x38 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_str     0x000b5656       0x38 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
                                  0xa6 (size before relaxing)
 
-.debug_frame    0x00000000     0x1a38
+.debug_frame    0x00000000     0x1a70
  .debug_frame   0x00000000       0xb0 ./Project_Settings/Startup_Code/exceptions.o
  .debug_frame   0x000000b0       0x50 ./Project_Settings/Startup_Code/nvic.o
  .debug_frame   0x00000100       0x54 ./Project_Settings/Startup_Code/startup.o
@@ -5674,15 +5688,16 @@ LOAD linker stubs
  .debug_frame   0x00001498      0x15c ./RTD/src/Siul2_Dio_Ip.o
  .debug_frame   0x000015f4      0x144 ./RTD/src/Siul2_Port_Ip.o
  .debug_frame   0x00001738       0x84 ./RTD/src/Tspc_Port_Ip.o
- .debug_frame   0x000017bc       0x54 ./src/battery/Battery_Monitor.o
- .debug_frame   0x00001810       0x40 ./src/drivers/Bms_Can.o
- .debug_frame   0x00001850       0x40 ./src/drivers/Bms_Gpio.o
- .debug_frame   0x00001890       0x6c ./src/drivers/Bms_Led.o
- .debug_frame   0x000018fc       0x38 ./src/main.o
- .debug_frame   0x00001934       0x60 ./src/safety/Fault_Manager.o
- .debug_frame   0x00001994       0x44 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .debug_frame   0x000019d8       0x2c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_frame   0x00001a04       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_frame   0x000017bc       0x48 ./src/app/Bms_App.o
+ .debug_frame   0x00001804       0x54 ./src/battery/Battery_Monitor.o
+ .debug_frame   0x00001858       0x40 ./src/drivers/Bms_Can.o
+ .debug_frame   0x00001898       0x40 ./src/drivers/Bms_Gpio.o
+ .debug_frame   0x000018d8       0x6c ./src/drivers/Bms_Led.o
+ .debug_frame   0x00001944       0x28 ./src/main.o
+ .debug_frame   0x0000196c       0x60 ./src/safety/Fault_Manager.o
+ .debug_frame   0x000019cc       0x44 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_frame   0x00001a10       0x2c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_frame   0x00001a3c       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
 
 .debug_loc      0x00000000     0x6faf
  .debug_loc     0x00000000       0xb9 ./Project_Settings/Startup_Code/nvic.o

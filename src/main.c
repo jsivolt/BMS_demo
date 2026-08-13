@@ -30,7 +30,7 @@
 
 #include "Siul2_Port_Ip.h"
 #include "Siul2_Port_Ip_Cfg.h"
-#include "Bms_Led.h"
+#include "Bms_App.h"
 
 static void delay(volatile unsigned int count)
 {
@@ -47,26 +47,17 @@ int main(void)
         g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
     );
 
-    Bms_Led_Init();
+    Bms_Init();
 
     while (1)
     {
-        Bms_Led_On(BMS_LED_GREEN);
-        delay(2000000U);
-        Bms_Led_Off(BMS_LED_GREEN);
+        Bms_MainFunction();
 
-        Bms_Led_On(BMS_LED_YELLOW);
-        delay(2000000U);
-        Bms_Led_Off(BMS_LED_YELLOW);
-
-        Bms_Led_On(BMS_LED_RED);
-        delay(2000000U);
-        Bms_Led_Off(BMS_LED_RED);
-
-        Bms_Led_On(BMS_LED_BLUE);
-        delay(2000000U);
-        Bms_Led_Off(BMS_LED_BLUE);
+        /* 现在先用软件 delay 模拟周期 */
+        delay(100000U);
     }
+
+    return 0;
 }
 
 /** @} */

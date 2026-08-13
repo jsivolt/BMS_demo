@@ -119,7 +119,7 @@ extern "C"{
 
 #define USING_GET_CORE_ID
 
-#define OSIF_USE_SYSTEM_TIMER            (STD_OFF)
+#define OSIF_USE_SYSTEM_TIMER            (STD_ON)
 
 #define OSIF_USE_CUSTOM_TIMER            (STD_OFF)
 

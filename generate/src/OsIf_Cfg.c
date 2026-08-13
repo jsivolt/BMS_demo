@@ -119,6 +119,28 @@ extern "C"{
 *                                      LOCAL MACROS
 ==================================================================================================*/
 
+#define BASENXP_START_SEC_CONFIG_DATA_UNSPECIFIED
+#include "BaseNXP_MemMap.h"
+
+static const OsIf_ConfigType OsIf_xPredefinedConfig =
+{
+    /*.counterId */         0,
+    /*.counterFrequency */  48000000U
+};
+
+#define BASENXP_STOP_SEC_CONFIG_DATA_UNSPECIFIED
+#include "BaseNXP_MemMap.h"
+
+#define BASENXP_START_SEC_CONFIG_DATA_UNSPECIFIED
+#include "BaseNXP_MemMap.h"
+
+const OsIf_ConfigType *const OsIf_apxPredefinedConfig[OSIF_MAX_COREIDX_SUPPORTED] =
+{
+    &OsIf_xPredefinedConfig
+};
+
+#define BASENXP_STOP_SEC_CONFIG_DATA_UNSPECIFIED
+#include "BaseNXP_MemMap.h"
 
 /*==================================================================================================
 *                                    LOCAL FUNCTION PROTOTYPES
