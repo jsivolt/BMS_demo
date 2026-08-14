@@ -4,6 +4,7 @@
  */
 
 #include "Bms_Scheduler.h"
+#include "OsIf.h"
 
 /*==================================================================================================
 *                                       LOCAL VARIABLES
@@ -13,8 +14,8 @@ static const Bms_Scheduler_TaskEntryType *Bms_Scheduler_TaskTable = NULL_PTR;
 static uint32 Bms_Scheduler_TaskCount = 0U;
 static uint32 Bms_Scheduler_TaskCounters[BMS_SCHEDULER_MAX_TASKS];
 
-/* Set by the ISR, consumed by the main loop. */
-static volatile boolean Bms_Scheduler_TickPending = FALSE;
+/* Incremented by the ISR for every base tick, drained by the main loop. */
+static volatile uint32 Bms_Scheduler_PendingTicks = 0U;
 
 /*==================================================================================================
 *                                       FUNCTION DEFINITIONS
@@ -32,21 +33,29 @@ void Bms_Scheduler_Init(const Bms_Scheduler_TaskEntryType * const taskTable, uin
         Bms_Scheduler_TaskCounters[index] = 0U;
     }
 
-    Bms_Scheduler_TickPending = FALSE;
+    Bms_Scheduler_PendingTicks = 0U;
 }
 
 void Bms_Scheduler_TickFromIsr(void)
 {
-    Bms_Scheduler_TickPending = TRUE;
+    Bms_Scheduler_PendingTicks++;
 }
 
 void Bms_Scheduler_MainFunction(void)
 {
     uint32 index;
+    uint32 pendingTicks;
 
-    if (Bms_Scheduler_TickPending == TRUE)
+    /* Atomically capture and clear the accumulated ticks so none are lost. */
+    OsIf_SuspendAllInterrupts();
+    pendingTicks = Bms_Scheduler_PendingTicks;
+    Bms_Scheduler_PendingTicks = 0U;
+    OsIf_ResumeAllInterrupts();
+
+    /* Process every elapsed tick, even if the main loop fell behind. */
+    while (pendingTicks > 0U)
     {
-        Bms_Scheduler_TickPending = FALSE;
+        pendingTicks--;
 
         for (index = 0U; index < Bms_Scheduler_TaskCount; index++)
         {
