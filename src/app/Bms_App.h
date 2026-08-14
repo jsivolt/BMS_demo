@@ -1,18 +1,28 @@
+/**
+ *  @file       Bms_App.h
+ *  @brief      BMS application module.
+ */
+
 #ifndef BMS_APP_H
 #define BMS_APP_H
 
-typedef enum
-{
-    BMS_STATE_INIT = 0,
-    BMS_STATE_NORMAL,
-    BMS_STATE_WARNING,
-    BMS_STATE_FAULT
-} Bms_StateType;
+#ifdef __cplusplus
+extern "C"{
+#endif
 
-void Bms_Init(void);
-void Bms_MainFunction(void);
+#include "Std_Types.h"
 
-void Bms_SetState(Bms_StateType state);
-Bms_StateType Bms_GetState(void);
+/*==================================================================================================
+*                                       FUNCTION PROTOTYPES
+==================================================================================================*/
+
+/**
+ * @brief Initializes the BMS application module.
+ */
+void Bms_App_Init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BMS_APP_H */

@@ -46,12 +46,17 @@
 
 #include "Bms_Scheduler.h"
 
+#include "Bms_Adc.h"
+
+
+
 /* ================================================================================================
  * PIT configuration
  * ============================================================================================== */
 
 #define PIT_INSTANCE            (0U)
 #define PIT_CHANNEL             (0U)
+
 
 /*
  * PIT0 clock = AIPS_SLOW_CLK = 40 MHz
@@ -125,6 +130,8 @@ void Bms_Pit10msCallback(uint8 channel)
 
 static void Bms_MainFunction_10ms(void)
 {
+    Bms_Adc_MainFunction();
+
     g_LedCounter++;
 
     /*
@@ -289,7 +296,32 @@ int main(void)
 
 
     /* ============================================================================================
-     * 8. Initialize the BMS scheduler
+     * 8. Initialize the BMS ADC
+     *
+     * Must be initialized before the 10 ms task runs Bms_Adc_MainFunction().
+     *
+     * During bring-up, expose ADC init/calibration failures instead of silently
+     * continuing to schedule conversions.
+     * ========================================================================================== */
+
+    if (Bms_Adc_Init() != (Std_ReturnType)E_OK)
+    {
+        /* ADC init or calibration failed: turn RED LED permanently ON and trap. */
+        Siul2_Dio_Ip_WritePin(
+            LED_RED_PORT,
+            LED_RED_PIN,
+            0U
+        );
+
+        while (1)
+        {
+            /* Error trap */
+        }
+    }
+
+
+    /* ============================================================================================
+     * 9. Initialize the BMS scheduler
      *
      * Must be registered before the PIT channel starts ticking.
      * ========================================================================================== */
@@ -301,7 +333,7 @@ int main(void)
 
 
     /* ============================================================================================
-     * 9. Start PIT Channel 0
+     * 10. Start PIT Channel 0
      *
      * 400000 PIT clocks = 10 ms
      * ========================================================================================== */
@@ -338,7 +370,7 @@ int main(void)
 
 
     /* ============================================================================================
-     * 10. Main loop
+     * 11. Main loop
      * ========================================================================================== */
 
     while (1)

@@ -4,6 +4,8 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../RTD/src/Adc_Sar_Ip.c \
+../RTD/src/Adc_Sar_Ip_Irq.c \
 ../RTD/src/Clock_Ip.c \
 ../RTD/src/Clock_Ip_Data.c \
 ../RTD/src/Clock_Ip_Divider.c \
@@ -29,6 +31,7 @@ C_SRCS += \
 ../RTD/src/OsIf_Timer_System.c \
 ../RTD/src/OsIf_Timer_System_Internal_Systick.c \
 ../RTD/src/Pit_Ip.c \
+../RTD/src/SchM_Adc.c \
 ../RTD/src/SchM_BaseNXP.c \
 ../RTD/src/SchM_Dio.c \
 ../RTD/src/SchM_Gpt.c \
@@ -39,6 +42,8 @@ C_SRCS += \
 ../RTD/src/Tspc_Port_Ip.c 
 
 OBJS += \
+./RTD/src/Adc_Sar_Ip.o \
+./RTD/src/Adc_Sar_Ip_Irq.o \
 ./RTD/src/Clock_Ip.o \
 ./RTD/src/Clock_Ip_Data.o \
 ./RTD/src/Clock_Ip_Divider.o \
@@ -64,6 +69,7 @@ OBJS += \
 ./RTD/src/OsIf_Timer_System.o \
 ./RTD/src/OsIf_Timer_System_Internal_Systick.o \
 ./RTD/src/Pit_Ip.o \
+./RTD/src/SchM_Adc.o \
 ./RTD/src/SchM_BaseNXP.o \
 ./RTD/src/SchM_Dio.o \
 ./RTD/src/SchM_Gpt.o \
@@ -74,6 +80,8 @@ OBJS += \
 ./RTD/src/Tspc_Port_Ip.o 
 
 C_DEPS += \
+./RTD/src/Adc_Sar_Ip.d \
+./RTD/src/Adc_Sar_Ip_Irq.d \
 ./RTD/src/Clock_Ip.d \
 ./RTD/src/Clock_Ip_Data.d \
 ./RTD/src/Clock_Ip_Divider.d \
@@ -99,6 +107,7 @@ C_DEPS += \
 ./RTD/src/OsIf_Timer_System.d \
 ./RTD/src/OsIf_Timer_System_Internal_Systick.d \
 ./RTD/src/Pit_Ip.d \
+./RTD/src/SchM_Adc.d \
 ./RTD/src/SchM_BaseNXP.d \
 ./RTD/src/SchM_Dio.d \
 ./RTD/src/SchM_Gpt.d \
@@ -113,7 +122,7 @@ C_DEPS += \
 RTD/src/%.o: ../RTD/src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Standard S32DS C Compiler'
-	arm-none-eabi-gcc "@RTD/src/Clock_Ip.args" -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc "@RTD/src/Adc_Sar_Ip.args" -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

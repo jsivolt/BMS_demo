@@ -391,8 +391,21 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.adc_sar" description="adc_sar is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.adc_sar" description="An unsupported version of the adc_sar in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
          </dependencies>
          <generated_project_files>
+            <file path="generate/include/Adc_Sar_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/Adc_Sar_Ip_CfgDefines.h" update_enabled="true"/>
+            <file path="generate/include/Adc_Sar_Ip_PBcfg.h" update_enabled="true"/>
             <file path="generate/include/DeviceDefinition.h" update_enabled="true"/>
             <file path="generate/include/IntCtrl_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/IntCtrl_Ip_CfgDefines.h" update_enabled="true"/>
@@ -405,6 +418,7 @@
             <file path="generate/include/Siul2_Port_Ip_Defines.h" update_enabled="true"/>
             <file path="generate/include/Soc_Ips.h" update_enabled="true"/>
             <file path="generate/include/modules.h" update_enabled="true"/>
+            <file path="generate/src/Adc_Sar_Ip_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/IntCtrl_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/OsIf_Cfg.c" update_enabled="true"/>
             <file path="generate/src/Pit_Ip_SA_PBcfg.c" update_enabled="true"/>
@@ -737,6 +751,81 @@
                                     <setting name="IsrHandler" value="PIT_0_ISR"/>
                                  </struct>
                               </array>
+                           </struct>
+                        </array>
+                     </config_set>
+                  </instance>
+                  <instance name="Adc_Sar_Ip" uuid="dc61437c-a551-4cdf-ab76-62ec0ba910bc" type="Adc_Sar_Ip" type_id="Adc_Sar_Ip" mode="ip" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="Adc_Sar_Ip">
+                        <setting name="Name" value="Adc_Sar_Ip"/>
+                        <struct name="AdcSarGeneral">
+                           <setting name="Name" value="AdcSarGeneral"/>
+                           <setting name="AdcSarTimeoutMethod" value="OSIF_COUNTER_DUMMY"/>
+                           <setting name="AdcSarTimeoutVal" value="100000"/>
+                           <setting name="AdcSarIpDevErrorDetect" value="false"/>
+                           <setting name="AdcSarEnableUserModeSupport" value="false"/>
+                           <setting name="AdcSarEnableWatchdogApi" value="true"/>
+                           <setting name="AdcSarEnableSelfTestApi" value="false"/>
+                           <setting name="AdcSarEnableEoC" value="true"/>
+                           <setting name="AdcSarEnableAsyncCalibration" value="false"/>
+                           <setting name="AdcSarEnableTempsenseApi" value="false"/>
+                           <setting name="AdcSarTempSenseVsupply" value="53"/>
+                        </struct>
+                        <array name="AdcHwUnit">
+                           <struct name="0">
+                              <setting name="Name" value="AdcHwUnit_0"/>
+                              <setting name="AdcHwUnitId" value="ADC1"/>
+                              <setting name="AdcHwUnitConvMode" value="ADC_SAR_IP_CONV_MODE_ONESHOT"/>
+                              <setting name="AdcPrescale" value="1"/>
+                              <setting name="AdcCalibrationPrescale" value="1"/>
+                              <setting name="AdcHighSpeedEnable" value="false"/>
+                              <setting name="AdcPowerDownDelay" value="0"/>
+                              <setting name="AdcMuxDelay" value="0"/>
+                              <setting name="AdcAutoClockOff" value="false"/>
+                              <setting name="AdcBypassSampling" value="false"/>
+                              <setting name="AdcHwUnitOverwriteEn" value="false"/>
+                              <setting name="AdcPresamplingInternalSignal0" value="VREFL"/>
+                              <setting name="AdcPresamplingInternalSignal1" value="VREFL"/>
+                              <setting name="AdcPresamplingInternalSignal2" value="VREFL"/>
+                              <setting name="AdcHwUnitCtuMode" value="ADC_SAR_IP_CTU_MODE_DISABLED"/>
+                              <setting name="AdcHwUnitExtInjTrg" value="ADC_SAR_IP_EXT_TRIG_EDGE_DISABLED"/>
+                              <setting name="AdcHwUnitExtNrmTrg" value="ADC_SAR_IP_EXT_TRIG_EDGE_DISABLED"/>
+                              <setting name="AdcHwUnitPrimaryExtNrmTrg" value="true"/>
+                              <setting name="AdcHwUnitAuxiliaryExtNrmTrg" value="false"/>
+                              <setting name="AdcHwUnitUsrOffset" value="0"/>
+                              <setting name="AdcHwUnitUsrGain" value="0"/>
+                              <setting name="AdcHwUnitResolution" value="RESOLUTION_14"/>
+                              <setting name="AdcHwUnitBypassResolution" value="false"/>
+                              <setting name="AdcHwUnitDmaEnable" value="false"/>
+                              <setting name="AdcHwUnitDmaClearSource" value="DMA_REQ_CLEAR_ON_ACK"/>
+                              <setting name="AdcHwUnitNotifChainN" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifChainJ" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifCtu" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifEOC" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifWdg" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitDataAlign" value="ADC_SAR_IP_DATA_ALIGNED_RIGHT"/>
+                              <setting name="AdcSarHwUnitVref" value="53"/>
+                              <array name="AdcSelfTestThresholdConfiguration"/>
+                              <setting name="AdcHardwareAverageEnable" value="false"/>
+                              <setting name="AdcHardwareAverageSelect" value="SAMPLES_4"/>
+                              <setting name="AdcSamplingDurationNormal0" value="22"/>
+                              <setting name="AdcSamplingDurationNormal1" value="22"/>
+                              <setting name="AdcSamplingDurationNormal2" value="22"/>
+                              <array name="AdcChannel">
+                                 <struct name="0">
+                                    <setting name="Name" value="AdcChannel_0"/>
+                                    <setting name="AdcChannelName" value="S10_ChanNum34"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                              </array>
+                              <array name="AdcThresholdControl"/>
                            </struct>
                         </array>
                      </config_set>
