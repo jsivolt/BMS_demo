@@ -44,6 +44,8 @@
 #include "Pit_Ip.h"
 #include "Pit_Ip_Cfg.h"
 
+#include "Bms_Scheduler.h"
+
 /* ================================================================================================
  * PIT configuration
  * ============================================================================================== */
@@ -87,12 +89,6 @@
  * ============================================================================================== */
 
 /*
- * Set by PIT interrupt.
- * Processed in main().
- */
-static volatile boolean g_Bms10msFlag = FALSE;
-
-/*
  * Used only to verify PIT timing.
  *
  * 50 × 10 ms = 500 ms
@@ -119,7 +115,7 @@ void Bms_Pit10msCallback(uint8 channel)
      *
      * Do NOT execute BMS algorithms directly here.
      */
-    g_Bms10msFlag = TRUE;
+    Bms_Scheduler_TickFromIsr();
 }
 
 
@@ -169,6 +165,35 @@ static void Bms_MainFunction_10ms(void)
         }
     }
 }
+
+
+/* ================================================================================================
+ * BMS 100 ms / 1000 ms tasks (placeholders for future use)
+ * ============================================================================================== */
+
+static void Bms_MainFunction_100ms(void)
+{
+    /* TODO: reserved for future 100 ms tasks (e.g. CAN transmit). */
+}
+
+static void Bms_MainFunction_1000ms(void)
+{
+    /* TODO: reserved for future 1000 ms tasks (e.g. diagnostics). */
+}
+
+
+/* ================================================================================================
+ * Scheduler task table
+ *
+ * Periods are expressed in base ticks (1 tick = 10 ms, driven by PIT0 Channel 0).
+ * ============================================================================================== */
+
+static const Bms_Scheduler_TaskEntryType Bms_Scheduler_TaskTable[] =
+{
+    { Bms_MainFunction_10ms,    1U },   /* 10 ms   */
+    { Bms_MainFunction_100ms,  10U },   /* 100 ms  */
+    { Bms_MainFunction_1000ms, 100U }   /* 1000 ms */
+};
 
 
 /* ================================================================================================
@@ -264,7 +289,19 @@ int main(void)
 
 
     /* ============================================================================================
-     * 8. Start PIT Channel 0
+     * 8. Initialize the BMS scheduler
+     *
+     * Must be registered before the PIT channel starts ticking.
+     * ========================================================================================== */
+
+    Bms_Scheduler_Init(
+        Bms_Scheduler_TaskTable,
+        (uint32)(sizeof(Bms_Scheduler_TaskTable) / sizeof(Bms_Scheduler_TaskTable[0]))
+    );
+
+
+    /* ============================================================================================
+     * 9. Start PIT Channel 0
      *
      * 400000 PIT clocks = 10 ms
      * ========================================================================================== */
@@ -301,22 +338,11 @@ int main(void)
 
 
     /* ============================================================================================
-     * 9. Main loop
+     * 10. Main loop
      * ========================================================================================== */
 
     while (1)
     {
-        if (g_Bms10msFlag == TRUE)
-        {
-            /*
-             * Clear first.
-             */
-            g_Bms10msFlag = FALSE;
-
-            /*
-             * Execute 10 ms BMS task.
-             */
-            Bms_MainFunction_10ms();
-        }
+        Bms_Scheduler_MainFunction();
     }
 }

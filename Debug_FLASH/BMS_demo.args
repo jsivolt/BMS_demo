@@ -59,6 +59,7 @@
 "./generate/src/OsIf_Cfg.o"
 "./generate/src/Pit_Ip_SA_PBcfg.o"
 "./src/app/Bms_App.o"
+"./src/app/Bms_Scheduler.o"
 "./src/battery/Battery_Monitor.o"
 "./src/drivers/Bms_Can.o"
 "./src/drivers/Bms_Gpio.o"

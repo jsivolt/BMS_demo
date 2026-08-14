@@ -68,7 +68,8 @@ src/main.o: ../src/main.c ../RTD/include/Clock_Ip.h \
  ../RTD/include/OsIf.h ../RTD/include/OsIf_Internal.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/BaseNXP_MemMap.h \
  ../RTD/include/SchM_Gpt.h \
- C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Rte_MemMap.h
+ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Rte_MemMap.h \
+ C\:/S32K344/workspace/BMS_demo/src/app/Bms_Scheduler.h
 ../RTD/include/Clock_Ip.h:
 ../RTD/include/Clock_Ip_Types.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
@@ -142,3 +143,4 @@ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/BaseNXP_MemMap.h:
 ../RTD/include/SchM_Gpt.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Rte_MemMap.h:
+C\:/S32K344/workspace/BMS_demo/src/app/Bms_Scheduler.h:
