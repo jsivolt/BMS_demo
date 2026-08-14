@@ -381,9 +381,21 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.IntCtrl_Ip" description="IntCtrl_Ip is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.IntCtrl_Ip" description="An unsupported version of the IntCtrl_Ip in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
          </dependencies>
          <generated_project_files>
             <file path="generate/include/DeviceDefinition.h" update_enabled="true"/>
+            <file path="generate/include/IntCtrl_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/IntCtrl_Ip_CfgDefines.h" update_enabled="true"/>
             <file path="generate/include/OsIf_ArchCfg.h" update_enabled="true"/>
             <file path="generate/include/OsIf_Cfg.h" update_enabled="true"/>
             <file path="generate/include/Pit_Ip_Cfg.h" update_enabled="true"/>
@@ -393,6 +405,7 @@
             <file path="generate/include/Siul2_Port_Ip_Defines.h" update_enabled="true"/>
             <file path="generate/include/Soc_Ips.h" update_enabled="true"/>
             <file path="generate/include/modules.h" update_enabled="true"/>
+            <file path="generate/src/IntCtrl_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/OsIf_Cfg.c" update_enabled="true"/>
             <file path="generate/src/Pit_Ip_SA_PBcfg.c" update_enabled="true"/>
          </generated_project_files>
@@ -697,6 +710,35 @@
                            <setting name="GptTimeoutMethod" value="OSIF_COUNTER_SYSTEM"/>
                            <setting name="GptTimeoutDuration" value="800"/>
                         </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="IntCtrl_Ip" uuid="6d80631d-d5ee-45c9-a7b0-3f5d0cf14af1" type="IntCtrl_Ip" type_id="IntCtrl_Ip" mode="ip" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="IntCtrl_Ip">
+                        <setting name="Name" value="IntCtrl_Ip"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-PRE-COMPILE"/>
+                        </struct>
+                        <struct name="IntCtrlConfigGeneral">
+                           <setting name="Name" value="IntCtrlConfigGeneral"/>
+                           <setting name="IntCtrlDevErrorDetect" value="true"/>
+                           <setting name="PlatformEnableUserModeSupport" value="false"/>
+                           <setting name="IntctrlEnableMSIConfiguration" value="false"/>
+                        </struct>
+                        <array name="IntCtrlConfig">
+                           <struct name="0">
+                              <setting name="Name" value="IntCtrlConfig_0"/>
+                              <array name="PlatformIsrConfig">
+                                 <struct name="0">
+                                    <setting name="Name" value="PlatformIsrConfig_0"/>
+                                    <setting name="IsrName" value="PIT0_IRQn"/>
+                                    <setting name="IsrEnabled" value="true"/>
+                                    <setting name="IsrPriority" value="10"/>
+                                    <setting name="IsrHandler" value="PIT_0_ISR"/>
+                                 </struct>
+                              </array>
+                           </struct>
+                        </array>
                      </config_set>
                   </instance>
                </instances>

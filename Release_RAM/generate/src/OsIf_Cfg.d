@@ -22,7 +22,8 @@ generate/src/OsIf_Cfg.o: ../generate/src/OsIf_Cfg.c \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/Platform_TS_T40D34M70I1R0/startup/include/system.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_SCB.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_MPU.h \
- C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_MemMap.h
+ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_MemMap.h \
+ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/BaseNXP_MemMap.h
 C\:/S32K344/workspace/BMS_demo/generate/include/OsIf_Cfg.h:
 C\:/S32K344/workspace/BMS_demo/generate/include/OsIf_ArchCfg.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
@@ -47,3 +48,4 @@ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/Platform_TS_T40D34M70I
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_SCB.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/header/S32K344_MPU.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_MemMap.h:
+C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/BaseNXP_MemMap.h:
