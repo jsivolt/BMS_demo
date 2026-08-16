@@ -8,12 +8,12 @@
 
 
 #define BMS_ADC_NTC1_CHANNEL      (1U)
-#define BMS_ADC_NTC2_CHANNEL      (2U)
-#define BMS_ADC_NTC3_CHANNEL      (3U)
+#define BMS_ADC_NTC2_CHANNEL      (32U)
+#define BMS_ADC_NTC3_CHANNEL      (33U)
 
 #define BMS_ADC_PACK_V1_CHANNEL   (4U)
-#define BMS_ADC_PACK_V2_CHANNEL   (5U)
-#define BMS_ADC_PACK_V3_CHANNEL   (6U)
+#define BMS_ADC_PACK_V2_CHANNEL   (35U)
+#define BMS_ADC_PACK_V3_CHANNEL   (36U)
 
 #define BMS_ADC_POT_CHANNEL       (34U)
 
@@ -85,7 +85,14 @@ void Bms_Adc_MainFunction(void)
         /*
          * Read second ADC input:
          * ADC1_P1 / Channel 1
-         */
+         * NTC2: ADC1_S8  / Channel 32 */
+        /* NTC3: ADC1_S9  / Channel 33 */
+
+        /* PackV1: ADC1_P4  / Channel 4  */
+        /* PackV2: ADC1_S11 / Channel 35 */
+        /* PackV3: ADC1_S12 / Channel 36 */
+
+        /* POT: ADC1_S10 / Channel 34 */
         Adc_Sar_Ip_GetConvResult(
             ADCHWUNIT_0_INSTANCE,
             BMS_ADC_NTC1_CHANNEL,

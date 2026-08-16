@@ -838,7 +838,7 @@
                                  </struct>
                                  <struct name="2">
                                     <setting name="Name" value="AdcChannel_Ntc2"/>
-                                    <setting name="AdcChannelName" value="P2_ChanNum2"/>
+                                    <setting name="AdcChannelName" value="S8_ChanNum32"/>
                                     <setting name="NormalChnEn" value="true"/>
                                     <setting name="InjectedChnEn" value="false"/>
                                     <setting name="AdcEnablePresampling" value="false"/>
@@ -850,7 +850,7 @@
                                  </struct>
                                  <struct name="3">
                                     <setting name="Name" value="AdcChannel_Ntc3"/>
-                                    <setting name="AdcChannelName" value="P3_ChanNum3"/>
+                                    <setting name="AdcChannelName" value="S9_ChanNum33"/>
                                     <setting name="NormalChnEn" value="true"/>
                                     <setting name="InjectedChnEn" value="false"/>
                                     <setting name="AdcEnablePresampling" value="false"/>
@@ -874,7 +874,7 @@
                                  </struct>
                                  <struct name="5">
                                     <setting name="Name" value="AdcChannel_PackV2"/>
-                                    <setting name="AdcChannelName" value="P5_ChanNum5"/>
+                                    <setting name="AdcChannelName" value="S11_ChanNum35"/>
                                     <setting name="NormalChnEn" value="true"/>
                                     <setting name="InjectedChnEn" value="false"/>
                                     <setting name="AdcEnablePresampling" value="false"/>
@@ -886,7 +886,7 @@
                                  </struct>
                                  <struct name="6">
                                     <setting name="Name" value="AdcChannel_PackV3"/>
-                                    <setting name="AdcChannelName" value="P6_ChanNum6"/>
+                                    <setting name="AdcChannelName" value="S12_ChanNum36"/>
                                     <setting name="NormalChnEn" value="true"/>
                                     <setting name="InjectedChnEn" value="false"/>
                                     <setting name="AdcEnablePresampling" value="false"/>

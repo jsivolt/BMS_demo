@@ -6624,7 +6624,7 @@ LOAD linker stubs
  .comment       0x00000088       0x89 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-errno.o)
  .comment       0x00000088       0x89 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-impure.o)
 
-.debug_info     0x00000000    0x33729
+.debug_info     0x00000000    0x3372d
  .debug_info    0x00000000      0x139 ./Project_Settings/Startup_Code/exceptions.o
  .debug_info    0x00000139      0x76c ./Project_Settings/Startup_Code/nvic.o
  .debug_info    0x000008a5      0x371 ./Project_Settings/Startup_Code/startup.o
@@ -6674,20 +6674,20 @@ LOAD linker stubs
  .debug_info    0x0002b3a6      0x576 ./generate/src/IntCtrl_Ip_Cfg.o
  .debug_info    0x0002b91c      0x140 ./generate/src/OsIf_Cfg.o
  .debug_info    0x0002ba5c      0x1cd ./generate/src/Pit_Ip_SA_PBcfg.o
- .debug_info    0x0002bc29      0xafb ./src/app/Bms_Adc.o
- .debug_info    0x0002c724       0x97 ./src/app/Bms_App.o
- .debug_info    0x0002c7bb      0x249 ./src/app/Bms_Scheduler.o
- .debug_info    0x0002ca04      0x308 ./src/battery/Battery_Monitor.o
- .debug_info    0x0002cd0c      0x404 ./src/battery/Bms_Ntc.o
- .debug_info    0x0002d110      0x1ce ./src/drivers/Bms_Can.o
- .debug_info    0x0002d2de      0x1e8 ./src/drivers/Bms_Gpio.o
- .debug_info    0x0002d4c6     0x2045 ./src/drivers/Bms_Led.o
- .debug_info    0x0002f50b     0x3a51 ./src/main.o
- .debug_info    0x00032f5c      0x23a ./src/safety/Fault_Manager.o
- .debug_info    0x00033196       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
- .debug_info    0x000331bc       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_info    0x000331e2      0x521 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
- .debug_info    0x00033703       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_info    0x0002bc29      0xaff ./src/app/Bms_Adc.o
+ .debug_info    0x0002c728       0x97 ./src/app/Bms_App.o
+ .debug_info    0x0002c7bf      0x249 ./src/app/Bms_Scheduler.o
+ .debug_info    0x0002ca08      0x308 ./src/battery/Battery_Monitor.o
+ .debug_info    0x0002cd10      0x404 ./src/battery/Bms_Ntc.o
+ .debug_info    0x0002d114      0x1ce ./src/drivers/Bms_Can.o
+ .debug_info    0x0002d2e2      0x1e8 ./src/drivers/Bms_Gpio.o
+ .debug_info    0x0002d4ca     0x2045 ./src/drivers/Bms_Led.o
+ .debug_info    0x0002f50f     0x3a51 ./src/main.o
+ .debug_info    0x00032f60      0x23a ./src/safety/Fault_Manager.o
+ .debug_info    0x0003319a       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_info    0x000331c0       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_info    0x000331e6      0x521 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_info    0x00033707       0x26 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
 .debug_abbrev   0x00000000     0x5e53
  .debug_abbrev  0x00000000       0x47 ./Project_Settings/Startup_Code/exceptions.o
@@ -7267,7 +7267,7 @@ LOAD linker stubs
  .debug_line    0x000231e4      0x59c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
  .debug_line    0x00023780       0x68 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
-.debug_str      0x00000000    0xebbb9
+.debug_str      0x00000000    0xebbbd
  .debug_str     0x00000000    0x14d88 ./Project_Settings/Startup_Code/exceptions.o
                               0x14fae (size before relaxing)
  .debug_str     0x00014d88     0xb895 ./Project_Settings/Startup_Code/nvic.o
@@ -7366,32 +7366,32 @@ LOAD linker stubs
                               0x1560f (size before relaxing)
  .debug_str     0x000e7df4      0x165 ./generate/src/Pit_Ip_SA_PBcfg.o
                                0x79bb (size before relaxing)
- .debug_str     0x000e7f59      0x446 ./src/app/Bms_Adc.o
-                              0x3c589 (size before relaxing)
- .debug_str     0x000e839f       0x2d ./src/app/Bms_App.o
+ .debug_str     0x000e7f59      0x44a ./src/app/Bms_Adc.o
+                              0x3c58d (size before relaxing)
+ .debug_str     0x000e83a3       0x2d ./src/app/Bms_App.o
                                0x5e65 (size before relaxing)
- .debug_str     0x000e83cc      0x164 ./src/app/Bms_Scheduler.o
+ .debug_str     0x000e83d0      0x164 ./src/app/Bms_Scheduler.o
                               0x14a74 (size before relaxing)
- .debug_str     0x000e8530      0x319 ./src/battery/Battery_Monitor.o
+ .debug_str     0x000e8534      0x319 ./src/battery/Battery_Monitor.o
                                0x618a (size before relaxing)
- .debug_str     0x000e8849     0x2cc6 ./src/battery/Bms_Ntc.o
+ .debug_str     0x000e884d     0x2cc6 ./src/battery/Bms_Ntc.o
                                0x8cd0 (size before relaxing)
- .debug_str     0x000eb50f       0x90 ./src/drivers/Bms_Can.o
+ .debug_str     0x000eb513       0x90 ./src/drivers/Bms_Can.o
                                0x5f16 (size before relaxing)
- .debug_str     0x000eb59f      0x123 ./src/drivers/Bms_Gpio.o
+ .debug_str     0x000eb5a3      0x123 ./src/drivers/Bms_Gpio.o
                               0x64f3f (size before relaxing)
- .debug_str     0x000eb6c2       0xce ./src/drivers/Bms_Led.o
+ .debug_str     0x000eb6c6       0xce ./src/drivers/Bms_Led.o
                               0x4016e (size before relaxing)
- .debug_str     0x000eb790       0xf1 ./src/main.o
+ .debug_str     0x000eb794       0xf1 ./src/main.o
                               0xa6a82 (size before relaxing)
- .debug_str     0x000eb881       0xb9 ./src/safety/Fault_Manager.o
+ .debug_str     0x000eb885       0xb9 ./src/safety/Fault_Manager.o
                                0x6014 (size before relaxing)
- .debug_str     0x000eb93a       0x96 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_str     0x000eb93e       0x96 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
                                  0xa2 (size before relaxing)
- .debug_str     0x000eb9d0       0xa2 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_str     0x000eb9d0      0x1b1 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_str     0x000eb9d4       0xa2 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_str     0x000eb9d4      0x1b1 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
                                 0x2c3 (size before relaxing)
- .debug_str     0x000ebb81       0x38 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_str     0x000ebb85       0x38 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
                                  0xa6 (size before relaxing)
 
 .debug_frame    0x00000000     0x4638
