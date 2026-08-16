@@ -5,12 +5,14 @@
 #include "Adc_Sar_Ip_Cfg.h"
 #include "Adc_Sar_Ip_CfgDefines.h"
 
-#define BMS_ADC_POT_CHANNEL    (34U)
+#define BMS_ADC_POT_CHANNEL      (34U)
+#define BMS_ADC_ADC1_CHANNEL     (1U)
 
-/* Latest ADC raw value */
+/* Latest ADC raw values */
 static volatile uint16 g_BmsAdcPotRaw = 0U;
+static volatile uint16 g_BmsAdcAdc1Raw = 0U;
 
-/* TRUE when the last acquisition produced a valid conversion result */
+/* TRUE when the last acquisition produced valid conversion results */
 static volatile boolean g_BmsAdcValid = FALSE;
 
 /* Indicates whether a conversion has already been started */
@@ -33,26 +35,47 @@ Std_ReturnType Bms_Adc_Init(void)
         );
     }
 
-    return (status == ADC_SAR_IP_STATUS_SUCCESS) ? (Std_ReturnType)E_OK : (Std_ReturnType)E_NOT_OK;
+    return (status == ADC_SAR_IP_STATUS_SUCCESS)
+        ? (Std_ReturnType)E_OK
+        : (Std_ReturnType)E_NOT_OK;
 }
 
 
 void Bms_Adc_MainFunction(void)
 {
-    Adc_Sar_Ip_ChanResultType result;
+    Adc_Sar_Ip_ChanResultType potResult;
+    Adc_Sar_Ip_ChanResultType adc1Result;
 
     if (g_BmsAdcConversionStarted == TRUE)
     {
+        /*
+         * Read potentiometer:
+         * ADC1_S10 / Channel 34
+         */
         Adc_Sar_Ip_GetConvResult(
             ADCHWUNIT_0_INSTANCE,
             BMS_ADC_POT_CHANNEL,
             ADC_SAR_IP_CONV_CHAIN_NORMAL,
-            &result
+            &potResult
         );
 
-        if (result.ValidFlag == TRUE)
+        /*
+         * Read second ADC input:
+         * ADC1_P1 / Channel 1
+         */
+        Adc_Sar_Ip_GetConvResult(
+            ADCHWUNIT_0_INSTANCE,
+            BMS_ADC_ADC1_CHANNEL,
+            ADC_SAR_IP_CONV_CHAIN_NORMAL,
+            &adc1Result
+        );
+
+        if ((potResult.ValidFlag == TRUE) &&
+            (adc1Result.ValidFlag == TRUE))
         {
-            g_BmsAdcPotRaw = result.ConvData;
+            g_BmsAdcPotRaw = potResult.ConvData;
+            g_BmsAdcAdc1Raw = adc1Result.ConvData;
+
             g_BmsAdcValid = TRUE;
         }
         else
@@ -75,9 +98,24 @@ uint16 Bms_Adc_GetPotRaw(void)
     return g_BmsAdcPotRaw;
 }
 
+
 uint16 Bms_Adc_GetPotVoltageMv(void)
 {
     uint32 raw = (uint32)g_BmsAdcPotRaw;
+
+    return (uint16)((raw * 3300U) / 16383U);
+}
+
+
+uint16 Bms_Adc_GetAdc1Raw(void)
+{
+    return g_BmsAdcAdc1Raw;
+}
+
+
+uint16 Bms_Adc_GetAdc1VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcAdc1Raw;
 
     return (uint16)((raw * 3300U) / 16383U);
 }

@@ -824,6 +824,18 @@
                                     <setting name="EOCEn" value="false"/>
                                     <setting name="DmaEn" value="false"/>
                                  </struct>
+                                 <struct name="1">
+                                    <setting name="Name" value="AdcChannel_1"/>
+                                    <setting name="AdcChannelName" value="P1_ChanNum1"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
                               </array>
                               <array name="AdcThresholdControl"/>
                            </struct>
