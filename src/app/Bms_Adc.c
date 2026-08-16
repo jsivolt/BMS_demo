@@ -169,14 +169,12 @@ uint16 Bms_Adc_GetPotRaw(void)
     return g_BmsAdcPotRaw;
 }
 
-
 uint16 Bms_Adc_GetPotVoltageMv(void)
 {
     uint32 raw = (uint32)g_BmsAdcPotRaw;
 
     return (uint16)((raw * 3300U) / 16383U);
 }
-
 
 uint16 Bms_Adc_GetNtc1Raw(void)
 {
@@ -198,9 +196,23 @@ uint16 Bms_Adc_GetPackV1Raw(void)
     return g_BmsAdcPackV1Raw;
 }
 
+uint16 Bms_Adc_GetPackV1VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcPackV1Raw;
+
+    return (uint16)((raw * 3300U) / 16383U);
+}
+
 uint16 Bms_Adc_GetPackV2Raw(void)
 {
     return g_BmsAdcPackV2Raw;
+}
+
+uint16 Bms_Adc_GetPackV2VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcPackV2Raw;
+
+    return (uint16)((raw * 3300U) / 16383U);
 }
 
 uint16 Bms_Adc_GetPackV3Raw(void)
@@ -208,7 +220,12 @@ uint16 Bms_Adc_GetPackV3Raw(void)
     return g_BmsAdcPackV3Raw;
 }
 
+uint16 Bms_Adc_GetPackV3VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcPackV3Raw;
 
+    return (uint16)((raw * 3300U) / 16383U);
+}
 
 uint16 Bms_Adc_GetNtc1VoltageMv(void)
 {
