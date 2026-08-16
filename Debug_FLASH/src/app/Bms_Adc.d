@@ -28,7 +28,8 @@ src/app/Bms_Adc.o: ../src/app/Bms_Adc.c ../src/app/Bms_Adc.h \
  ../RTD/include/Adc_Sar_Ip_Types.h \
  C\:/S32K344/workspace/BMS_demo/generate/include/Adc_Sar_Ip_PBcfg.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Adc_MemMap.h \
- C\:/S32K344/workspace/BMS_demo/generate/include/Adc_Sar_Ip_PBcfg.h
+ C\:/S32K344/workspace/BMS_demo/generate/include/Adc_Sar_Ip_PBcfg.h \
+ C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc_Cfg.h
 ../src/app/Bms_Adc.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_Types.h:
@@ -62,3 +63,4 @@ C\:/S32K344/workspace/BMS_demo/generate/include/Adc_Sar_Ip_Cfg.h:
 C\:/S32K344/workspace/BMS_demo/generate/include/Adc_Sar_Ip_PBcfg.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Adc_MemMap.h:
 C\:/S32K344/workspace/BMS_demo/generate/include/Adc_Sar_Ip_PBcfg.h:
+C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc_Cfg.h:

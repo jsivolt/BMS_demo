@@ -47,6 +47,7 @@
 #include "Bms_Scheduler.h"
 
 #include "Bms_Adc.h"
+#include "Bms_Ntc.h"
 
 
 
@@ -181,6 +182,7 @@ static void Bms_MainFunction_10ms(void)
 static void Bms_MainFunction_100ms(void)
 {
     /* TODO: reserved for future 100 ms tasks (e.g. CAN transmit). */
+	 Bms_Ntc_MainFunction();
 }
 
 static void Bms_MainFunction_1000ms(void)

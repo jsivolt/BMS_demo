@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/battery/Battery_Monitor.c 
+../src/battery/Battery_Monitor.c \
+../src/battery/Bms_Ntc.c 
 
 OBJS += \
-./src/battery/Battery_Monitor.o 
+./src/battery/Battery_Monitor.o \
+./src/battery/Bms_Ntc.o 
 
 C_DEPS += \
-./src/battery/Battery_Monitor.d 
+./src/battery/Battery_Monitor.d \
+./src/battery/Bms_Ntc.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

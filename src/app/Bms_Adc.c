@@ -4,6 +4,8 @@
 #include "Adc_Sar_Ip_PBcfg.h"
 #include "Adc_Sar_Ip_Cfg.h"
 #include "Adc_Sar_Ip_CfgDefines.h"
+#include "Bms_Ntc_Cfg.h"
+
 
 #define BMS_ADC_POT_CHANNEL      (34U)
 #define BMS_ADC_NTC_CHANNEL     (1U)
@@ -116,5 +118,8 @@ uint16 Bms_Adc_GetNtcVoltageMv(void)
 {
     uint32 raw = (uint32)g_BmsAdcNtcRaw;
 
-    return (uint16)((raw * 3300U) / 16383U);
+    return (uint16)(
+        (raw * BMS_NTC_CFG_ADC_VREF_MV) /
+        BMS_NTC_CFG_ADC_FULL_SCALE
+    );
 }

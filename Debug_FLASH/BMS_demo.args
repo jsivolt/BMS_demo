@@ -66,6 +66,7 @@
 "./src/app/Bms_App.o"
 "./src/app/Bms_Scheduler.o"
 "./src/battery/Battery_Monitor.o"
+"./src/battery/Bms_Ntc.o"
 "./src/drivers/Bms_Can.o"
 "./src/drivers/Bms_Gpio.o"
 "./src/drivers/Bms_Led.o"
