@@ -7,12 +7,26 @@
 #include "Bms_Ntc_Cfg.h"
 
 
-#define BMS_ADC_POT_CHANNEL      (34U)
-#define BMS_ADC_NTC_CHANNEL     (1U)
+#define BMS_ADC_NTC1_CHANNEL      (1U)
+#define BMS_ADC_NTC2_CHANNEL      (2U)
+#define BMS_ADC_NTC3_CHANNEL      (3U)
+
+#define BMS_ADC_PACK_V1_CHANNEL   (4U)
+#define BMS_ADC_PACK_V2_CHANNEL   (5U)
+#define BMS_ADC_PACK_V3_CHANNEL   (6U)
+
+#define BMS_ADC_POT_CHANNEL       (34U)
 
 /* Latest ADC raw values */
 static volatile uint16 g_BmsAdcPotRaw = 0U;
-static volatile uint16 g_BmsAdcNtcRaw = 0U;
+
+static volatile uint16 g_BmsAdcNtc1Raw = 0U;
+static volatile uint16 g_BmsAdcNtc2Raw = 0U;
+static volatile uint16 g_BmsAdcNtc3Raw = 0U;
+
+static volatile uint16 g_BmsAdcPackV1Raw = 0U;
+static volatile uint16 g_BmsAdcPackV2Raw = 0U;
+static volatile uint16 g_BmsAdcPackV3Raw = 0U;
 
 /* TRUE when the last acquisition produced valid conversion results */
 static volatile boolean g_BmsAdcValid = FALSE;
@@ -46,7 +60,14 @@ Std_ReturnType Bms_Adc_Init(void)
 void Bms_Adc_MainFunction(void)
 {
     Adc_Sar_Ip_ChanResultType potResult;
-    Adc_Sar_Ip_ChanResultType ntcResult;
+
+    Adc_Sar_Ip_ChanResultType ntc1Result;
+    Adc_Sar_Ip_ChanResultType ntc2Result;
+    Adc_Sar_Ip_ChanResultType ntc3Result;
+
+    Adc_Sar_Ip_ChanResultType packV1Result;
+    Adc_Sar_Ip_ChanResultType packV2Result;
+    Adc_Sar_Ip_ChanResultType packV3Result;
 
     if (g_BmsAdcConversionStarted == TRUE)
     {
@@ -67,16 +88,64 @@ void Bms_Adc_MainFunction(void)
          */
         Adc_Sar_Ip_GetConvResult(
             ADCHWUNIT_0_INSTANCE,
-            BMS_ADC_NTC_CHANNEL,
+            BMS_ADC_NTC1_CHANNEL,
             ADC_SAR_IP_CONV_CHAIN_NORMAL,
-            &ntcResult
+            &ntc1Result
         );
 
+        Adc_Sar_Ip_GetConvResult(
+            ADCHWUNIT_0_INSTANCE,
+            BMS_ADC_NTC2_CHANNEL,
+            ADC_SAR_IP_CONV_CHAIN_NORMAL,
+            &ntc2Result
+        );
+
+        Adc_Sar_Ip_GetConvResult(
+            ADCHWUNIT_0_INSTANCE,
+            BMS_ADC_NTC3_CHANNEL,
+            ADC_SAR_IP_CONV_CHAIN_NORMAL,
+            &ntc3Result
+        );
+
+        Adc_Sar_Ip_GetConvResult(
+            ADCHWUNIT_0_INSTANCE,
+            BMS_ADC_PACK_V1_CHANNEL,
+            ADC_SAR_IP_CONV_CHAIN_NORMAL,
+            &packV1Result
+        );
+
+        Adc_Sar_Ip_GetConvResult(
+            ADCHWUNIT_0_INSTANCE,
+            BMS_ADC_PACK_V2_CHANNEL,
+            ADC_SAR_IP_CONV_CHAIN_NORMAL,
+            &packV2Result
+        );
+
+        Adc_Sar_Ip_GetConvResult(
+            ADCHWUNIT_0_INSTANCE,
+            BMS_ADC_PACK_V3_CHANNEL,
+            ADC_SAR_IP_CONV_CHAIN_NORMAL,
+            &packV3Result
+        );
+
+
         if ((potResult.ValidFlag == TRUE) &&
-            (ntcResult.ValidFlag == TRUE))
+            (ntc1Result.ValidFlag == TRUE) &&
+            (ntc2Result.ValidFlag == TRUE) &&
+            (ntc3Result.ValidFlag == TRUE) &&
+            (packV1Result.ValidFlag == TRUE) &&
+            (packV2Result.ValidFlag == TRUE) &&
+            (packV3Result.ValidFlag == TRUE))
         {
             g_BmsAdcPotRaw = potResult.ConvData;
-            g_BmsAdcNtcRaw = ntcResult.ConvData;
+
+            g_BmsAdcNtc1Raw = ntc1Result.ConvData;
+            g_BmsAdcNtc2Raw = ntc2Result.ConvData;
+            g_BmsAdcNtc3Raw = ntc3Result.ConvData;
+
+            g_BmsAdcPackV1Raw = packV1Result.ConvData;
+            g_BmsAdcPackV2Raw = packV2Result.ConvData;
+            g_BmsAdcPackV3Raw = packV3Result.ConvData;
 
             g_BmsAdcValid = TRUE;
         }
@@ -109,14 +178,41 @@ uint16 Bms_Adc_GetPotVoltageMv(void)
 }
 
 
-uint16 Bms_Adc_GetNtcRaw(void)
+uint16 Bms_Adc_GetNtc1Raw(void)
 {
-    return g_BmsAdcNtcRaw;
+    return g_BmsAdcNtc1Raw;
 }
 
-uint16 Bms_Adc_GetNtcVoltageMv(void)
+uint16 Bms_Adc_GetNtc2Raw(void)
 {
-    uint32 raw = (uint32)g_BmsAdcNtcRaw;
+    return g_BmsAdcNtc2Raw;
+}
+
+uint16 Bms_Adc_GetNtc3Raw(void)
+{
+    return g_BmsAdcNtc3Raw;
+}
+
+uint16 Bms_Adc_GetPackV1Raw(void)
+{
+    return g_BmsAdcPackV1Raw;
+}
+
+uint16 Bms_Adc_GetPackV2Raw(void)
+{
+    return g_BmsAdcPackV2Raw;
+}
+
+uint16 Bms_Adc_GetPackV3Raw(void)
+{
+    return g_BmsAdcPackV3Raw;
+}
+
+
+
+uint16 Bms_Adc_GetNtc1VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcNtc1Raw;
 
     return (uint16)(
         (raw * BMS_NTC_CFG_ADC_VREF_MV) /

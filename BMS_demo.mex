@@ -825,8 +825,68 @@
                                     <setting name="DmaEn" value="false"/>
                                  </struct>
                                  <struct name="1">
-                                    <setting name="Name" value="AdcChannel_1"/>
+                                    <setting name="Name" value="AdcChannel_Ntc1"/>
                                     <setting name="AdcChannelName" value="P1_ChanNum1"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="2">
+                                    <setting name="Name" value="AdcChannel_Ntc2"/>
+                                    <setting name="AdcChannelName" value="P2_ChanNum2"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="3">
+                                    <setting name="Name" value="AdcChannel_Ntc3"/>
+                                    <setting name="AdcChannelName" value="P3_ChanNum3"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="4">
+                                    <setting name="Name" value="AdcChannel_PackV1"/>
+                                    <setting name="AdcChannelName" value="P4_ChanNum4"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="5">
+                                    <setting name="Name" value="AdcChannel_PackV2"/>
+                                    <setting name="AdcChannelName" value="P5_ChanNum5"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="6">
+                                    <setting name="Name" value="AdcChannel_PackV3"/>
+                                    <setting name="AdcChannelName" value="P6_ChanNum6"/>
                                     <setting name="NormalChnEn" value="true"/>
                                     <setting name="InjectedChnEn" value="false"/>
                                     <setting name="AdcEnablePresampling" value="false"/>

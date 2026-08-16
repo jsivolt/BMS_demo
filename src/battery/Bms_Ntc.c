@@ -106,7 +106,7 @@ void Bms_Ntc_MainFunction(void)
     uint16 adcRaw;
     sint16 temperature_dC;
 
-    adcRaw = Bms_Adc_GetNtcRaw();
+    adcRaw = Bms_Adc_GetNtc1Raw();
 
     if (Bms_Ntc_RawToTemperature(
             adcRaw,
