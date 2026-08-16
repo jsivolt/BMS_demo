@@ -33,12 +33,12 @@ uint16 Bms_Adc_GetPotVoltageMv(void);
 /**
  * @brief Returns the latest raw value of ADC1_P1.
  */
-uint16 Bms_Adc_GetAdc1Raw(void);
+uint16 Bms_Adc_GetNtcRaw(void);
 
 /**
  * @brief Returns the latest ADC1_P1 voltage in millivolts.
  */
-uint16 Bms_Adc_GetAdc1VoltageMv(void);
+uint16 Bms_Adc_GetNtcVoltageMv(void);
 
 
 #ifdef __cplusplus

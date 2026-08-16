@@ -6,11 +6,11 @@
 #include "Adc_Sar_Ip_CfgDefines.h"
 
 #define BMS_ADC_POT_CHANNEL      (34U)
-#define BMS_ADC_ADC1_CHANNEL     (1U)
+#define BMS_ADC_NTC_CHANNEL     (1U)
 
 /* Latest ADC raw values */
 static volatile uint16 g_BmsAdcPotRaw = 0U;
-static volatile uint16 g_BmsAdcAdc1Raw = 0U;
+static volatile uint16 g_BmsAdcNtcRaw = 0U;
 
 /* TRUE when the last acquisition produced valid conversion results */
 static volatile boolean g_BmsAdcValid = FALSE;
@@ -44,7 +44,7 @@ Std_ReturnType Bms_Adc_Init(void)
 void Bms_Adc_MainFunction(void)
 {
     Adc_Sar_Ip_ChanResultType potResult;
-    Adc_Sar_Ip_ChanResultType adc1Result;
+    Adc_Sar_Ip_ChanResultType ntcResult;
 
     if (g_BmsAdcConversionStarted == TRUE)
     {
@@ -65,16 +65,16 @@ void Bms_Adc_MainFunction(void)
          */
         Adc_Sar_Ip_GetConvResult(
             ADCHWUNIT_0_INSTANCE,
-            BMS_ADC_ADC1_CHANNEL,
+            BMS_ADC_NTC_CHANNEL,
             ADC_SAR_IP_CONV_CHAIN_NORMAL,
-            &adc1Result
+            &ntcResult
         );
 
         if ((potResult.ValidFlag == TRUE) &&
-            (adc1Result.ValidFlag == TRUE))
+            (ntcResult.ValidFlag == TRUE))
         {
             g_BmsAdcPotRaw = potResult.ConvData;
-            g_BmsAdcAdc1Raw = adc1Result.ConvData;
+            g_BmsAdcNtcRaw = ntcResult.ConvData;
 
             g_BmsAdcValid = TRUE;
         }
@@ -107,15 +107,14 @@ uint16 Bms_Adc_GetPotVoltageMv(void)
 }
 
 
-uint16 Bms_Adc_GetAdc1Raw(void)
+uint16 Bms_Adc_GetNtcRaw(void)
 {
-    return g_BmsAdcAdc1Raw;
+    return g_BmsAdcNtcRaw;
 }
 
-
-uint16 Bms_Adc_GetAdc1VoltageMv(void)
+uint16 Bms_Adc_GetNtcVoltageMv(void)
 {
-    uint32 raw = (uint32)g_BmsAdcAdc1Raw;
+    uint32 raw = (uint32)g_BmsAdcNtcRaw;
 
     return (uint16)((raw * 3300U) / 16383U);
 }
