@@ -10,6 +10,7 @@ RM := rm -rf
 -include sources.mk
 -include src/safety/subdir.mk
 -include src/drivers/subdir.mk
+-include src/communication/subdir.mk
 -include src/battery/subdir.mk
 -include src/app/subdir.mk
 -include src/subdir.mk

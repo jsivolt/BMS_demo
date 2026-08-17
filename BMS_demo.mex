@@ -2,7 +2,7 @@
 <configuration name="S32K344" xsi:schemaLocation="http://mcuxpresso.nxp.com/XSD/mex_configuration_19 http://mcuxpresso.nxp.com/XSD/mex_configuration_19.xsd" uuid="cb0a0571-31b0-4026-b225-2a0da4ce6ac1" version="19" xmlns="http://mcuxpresso.nxp.com/XSD/mex_configuration_19" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <common>
       <processor>S32K344</processor>
-      <package>S32K344_257BGA</package>
+      <package>S32K344_172HDQFP</package>
       <mcu_data>PlatformSDK_S32K3</mcu_data>
       <cores selected="M7_0">
          <core name="Cortex-M7" id="M7_0" description=""/>
@@ -42,35 +42,37 @@
                   </dependency>
                </dependencies>
                <pins>
-                  <pin peripheral="SIUL2" signal="gpio, 0" pin_num="A13" pin_signal="PTA0">
+                  <pin peripheral="SIUL2" signal="gpio, 0" pin_num="137" pin_signal="PTA0">
                      <pin_features>
                         <pin_feature name="direction" value="INPUT/OUTPUT"/>
                      </pin_features>
                   </pin>
-                  <pin peripheral="SIUL2" signal="gpio, 29" pin_num="M3" pin_signal="PTA29">
+                  <pin peripheral="SIUL2" signal="gpio, 29" pin_num="32" pin_signal="PTA29">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
                         <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
-                  <pin peripheral="SIUL2" signal="gpio, 30" pin_num="P3" pin_signal="PTA30">
+                  <pin peripheral="SIUL2" signal="gpio, 30" pin_num="33" pin_signal="PTA30">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
                         <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
-                  <pin peripheral="SIUL2" signal="gpio, 31" pin_num="P1" pin_signal="PTA31">
+                  <pin peripheral="SIUL2" signal="gpio, 31" pin_num="39" pin_signal="PTA31">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
                         <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
-                  <pin peripheral="SIUL2" signal="gpio, 50" pin_num="R1" pin_signal="PTB18">
+                  <pin peripheral="SIUL2" signal="gpio, 50" pin_num="42" pin_signal="PTB18">
                      <pin_features>
                         <pin_feature name="direction" value="OUTPUT"/>
                         <pin_feature name="InitValue" value="state_1"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="CAN0" signal="can0_tx" pin_num="100" pin_signal="PTA7"/>
+                  <pin peripheral="CAN0" signal="can0_rx" pin_num="102" pin_signal="PTA6"/>
                </pins>
             </function>
          </functions_list>
@@ -401,12 +403,25 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.FlexCAN" description="FlexCAN is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.FlexCAN" description="An unsupported version of the FlexCAN in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">0.1.0</data>
+               </feature>
+            </dependency>
          </dependencies>
          <generated_project_files>
             <file path="generate/include/Adc_Sar_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/Adc_Sar_Ip_CfgDefines.h" update_enabled="true"/>
             <file path="generate/include/Adc_Sar_Ip_PBcfg.h" update_enabled="true"/>
             <file path="generate/include/DeviceDefinition.h" update_enabled="true"/>
+            <file path="generate/include/FlexCAN_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/FlexCAN_Ip_CfgDefines.h" update_enabled="true"/>
+            <file path="generate/include/FlexCAN_Ip_Sa_PBcfg.h" update_enabled="true"/>
             <file path="generate/include/IntCtrl_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/IntCtrl_Ip_CfgDefines.h" update_enabled="true"/>
             <file path="generate/include/OsIf_ArchCfg.h" update_enabled="true"/>
@@ -419,6 +434,7 @@
             <file path="generate/include/Soc_Ips.h" update_enabled="true"/>
             <file path="generate/include/modules.h" update_enabled="true"/>
             <file path="generate/src/Adc_Sar_Ip_PBcfg.c" update_enabled="true"/>
+            <file path="generate/src/FlexCAN_Ip_Sa_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/IntCtrl_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/OsIf_Cfg.c" update_enabled="true"/>
             <file path="generate/src/Pit_Ip_SA_PBcfg.c" update_enabled="true"/>
@@ -580,6 +596,38 @@
                                        <setting name="PortPinInvertControl" value="false"/>
                                        <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
                                        <setting name="PortPinId" value="5"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
+                                    <struct name="5">
+                                       <setting name="Name" value="PortPin_5"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="6"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
+                                    <struct name="6">
+                                       <setting name="Name" value="PortPin_6"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="7"/>
                                        <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
                                     </struct>
                                  </array>
@@ -900,6 +948,82 @@
                               <array name="AdcThresholdControl"/>
                            </struct>
                         </array>
+                     </config_set>
+                  </instance>
+                  <instance name="FlexCAN" uuid="58bc5871-45e7-46f5-84f6-94821a001c11" type="FlexCAN" type_id="FlexCAN" mode="ip" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="FlexCAN">
+                        <setting name="Name" value="FlexCAN"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-PRE-COMPILE"/>
+                        </struct>
+                        <array name="FlexCAN_Configurations">
+                           <struct name="0">
+                              <setting name="CanHwChannel" value="FLEXCAN_0"/>
+                              <setting name="Name" value="FlexCAN_Config0"/>
+                              <setting name="max_num_mb" value="16"/>
+                              <setting name="num_id_filters" value="FLEXCAN_RX_FIFO_ID_FILTERS_8"/>
+                              <setting name="is_rx_fifo_needed" value="false"/>
+                              <setting name="fd_enable" value="false"/>
+                              <setting name="flexcanMode" value="FLEXCAN_NORMAL_MODE"/>
+                              <struct name="FlexCANRamBlock" quick_selection="Default">
+                                 <setting name="Name" value="FlexCANRamBlock"/>
+                                 <setting name="Choice" value="FlexCANRamBlockUnified"/>
+                                 <struct name="FlexCANRamBlockUnified" quick_selection="Default">
+                                    <setting name="Name" value="FlexCANRamBlock"/>
+                                    <setting name="RamBlockUnifiedPayloadLength" value="FLEXCAN_PAYLOAD_SIZE_8"/>
+                                 </struct>
+                              </struct>
+                              <setting name="transfer_type" value="FLEXCAN_RXFIFO_USING_INTERRUPTS"/>
+                              <setting name="rxFifoDMAChannel" value="0"/>
+                              <setting name="extCbtEnable" value="false"/>
+                              <setting name="bitRateSwitch" value="false"/>
+                              <setting name="CanControllerFdISO" value="true"/>
+                              <setting name="CanControllerAutoBusOff" value="true"/>
+                              <setting name="CanRemoteRequestStore" value="false"/>
+                              <setting name="CanLowestBufferTransmittedFirst" value="false"/>
+                              <setting name="timeStampSurce" value="FLEXCAN_CAN_CLK_TIMESTAMP_SRC"/>
+                              <setting name="msgBuffTimeStampType" value="FLEXCAN_MSGBUFFTIMESTAMP_TIMER"/>
+                              <setting name="hrConfigType" value="FLEXCAN_TIMESTAMPCAPTURE_DISABLE"/>
+                              <setting name="pe_clock_frequency" value="24000000"/>
+                              <struct name="flexcan_time_segment">
+                                 <setting name="Name" value="FlexCAN_Ip_TimeSeg0"/>
+                                 <setting name="flexcan_cfg_propSeg" value="7"/>
+                                 <setting name="flexcan_cfg_phaseSeg1" value="6"/>
+                                 <setting name="flexcan_cfg_phaseSeg2" value="2"/>
+                                 <setting name="flexcan_cfg_preDivider" value="3"/>
+                                 <setting name="flexcan_cfg_rJumpwidth" value="2"/>
+                              </struct>
+                              <struct name="flexcan_time_segment_cbt">
+                                 <setting name="Name" value="FlexCAN_Ip_TimeSegCBT0"/>
+                                 <setting name="flexcan_cfg_propSeg" value="7"/>
+                                 <setting name="flexcan_cfg_phaseSeg1" value="6"/>
+                                 <setting name="flexcan_cfg_phaseSeg2" value="2"/>
+                                 <setting name="flexcan_cfg_preDivider" value="5"/>
+                                 <setting name="flexcan_cfg_rJumpwidth" value="2"/>
+                              </struct>
+                              <setting name="FlexCanCallback" value="NULL_PTR"/>
+                              <setting name="FlexCanErrorCallback" value="NULL_PTR"/>
+                              <setting name="num_enhanced_std_id_filters" value="0"/>
+                              <setting name="num_enhanced_ext_id_filters" value="0"/>
+                              <setting name="num_enhanced_watermark" value="0"/>
+                              <setting name="is_enhanced_rx_fifo_needed" value="false"/>
+                           </struct>
+                        </array>
+                        <struct name="FlexCAN_General">
+                           <setting name="Name" value="FlexCAN_General"/>
+                           <setting name="FlexCANEnableUserModeSupport" value="false"/>
+                           <setting name="FlexCANIpDevErrorDetect" value="true"/>
+                           <setting name="FlexCANEnableTimeStampSupport" value="false"/>
+                           <setting name="hrSrc" value="FLEXCAN_HRTIMERSRC_EMAC"/>
+                           <setting name="MemoryErrorDetectionAndCorrectionEnabled" value="false"/>
+                           <setting name="FlexCANNonCorrectableErrorResponse" value="FLEXCAN_NORMAL_MODE"/>
+                        </struct>
+                        <struct name="timeout">
+                           <setting name="Name" value="FlexCAN_Timeout"/>
+                           <setting name="timeout_type" value="OSIF_COUNTER_DUMMY"/>
+                           <setting name="timeout_value" value="10000"/>
+                        </struct>
                      </config_set>
                   </instance>
                </instances>

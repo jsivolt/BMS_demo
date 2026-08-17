@@ -23,6 +23,9 @@ C_SRCS += \
 ../RTD/src/Clock_Ip_Specific.c \
 ../RTD/src/Det.c \
 ../RTD/src/Det_stub.c \
+../RTD/src/FlexCAN_Ip.c \
+../RTD/src/FlexCAN_Ip_HwAccess.c \
+../RTD/src/FlexCAN_Ip_Irq.c \
 ../RTD/src/Igf_Port_Ip.c \
 ../RTD/src/IntCtrl_Ip.c \
 ../RTD/src/OsIf_Interrupts.c \
@@ -33,6 +36,7 @@ C_SRCS += \
 ../RTD/src/Pit_Ip.c \
 ../RTD/src/SchM_Adc.c \
 ../RTD/src/SchM_BaseNXP.c \
+../RTD/src/SchM_Can_43_FLEXCAN.c \
 ../RTD/src/SchM_Dio.c \
 ../RTD/src/SchM_Gpt.c \
 ../RTD/src/SchM_Mcu.c \
@@ -61,6 +65,9 @@ OBJS += \
 ./RTD/src/Clock_Ip_Specific.o \
 ./RTD/src/Det.o \
 ./RTD/src/Det_stub.o \
+./RTD/src/FlexCAN_Ip.o \
+./RTD/src/FlexCAN_Ip_HwAccess.o \
+./RTD/src/FlexCAN_Ip_Irq.o \
 ./RTD/src/Igf_Port_Ip.o \
 ./RTD/src/IntCtrl_Ip.o \
 ./RTD/src/OsIf_Interrupts.o \
@@ -71,6 +78,7 @@ OBJS += \
 ./RTD/src/Pit_Ip.o \
 ./RTD/src/SchM_Adc.o \
 ./RTD/src/SchM_BaseNXP.o \
+./RTD/src/SchM_Can_43_FLEXCAN.o \
 ./RTD/src/SchM_Dio.o \
 ./RTD/src/SchM_Gpt.o \
 ./RTD/src/SchM_Mcu.o \
@@ -99,6 +107,9 @@ C_DEPS += \
 ./RTD/src/Clock_Ip_Specific.d \
 ./RTD/src/Det.d \
 ./RTD/src/Det_stub.d \
+./RTD/src/FlexCAN_Ip.d \
+./RTD/src/FlexCAN_Ip_HwAccess.d \
+./RTD/src/FlexCAN_Ip_Irq.d \
 ./RTD/src/Igf_Port_Ip.d \
 ./RTD/src/IntCtrl_Ip.d \
 ./RTD/src/OsIf_Interrupts.d \
@@ -109,6 +120,7 @@ C_DEPS += \
 ./RTD/src/Pit_Ip.d \
 ./RTD/src/SchM_Adc.d \
 ./RTD/src/SchM_BaseNXP.d \
+./RTD/src/SchM_Can_43_FLEXCAN.d \
 ./RTD/src/SchM_Dio.d \
 ./RTD/src/SchM_Gpt.d \
 ./RTD/src/SchM_Mcu.d \

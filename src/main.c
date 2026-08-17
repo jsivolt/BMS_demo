@@ -48,6 +48,7 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "communication/Bms_Can.h"
 
 
 
@@ -181,8 +182,8 @@ static void Bms_MainFunction_10ms(void)
 
 static void Bms_MainFunction_100ms(void)
 {
-    /* TODO: reserved for future 100 ms tasks (e.g. CAN transmit). */
 	 Bms_Ntc_MainFunction();
+	 Bms_Can_SendTest();
 }
 
 static void Bms_MainFunction_1000ms(void)
@@ -318,6 +319,22 @@ int main(void)
         while (1)
         {
             /* Error trap */
+        }
+    }
+
+    /* Initialize CAN (FlexCAN) for BMS communication. */
+    if (Bms_Can_Init() != (Std_ReturnType)E_OK)
+    {
+        /* CAN init failed: turn RED LED permanently ON and trap. */
+        Siul2_Dio_Ip_WritePin(
+            LED_RED_PORT,
+            LED_RED_PIN,
+            0U
+        );
+
+        while (1)
+        {
+            /* CAN init failed */
         }
     }
 

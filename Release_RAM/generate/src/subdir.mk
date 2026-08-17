@@ -6,6 +6,7 @@
 C_SRCS += \
 ../generate/src/Adc_Sar_Ip_PBcfg.c \
 ../generate/src/Clock_Ip_Cfg.c \
+../generate/src/FlexCAN_Ip_Sa_PBcfg.c \
 ../generate/src/Igf_Port_Ip_Cfg.c \
 ../generate/src/IntCtrl_Ip_Cfg.c \
 ../generate/src/OsIf_Cfg.c \
@@ -14,6 +15,7 @@ C_SRCS += \
 OBJS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.o \
 ./generate/src/Clock_Ip_Cfg.o \
+./generate/src/FlexCAN_Ip_Sa_PBcfg.o \
 ./generate/src/Igf_Port_Ip_Cfg.o \
 ./generate/src/IntCtrl_Ip_Cfg.o \
 ./generate/src/OsIf_Cfg.o \
@@ -22,6 +24,7 @@ OBJS += \
 C_DEPS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.d \
 ./generate/src/Clock_Ip_Cfg.d \
+./generate/src/FlexCAN_Ip_Sa_PBcfg.d \
 ./generate/src/Igf_Port_Ip_Cfg.d \
 ./generate/src/IntCtrl_Ip_Cfg.d \
 ./generate/src/OsIf_Cfg.d \
