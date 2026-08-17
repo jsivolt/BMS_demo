@@ -6,17 +6,20 @@
 C_SRCS += \
 ../src/app/Bms_Adc.c \
 ../src/app/Bms_App.c \
-../src/app/Bms_Scheduler.c 
+../src/app/Bms_Scheduler.c \
+../src/app/Bms_StateMachine.c 
 
 OBJS += \
 ./src/app/Bms_Adc.o \
 ./src/app/Bms_App.o \
-./src/app/Bms_Scheduler.o 
+./src/app/Bms_Scheduler.o \
+./src/app/Bms_StateMachine.o 
 
 C_DEPS += \
 ./src/app/Bms_Adc.d \
 ./src/app/Bms_App.d \
-./src/app/Bms_Scheduler.d 
+./src/app/Bms_Scheduler.d \
+./src/app/Bms_StateMachine.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

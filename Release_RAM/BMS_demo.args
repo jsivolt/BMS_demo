@@ -70,6 +70,7 @@
 "./src/app/Bms_Adc.o"
 "./src/app/Bms_App.o"
 "./src/app/Bms_Scheduler.o"
+"./src/app/Bms_StateMachine.o"
 "./src/battery/Battery_Monitor.o"
 "./src/battery/Bms_Ntc.o"
 "./src/communication/Bms_Can.o"

@@ -50,7 +50,7 @@
 #include "Bms_Ntc.h"
 #include "communication/Bms_Can.h"
 
-
+#include "Bms_StateMachine.h"
 
 /* ================================================================================================
  * PIT configuration
@@ -185,6 +185,8 @@ static void Bms_MainFunction_100ms(void)
 	 Bms_Ntc_MainFunction();
 
      Bms_Can_MainFunction();
+
+     Bms_StateMachine_MainFunction();
      
 	 Bms_Can_SendTest();
 }
@@ -340,6 +342,9 @@ int main(void)
             /* CAN init failed */
         }
     }
+
+    /* Initialize BMS state machine. */
+    Bms_StateMachine_Init();
 
 
     /* ============================================================================================
