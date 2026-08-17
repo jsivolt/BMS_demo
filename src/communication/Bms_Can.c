@@ -60,12 +60,16 @@ static Flexcan_Ip_DataInfoType g_BmsCanRxInfo =
 
 volatile Flexcan_Ip_StatusType g_BmsCanInitStatus;
 volatile Flexcan_Ip_StatusType g_BmsCanTxStatus;
-volatile Flexcan_Ip_StatusType g_BmsCanRxStatus;
+volatile Flexcan_Ip_StatusType g_BmsCanRxDebugStatus;
+volatile Flexcan_Ip_StatusType g_BmsCanRxControlStatus;
 
 volatile uint32 g_BmsCanRxCount = 0U;
 volatile uint32 g_BmsCanRxInvalidCount = 0U;
 volatile uint32 g_BmsCanRxId = 0U;
 volatile uint8 g_BmsCanRxDlc = 0U;
+volatile boolean g_BmsEnableRequest = FALSE;
+volatile boolean g_BmsDisableRequest = FALSE;
+volatile boolean g_BmsClearFaultRequest = FALSE;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -77,12 +81,13 @@ volatile uint8 g_BmsCanRxData[8] =
 /*
  * RTD receives the complete CAN frame into this structure.
  */
-static Flexcan_Ip_MsgBuffType g_BmsCanRxMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCanRxDebugMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
 
 
 static void Bms_Can_ProcessRxMessage(void)
 {
-    if (g_BmsCanRxId != BMS_CAN_CFG_RX_COMMAND_ID)
+    if (g_BmsCanRxId != BMS_CAN_CFG_RX_DEBUG_ID)
     {
         g_BmsCanRxInvalidCount++;
         return;
@@ -129,6 +134,38 @@ static void Bms_Can_ProcessRxMessage(void)
 }
 
 
+static void Bms_Can_ProcessControlCommand(const uint8 *data, uint8 dlc)
+{
+    if (dlc < 1U)
+    {
+        return;
+    }
+
+    switch (data[0])
+    {
+        case 0x00U:
+            break;
+
+        case 0x01U:
+            g_BmsEnableRequest = TRUE;
+            g_BmsDisableRequest = FALSE;
+            break;
+
+        case 0x02U:
+            g_BmsDisableRequest = TRUE;
+            g_BmsEnableRequest = FALSE;
+            break;
+
+        case 0x03U:
+            g_BmsClearFaultRequest = TRUE;
+            break;
+
+        default:
+            break;
+    }
+}
+
+
 /* ================================================================================================
  * CAN initialization
  * ============================================================================================== */
@@ -156,9 +193,22 @@ Std_ReturnType Bms_Can_Init(void)
      */
     g_BmsCanInitStatus = FlexCAN_Ip_ConfigRxMb(
         BMS_CAN_CFG_INSTANCE,
-        BMS_CAN_CFG_RX_MB_INDEX,
+        BMS_CAN_CFG_RX_DEBUG_MB_INDEX,
         &g_BmsCanRxInfo,
-        BMS_CAN_CFG_RX_COMMAND_ID
+        BMS_CAN_CFG_RX_DEBUG_ID
+    );
+
+    if (g_BmsCanInitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+
+    g_BmsCanInitStatus = FlexCAN_Ip_ConfigRxMb(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_RX_CONTROL_MB_INDEX,
+        &g_BmsCanRxInfo,
+        BMS_CAN_CFG_RX_CONTROL_ID
     );
 
     if (g_BmsCanInitStatus != FLEXCAN_STATUS_SUCCESS)
@@ -183,14 +233,27 @@ Std_ReturnType Bms_Can_Init(void)
     /*
      * Arm the first RX operation.
      */
-    g_BmsCanRxStatus = FlexCAN_Ip_Receive(
+    g_BmsCanRxDebugStatus = FlexCAN_Ip_Receive(
         BMS_CAN_CFG_INSTANCE,
-        BMS_CAN_CFG_RX_MB_INDEX,
-        &g_BmsCanRxMessage,
+        BMS_CAN_CFG_RX_DEBUG_MB_INDEX,
+        &g_BmsCanRxDebugMessage,
         TRUE
     );
 
-    if (g_BmsCanRxStatus != FLEXCAN_STATUS_SUCCESS)
+    if (g_BmsCanRxDebugStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+
+    g_BmsCanRxControlStatus = FlexCAN_Ip_Receive(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_RX_CONTROL_MB_INDEX,
+        &g_BmsCanRxControlMessage,
+        TRUE
+    );
+
+    if (g_BmsCanRxControlStatus != FLEXCAN_STATUS_SUCCESS)
     {
         return (Std_ReturnType)E_NOT_OK;
     }
@@ -242,28 +305,22 @@ void Bms_Can_MainFunction(void)
     uint8 i;
 
 
-    /*
-     * Let RTD process polling RX completion.
-     */
+    /* Process 0x200 debug mailbox. */
     FlexCAN_Ip_MainFunctionRead(
         BMS_CAN_CFG_INSTANCE,
-        BMS_CAN_CFG_RX_MB_INDEX
+        BMS_CAN_CFG_RX_DEBUG_MB_INDEX
     );
 
-
-    /*
-     * Check whether reception completed.
-     */
-    g_BmsCanRxStatus = FlexCAN_Ip_GetTransferStatus(
+    g_BmsCanRxDebugStatus = FlexCAN_Ip_GetTransferStatus(
         BMS_CAN_CFG_INSTANCE,
-        BMS_CAN_CFG_RX_MB_INDEX
+        BMS_CAN_CFG_RX_DEBUG_MB_INDEX
     );
 
 
-    if (g_BmsCanRxStatus == FLEXCAN_STATUS_SUCCESS)
+    if (g_BmsCanRxDebugStatus == FLEXCAN_STATUS_SUCCESS)
     {
-        g_BmsCanRxId  = g_BmsCanRxMessage.msgId;
-        g_BmsCanRxDlc = g_BmsCanRxMessage.dataLen;
+        g_BmsCanRxId  = g_BmsCanRxDebugMessage.msgId;
+        g_BmsCanRxDlc = g_BmsCanRxDebugMessage.dataLen;
 
         if (g_BmsCanRxDlc > 8U)
         {
@@ -272,16 +329,43 @@ void Bms_Can_MainFunction(void)
 
         for (i = 0U; i < g_BmsCanRxDlc; i++)
         {
-            g_BmsCanRxData[i] = g_BmsCanRxMessage.data[i];
+            g_BmsCanRxData[i] = g_BmsCanRxDebugMessage.data[i];
         }
 
         g_BmsCanRxCount++;
         Bms_Can_ProcessRxMessage();
 
-        g_BmsCanRxStatus = FlexCAN_Ip_Receive(
+        g_BmsCanRxDebugStatus = FlexCAN_Ip_Receive(
             BMS_CAN_CFG_INSTANCE,
-            BMS_CAN_CFG_RX_MB_INDEX,
-            &g_BmsCanRxMessage,
+            BMS_CAN_CFG_RX_DEBUG_MB_INDEX,
+            &g_BmsCanRxDebugMessage,
+            TRUE
+        );
+    }
+
+
+    /* Process 0x201 control mailbox. */
+    FlexCAN_Ip_MainFunctionRead(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_RX_CONTROL_MB_INDEX
+    );
+
+    g_BmsCanRxControlStatus = FlexCAN_Ip_GetTransferStatus(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_RX_CONTROL_MB_INDEX
+    );
+
+    if (g_BmsCanRxControlStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        Bms_Can_ProcessControlCommand(
+            g_BmsCanRxControlMessage.data,
+            g_BmsCanRxControlMessage.dataLen
+        );
+
+        g_BmsCanRxControlStatus = FlexCAN_Ip_Receive(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_RX_CONTROL_MB_INDEX,
+            &g_BmsCanRxControlMessage,
             TRUE
         );
     }

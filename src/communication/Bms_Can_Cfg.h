@@ -17,22 +17,28 @@ extern "C" {
 ==================================================================================================*/
 
 /** @brief FlexCAN hardware instance used by the BMS application. */
-#define BMS_CAN_CFG_INSTANCE            (0U)
+#define BMS_CAN_CFG_INSTANCE              (0U)
 
 /** @brief Message buffer index reserved for transmission. */
-#define BMS_CAN_CFG_TX_MB_INDEX         (0U)
+#define BMS_CAN_CFG_TX_MB_INDEX           (0U)
 
-/** @brief Message buffer index reserved for reception. */
-#define BMS_CAN_CFG_RX_MB_INDEX         (1U)
+/** @brief Message buffer index reserved for debug reception. */
+#define BMS_CAN_CFG_RX_DEBUG_MB_INDEX     (1U)
+
+/** @brief Message buffer index reserved for control reception. */
+#define BMS_CAN_CFG_RX_CONTROL_MB_INDEX   (2U)
 
 /** @brief Nominal CAN bit rate, in bits per second. */
 #define BMS_CAN_CFG_BAUDRATE_BPS        (500000U)
 
 /** @brief CAN identifier used to broadcast BMS status frames. */
-#define BMS_CAN_CFG_TX_STATUS_ID        (0x100U)
+#define BMS_CAN_CFG_TX_STATUS_ID          (0x100U)
 
-/** @brief CAN identifier the BMS listens to for incoming command frames. */
-#define BMS_CAN_CFG_RX_COMMAND_ID       (0x200U)
+/** @brief CAN identifier used for incoming debug frames. */
+#define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)
+
+/** @brief CAN identifier used for incoming control frames. */
+#define BMS_CAN_CFG_RX_CONTROL_ID         (0x201U)
 
 /** @brief Acceptance mask applied to the reception message buffer. */
 #define BMS_CAN_CFG_RX_MASK             (0x7FFU)
