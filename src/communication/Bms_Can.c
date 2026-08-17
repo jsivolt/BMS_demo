@@ -3,9 +3,13 @@
 
 #include "FlexCAN_Ip.h"
 #include "FlexCAN_Ip_Sa_PBcfg.h"
+#include "Siul2_Dio_Ip.h"
+#include "Siul2_Dio_Ip_Cfg.h"
 
 
 #define BMS_CAN_TX_TIMEOUT_MS   (100U)
+#define BMS_CAN_LED_PORT         PTA_H_HALF
+#define BMS_CAN_LED_PIN          (14U)
 
 
 /* ================================================================================================
@@ -97,11 +101,21 @@ static void Bms_Can_ProcessRxMessage(void)
             break;
 
         case 0x01U:
-            /* LED1 ON */
+            /* LED2 GREEN ON - active low */
+            Siul2_Dio_Ip_WritePin(
+                BMS_CAN_LED_PORT,
+                BMS_CAN_LED_PIN,
+                0U
+            );
             break;
 
         case 0x02U:
-            /* LED1 OFF */
+            /* LED2 GREEN OFF - active low */
+            Siul2_Dio_Ip_WritePin(
+                BMS_CAN_LED_PORT,
+                BMS_CAN_LED_PIN,
+                1U
+            );
             break;
 
         case 0x03U:
