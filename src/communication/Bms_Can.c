@@ -59,6 +59,9 @@ volatile Flexcan_Ip_StatusType g_BmsCanTxStatus;
 volatile Flexcan_Ip_StatusType g_BmsCanRxStatus;
 
 volatile uint32 g_BmsCanRxCount = 0U;
+volatile uint32 g_BmsCanRxInvalidCount = 0U;
+volatile uint32 g_BmsCanRxId = 0U;
+volatile uint8 g_BmsCanRxDlc = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -71,6 +74,45 @@ volatile uint8 g_BmsCanRxData[8] =
  * RTD receives the complete CAN frame into this structure.
  */
 static Flexcan_Ip_MsgBuffType g_BmsCanRxMessage;
+
+
+static void Bms_Can_ProcessRxMessage(void)
+{
+    if (g_BmsCanRxId != BMS_CAN_CFG_RX_COMMAND_ID)
+    {
+        g_BmsCanRxInvalidCount++;
+        return;
+    }
+
+    if (g_BmsCanRxDlc < 1U)
+    {
+        g_BmsCanRxInvalidCount++;
+        return;
+    }
+
+    switch (g_BmsCanRxData[0])
+    {
+        case 0x00U:
+            /* NOP */
+            break;
+
+        case 0x01U:
+            /* LED1 ON */
+            break;
+
+        case 0x02U:
+            /* LED1 OFF */
+            break;
+
+        case 0x03U:
+            g_BmsCanRxCount = 0U;
+            break;
+
+        default:
+            g_BmsCanRxInvalidCount++;
+            break;
+    }
+}
 
 
 /* ================================================================================================
@@ -206,21 +248,22 @@ void Bms_Can_MainFunction(void)
 
     if (g_BmsCanRxStatus == FLEXCAN_STATUS_SUCCESS)
     {
-        /*
-         * Copy received payload into simple debug buffer.
-         */
-        for (i = 0U; i < 8U; i++)
+        g_BmsCanRxId  = g_BmsCanRxMessage.msgId;
+        g_BmsCanRxDlc = g_BmsCanRxMessage.dataLen;
+
+        if (g_BmsCanRxDlc > 8U)
+        {
+            g_BmsCanRxDlc = 8U;
+        }
+
+        for (i = 0U; i < g_BmsCanRxDlc; i++)
         {
             g_BmsCanRxData[i] = g_BmsCanRxMessage.data[i];
         }
 
-
         g_BmsCanRxCount++;
+        Bms_Can_ProcessRxMessage();
 
-
-        /*
-         * Rearm RX mailbox for the next frame.
-         */
         g_BmsCanRxStatus = FlexCAN_Ip_Receive(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_RX_MB_INDEX,
