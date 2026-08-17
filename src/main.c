@@ -183,6 +183,9 @@ static void Bms_MainFunction_10ms(void)
 static void Bms_MainFunction_100ms(void)
 {
 	 Bms_Ntc_MainFunction();
+
+     Bms_Can_MainFunction();
+     
 	 Bms_Can_SendTest();
 }
 
