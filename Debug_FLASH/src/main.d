@@ -72,7 +72,7 @@ src/main.o: ../src/main.c ../RTD/include/Clock_Ip.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Scheduler.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h \
  C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h \
- ../src/communication/Bms_Can.h \
+ ../src/communication/Bms_Can.h ../src/communication/Bms_Spi.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_StateMachine.h
 ../RTD/include/Clock_Ip.h:
 ../RTD/include/Clock_Ip_Types.h:
@@ -151,4 +151,5 @@ C\:/S32K344/workspace/BMS_demo/src/app/Bms_Scheduler.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h:
 C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h:
 ../src/communication/Bms_Can.h:
+../src/communication/Bms_Spi.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_StateMachine.h:

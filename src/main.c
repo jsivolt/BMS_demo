@@ -49,6 +49,7 @@
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
 #include "communication/Bms_Can.h"
+#include "communication/Bms_Spi.h"
 
 #include "Bms_StateMachine.h"
 
@@ -340,6 +341,21 @@ int main(void)
         while (1)
         {
             /* CAN init failed */
+        }
+    }
+
+    /* Initialize SPI for BMS communication. */
+    if (Bms_Spi_Init() != (Std_ReturnType)E_OK)
+    {
+        Siul2_Dio_Ip_WritePin(
+            LED_RED_PORT,
+            LED_RED_PIN,
+            0U
+        );
+
+        while (1)
+        {
+            /* SPI init failed */
         }
     }
 

@@ -28,6 +28,8 @@ C_SRCS += \
 ../RTD/src/FlexCAN_Ip_Irq.c \
 ../RTD/src/Igf_Port_Ip.c \
 ../RTD/src/IntCtrl_Ip.c \
+../RTD/src/Lpspi_Ip.c \
+../RTD/src/Lpspi_Ip_Irq.c \
 ../RTD/src/OsIf_Interrupts.c \
 ../RTD/src/OsIf_Software_Semaphore.c \
 ../RTD/src/OsIf_Timer.c \
@@ -41,6 +43,7 @@ C_SRCS += \
 ../RTD/src/SchM_Gpt.c \
 ../RTD/src/SchM_Mcu.c \
 ../RTD/src/SchM_Port.c \
+../RTD/src/SchM_Spi.c \
 ../RTD/src/Siul2_Dio_Ip.c \
 ../RTD/src/Siul2_Port_Ip.c \
 ../RTD/src/Tspc_Port_Ip.c 
@@ -70,6 +73,8 @@ OBJS += \
 ./RTD/src/FlexCAN_Ip_Irq.o \
 ./RTD/src/Igf_Port_Ip.o \
 ./RTD/src/IntCtrl_Ip.o \
+./RTD/src/Lpspi_Ip.o \
+./RTD/src/Lpspi_Ip_Irq.o \
 ./RTD/src/OsIf_Interrupts.o \
 ./RTD/src/OsIf_Software_Semaphore.o \
 ./RTD/src/OsIf_Timer.o \
@@ -83,6 +88,7 @@ OBJS += \
 ./RTD/src/SchM_Gpt.o \
 ./RTD/src/SchM_Mcu.o \
 ./RTD/src/SchM_Port.o \
+./RTD/src/SchM_Spi.o \
 ./RTD/src/Siul2_Dio_Ip.o \
 ./RTD/src/Siul2_Port_Ip.o \
 ./RTD/src/Tspc_Port_Ip.o 
@@ -112,6 +118,8 @@ C_DEPS += \
 ./RTD/src/FlexCAN_Ip_Irq.d \
 ./RTD/src/Igf_Port_Ip.d \
 ./RTD/src/IntCtrl_Ip.d \
+./RTD/src/Lpspi_Ip.d \
+./RTD/src/Lpspi_Ip_Irq.d \
 ./RTD/src/OsIf_Interrupts.d \
 ./RTD/src/OsIf_Software_Semaphore.d \
 ./RTD/src/OsIf_Timer.d \
@@ -125,6 +133,7 @@ C_DEPS += \
 ./RTD/src/SchM_Gpt.d \
 ./RTD/src/SchM_Mcu.d \
 ./RTD/src/SchM_Port.d \
+./RTD/src/SchM_Spi.d \
 ./RTD/src/Siul2_Dio_Ip.d \
 ./RTD/src/Siul2_Port_Ip.d \
 ./RTD/src/Tspc_Port_Ip.d 

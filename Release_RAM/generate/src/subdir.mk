@@ -9,6 +9,7 @@ C_SRCS += \
 ../generate/src/FlexCAN_Ip_Sa_PBcfg.c \
 ../generate/src/Igf_Port_Ip_Cfg.c \
 ../generate/src/IntCtrl_Ip_Cfg.c \
+../generate/src/Lpspi_Ip_Sa_PBcfg.c \
 ../generate/src/OsIf_Cfg.c \
 ../generate/src/Pit_Ip_SA_PBcfg.c 
 
@@ -18,6 +19,7 @@ OBJS += \
 ./generate/src/FlexCAN_Ip_Sa_PBcfg.o \
 ./generate/src/Igf_Port_Ip_Cfg.o \
 ./generate/src/IntCtrl_Ip_Cfg.o \
+./generate/src/Lpspi_Ip_Sa_PBcfg.o \
 ./generate/src/OsIf_Cfg.o \
 ./generate/src/Pit_Ip_SA_PBcfg.o 
 
@@ -27,6 +29,7 @@ C_DEPS += \
 ./generate/src/FlexCAN_Ip_Sa_PBcfg.d \
 ./generate/src/Igf_Port_Ip_Cfg.d \
 ./generate/src/IntCtrl_Ip_Cfg.d \
+./generate/src/Lpspi_Ip_Sa_PBcfg.d \
 ./generate/src/OsIf_Cfg.d \
 ./generate/src/Pit_Ip_SA_PBcfg.d 
 
