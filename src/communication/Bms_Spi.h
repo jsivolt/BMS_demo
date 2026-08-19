@@ -4,6 +4,7 @@
 #include "Std_Types.h"
 
 Std_ReturnType Bms_Spi_Init(void);
+Std_ReturnType Bms_Spi_Test(void);
 
 /*
  * Full-duplex synchronous SPI transfer (blocking, hardware CS on PCS0).

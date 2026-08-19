@@ -50,3 +50,22 @@ Std_ReturnType Bms_Spi_Transfer(const uint8 *TxBuffer, uint8 *RxBuffer, uint16 L
 
     return (Std_ReturnType)E_OK;
 }
+
+Std_ReturnType Bms_Spi_Test(void)
+{
+    uint8 txData[4] =
+    {
+        0xAAU,
+        0x55U,
+        0xA5U,
+        0x5AU
+    };
+
+    uint8 rxData[4] = {0U};
+
+    return Bms_Spi_Transfer(
+        txData,
+        rxData,
+        (uint16)sizeof(txData)
+    );
+}

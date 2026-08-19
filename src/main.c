@@ -359,6 +359,20 @@ int main(void)
         }
     }
 
+    if (Bms_Spi_Test() != (Std_ReturnType)E_OK)
+    {
+        Siul2_Dio_Ip_WritePin(
+            LED_RED_PORT,
+            LED_RED_PIN,
+            0U
+        );
+
+        while (1)
+        {
+        /* SPI test failed */
+        }
+    }
+
     /* Initialize BMS state machine. */
     Bms_StateMachine_Init();
 
