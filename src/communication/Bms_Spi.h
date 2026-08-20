@@ -3,14 +3,24 @@
 
 #include "Std_Types.h"
 
-Std_ReturnType Bms_Spi_Init(void);
-Std_ReturnType Bms_Spi_Test(void);
+Std_ReturnType Bms_Spi_Init(void); 
 
-/*
- * Full-duplex synchronous SPI transfer (blocking, hardware CS on PCS0).
- *
- * TxBuffer/RxBuffer may each be NULL_PTR if not needed by the caller.
- */
-Std_ReturnType Bms_Spi_Transfer(const uint8 *TxBuffer, uint8 *RxBuffer, uint16 Length);
+Std_ReturnType Bms_Spi_Write(
+    const uint8 *TxBuffer,
+    uint16 Length
+);
 
-#endif
+Std_ReturnType Bms_Spi_Read(
+    uint8 *RxBuffer,
+    uint16 Length
+);
+
+Std_ReturnType Bms_Spi_WriteRead(
+    const uint8 *TxBuffer,
+    uint8 *RxBuffer,
+    uint16 Length
+);
+
+/*Std_ReturnType Bms_Spi_Test(void);*/
+
+#endif /* BMS_SPI_H */
