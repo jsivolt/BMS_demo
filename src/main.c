@@ -114,6 +114,9 @@ static boolean g_FaultInjected = FALSE;
 static boolean g_FaultCleared = FALSE;
 static boolean g_RecloseRequested = FALSE;
 
+static uint32 g_SystemFaultTestCounter = 0U;
+static boolean g_SystemFaultInjected = FALSE;
+
 /* ================================================================================================
  * PIT callback
  *
@@ -144,6 +147,15 @@ static void Bms_MainFunction_10ms(void)
     Bms_Adc_MainFunction();
 
     Bms_Contactor_MainFunction();
+
+    g_SystemFaultTestCounter++;
+
+    if ((g_SystemFaultTestCounter >= 500U) &&
+        (g_SystemFaultInjected == FALSE))
+    {
+        FaultManager_SetSystem(FAULT_AFE_COMM);
+        g_SystemFaultInjected = TRUE;
+    }
 
     /* Temporary fault-injection test code (disabled: precharge isolation test only)
     g_FaultTestCounter++;
@@ -413,8 +425,8 @@ int main(void)
         BMS_PACK_3,
         98.0F);
 
-    /* Bus << packs (91V) to trigger precharge isolation fault on all packs */
-    Bms_Contactor_SetBusVoltage(91.0F);
+    /* System fault test: let all packs precharge successfully first */
+    Bms_Contactor_SetBusVoltage(100.0F);
 
     Bms_Contactor_RequestClose(BMS_PACK_1);
     Bms_Contactor_RequestClose(BMS_PACK_2);
