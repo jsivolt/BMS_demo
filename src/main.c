@@ -109,6 +109,11 @@ static uint32 g_LedCounter = 0U;
 static boolean g_LedOn = FALSE;
 
 
+static uint32 g_FaultTestCounter = 0U;
+static boolean g_FaultInjected = FALSE;
+static boolean g_FaultCleared = FALSE;
+static boolean g_RecloseRequested = FALSE;
+
 /* ================================================================================================
  * PIT callback
  *
@@ -139,6 +144,29 @@ static void Bms_MainFunction_10ms(void)
     Bms_Adc_MainFunction();
 
     Bms_Contactor_MainFunction();
+
+    g_FaultTestCounter++;
+
+    if ((g_FaultTestCounter >= 500U) &&
+        (g_FaultInjected == FALSE))
+    {
+        FaultManager_Set(FAULT_OVER_CURRENT);
+        g_FaultInjected = TRUE;
+    }
+
+    if ((g_FaultTestCounter >= 800U) &&
+        (g_FaultCleared == FALSE))
+    {
+        FaultManager_ClearAll();
+        g_FaultCleared = TRUE;
+    }
+
+    if ((g_FaultTestCounter >= 1000U) &&
+        (g_RecloseRequested == FALSE))
+    {
+        Bms_Contactor_RequestClose();
+        g_RecloseRequested = TRUE;
+    }
 
     g_LedCounter++;
 
@@ -372,7 +400,7 @@ int main(void)
 
     /* Temporary contactor state-machine test */
     Bms_Contactor_SetPackVoltage(100.0F);
-    Bms_Contactor_SetBusVoltage(0.0F);
+    Bms_Contactor_SetBusVoltage(91.0F);
     Bms_Contactor_RequestClose();
 
     /* Initialize BMS state machine. */

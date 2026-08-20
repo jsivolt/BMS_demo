@@ -77,7 +77,12 @@ void Bms_Contactor_RequestOpen(void)
 
 void Bms_Contactor_MainFunction(void)
 {
-    g_StateTimerMs += BMS_CONTACTOR_TASK_PERIOD_MS;
+    if ((g_State == BMS_CONTACTOR_NEG_ON) ||
+    (g_State == BMS_CONTACTOR_PRECHARGE) ||
+    (g_State == BMS_CONTACTOR_POS_ON))
+    {
+        g_StateTimerMs += BMS_CONTACTOR_TASK_PERIOD_MS;
+    }
 
 
     /*
