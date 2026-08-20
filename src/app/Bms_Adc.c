@@ -243,3 +243,8 @@ uint16 Bms_Adc_GetNtc1VoltageMv(void)
         BMS_NTC_CFG_ADC_FULL_SCALE
     );
 }
+
+boolean Bms_Adc_IsValid(void)
+{
+    return g_BmsAdcValid;
+}

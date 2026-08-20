@@ -108,15 +108,6 @@ static uint32 g_LedCounter = 0U;
 
 static boolean g_LedOn = FALSE;
 
-
-static uint32 g_FaultTestCounter = 0U;
-static boolean g_FaultInjected = FALSE;
-static boolean g_FaultCleared = FALSE;
-static boolean g_RecloseRequested = FALSE;
-
-static uint32 g_SystemFaultTestCounter = 0U;
-static boolean g_SystemFaultInjected = FALSE;
-
 /* ================================================================================================
  * PIT callback
  *
@@ -146,41 +137,22 @@ static void Bms_MainFunction_10ms(void)
 {
     Bms_Adc_MainFunction();
 
+    if (Bms_Adc_IsValid() == TRUE)
+    {
+        Bms_Contactor_SetPackVoltage(
+            BMS_PACK_1,
+            (float)Bms_Adc_GetPackV1VoltageMv());
+
+        Bms_Contactor_SetPackVoltage(
+            BMS_PACK_2,
+            (float)Bms_Adc_GetPackV2VoltageMv());
+
+        Bms_Contactor_SetPackVoltage(
+            BMS_PACK_3,
+            (float)Bms_Adc_GetPackV3VoltageMv());
+    }
+
     Bms_Contactor_MainFunction();
-
-    g_SystemFaultTestCounter++;
-
-    if ((g_SystemFaultTestCounter >= 500U) &&
-        (g_SystemFaultInjected == FALSE))
-    {
-        FaultManager_SetSystem(FAULT_AFE_COMM);
-        g_SystemFaultInjected = TRUE;
-    }
-
-    /* Temporary fault-injection test code (disabled: precharge isolation test only)
-    g_FaultTestCounter++;
-
-    if ((g_FaultTestCounter >= 500U) &&
-        (g_FaultInjected == FALSE))
-    {
-        FaultManager_Set(FAULT_OVER_CURRENT);
-        g_FaultInjected = TRUE;
-    }
-
-    if ((g_FaultTestCounter >= 800U) &&
-        (g_FaultCleared == FALSE))
-    {
-        FaultManager_ClearAll();
-        g_FaultCleared = TRUE;
-    }
-
-    if ((g_FaultTestCounter >= 1000U) &&
-        (g_RecloseRequested == FALSE))
-    {
-        Bms_Contactor_RequestClose(BMS_PACK_1);
-        g_RecloseRequested = TRUE;
-    }
-    */
 
     g_LedCounter++;
 
@@ -411,26 +383,6 @@ int main(void)
 
 /* Initialize contactor / precharge state machine. */
     Bms_Contactor_Init();
-
-    /* Temporary contactor state-machine test: precharge isolation only */
-    Bms_Contactor_SetPackVoltage(
-        BMS_PACK_1,
-        100.0F);
-
-    Bms_Contactor_SetPackVoltage(
-        BMS_PACK_2,
-        105.0F);
-
-    Bms_Contactor_SetPackVoltage(
-        BMS_PACK_3,
-        98.0F);
-
-    /* System fault test: let all packs precharge successfully first */
-    Bms_Contactor_SetBusVoltage(100.0F);
-
-    Bms_Contactor_RequestClose(BMS_PACK_1);
-    Bms_Contactor_RequestClose(BMS_PACK_2);
-    Bms_Contactor_RequestClose(BMS_PACK_3);
 
     /* Initialize BMS state machine. */
     Bms_StateMachine_Init();

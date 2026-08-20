@@ -41,10 +41,19 @@ uint16 Bms_Adc_GetPackV1Raw(void);
 uint16 Bms_Adc_GetPackV2Raw(void);
 uint16 Bms_Adc_GetPackV3Raw(void);
 
+uint16 Bms_Adc_GetPackV1VoltageMv(void);
+uint16 Bms_Adc_GetPackV2VoltageMv(void);
+uint16 Bms_Adc_GetPackV3VoltageMv(void);
+
 /**
  * @brief Returns the latest ADC1_P1 voltage in millivolts.
  */
 uint16 Bms_Adc_GetNtc1VoltageMv(void);
+
+/**
+ * @brief Returns TRUE if the latest ADC acquisition round was fully valid.
+ */
+boolean Bms_Adc_IsValid(void);
 
 
 
