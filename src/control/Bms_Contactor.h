@@ -4,6 +4,17 @@
 #include "Std_Types.h"
 
 
+#define BMS_PACK_COUNT   (3U)
+
+typedef enum
+{
+    BMS_PACK_1 = 0U,
+    BMS_PACK_2,
+    BMS_PACK_3
+
+} Bms_PackIdType;
+
+
 typedef enum
 {
     BMS_CONTACTOR_OFF = 0,
@@ -36,13 +47,13 @@ void Bms_Contactor_Init(void);
 
 void Bms_Contactor_MainFunction(void);
 
-void Bms_Contactor_RequestClose(void);
+void Bms_Contactor_RequestClose(Bms_PackIdType packId);
 
-void Bms_Contactor_RequestOpen(void);
+void Bms_Contactor_RequestOpen(Bms_PackIdType packId);
 
-Bms_ContactorStateType Bms_Contactor_GetState(void);
+Bms_ContactorStateType Bms_Contactor_GetState(Bms_PackIdType packId);
 
-Bms_ContactorOutputType Bms_Contactor_GetOutputs(void);
+Bms_ContactorOutputType Bms_Contactor_GetOutputs(Bms_PackIdType packId);
 
 
 /*
@@ -50,7 +61,13 @@ Bms_ContactorOutputType Bms_Contactor_GetOutputs(void);
  *
  * Later PackVoltage / BusVoltage will come from ADC / AFE.
  */
-void Bms_Contactor_SetPackVoltage(float voltage);
+void Bms_Contactor_SetPackVoltage(
+        Bms_PackIdType packId,
+        float voltage);
+
+/*
+ * All packs share the same DC bus.
+ */
 void Bms_Contactor_SetBusVoltage(float voltage);
 
 

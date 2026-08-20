@@ -145,6 +145,7 @@ static void Bms_MainFunction_10ms(void)
 
     Bms_Contactor_MainFunction();
 
+    /* Temporary fault-injection test code (disabled: precharge isolation test only)
     g_FaultTestCounter++;
 
     if ((g_FaultTestCounter >= 500U) &&
@@ -164,9 +165,10 @@ static void Bms_MainFunction_10ms(void)
     if ((g_FaultTestCounter >= 1000U) &&
         (g_RecloseRequested == FALSE))
     {
-        Bms_Contactor_RequestClose();
+        Bms_Contactor_RequestClose(BMS_PACK_1);
         g_RecloseRequested = TRUE;
     }
+    */
 
     g_LedCounter++;
 
@@ -398,10 +400,25 @@ int main(void)
 /* Initialize contactor / precharge state machine. */
     Bms_Contactor_Init();
 
-    /* Temporary contactor state-machine test */
-    Bms_Contactor_SetPackVoltage(100.0F);
+    /* Temporary contactor state-machine test: precharge isolation only */
+    Bms_Contactor_SetPackVoltage(
+        BMS_PACK_1,
+        100.0F);
+
+    Bms_Contactor_SetPackVoltage(
+        BMS_PACK_2,
+        105.0F);
+
+    Bms_Contactor_SetPackVoltage(
+        BMS_PACK_3,
+        98.0F);
+
+    /* Bus << packs (91V) to trigger precharge isolation fault on all packs */
     Bms_Contactor_SetBusVoltage(91.0F);
-    Bms_Contactor_RequestClose();
+
+    Bms_Contactor_RequestClose(BMS_PACK_1);
+    Bms_Contactor_RequestClose(BMS_PACK_2);
+    Bms_Contactor_RequestClose(BMS_PACK_3);
 
     /* Initialize BMS state machine. */
     Bms_StateMachine_Init();

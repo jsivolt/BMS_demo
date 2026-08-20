@@ -3,73 +3,96 @@
 #include "Fault_Manager.h"
 
 
-static volatile Bms_ContactorStateType g_State;
+typedef struct
+{
+    Bms_ContactorStateType state;
 
-static volatile boolean g_CloseRequest;
-static volatile boolean g_OpenRequest;
+    boolean closeRequest;
+    boolean openRequest;
 
-static volatile float g_PackVoltage;
+    float packVoltage;
+
+    uint32 stateTimerMs;
+
+    Bms_ContactorOutputType output;
+
+} Bms_ContactorContextType;
+
+static Bms_ContactorContextType
+    g_Contactor[BMS_PACK_COUNT];
+
+/*
+ * Shared DC bus, common to all packs.
+ */
 static volatile float g_BusVoltage;
-
-static volatile uint32 g_StateTimerMs;
-
-static Bms_ContactorOutputType g_Output;
 
 
 /* ---------------------------------------------------------- */
 
-static void Bms_Contactor_AllOff(void)
+static void Bms_Contactor_AllOff(Bms_PackIdType packId)
 {
-    g_Output.negative = FALSE;
-    g_Output.positive = FALSE;
-    g_Output.precharge = FALSE;
+    g_Contactor[packId].output.negative = FALSE;
+    g_Contactor[packId].output.positive = FALSE;
+    g_Contactor[packId].output.precharge = FALSE;
 }
 
 
 /* ---------------------------------------------------------- */
 
 static void Bms_Contactor_EnterState(
+        Bms_PackIdType packId,
         Bms_ContactorStateType newState)
 {
-    g_State = newState;
+    g_Contactor[packId].state = newState;
 
-    g_StateTimerMs = 0U;
+    g_Contactor[packId].stateTimerMs = 0U;
 }
+
+
+/* ---------------------------------------------------------- */
+
+static void Bms_Contactor_ProcessPack(Bms_PackIdType packId);
 
 
 /* ---------------------------------------------------------- */
 
 void Bms_Contactor_Init(void)
 {
-    g_State = BMS_CONTACTOR_OFF;
+    uint32 i;
 
-    g_CloseRequest = FALSE;
-    g_OpenRequest = FALSE;
+    for (i = 0U; i < BMS_PACK_COUNT; i++)
+    {
+        g_Contactor[i].state = BMS_CONTACTOR_OFF;
 
-    g_PackVoltage = 0.0F;
+        g_Contactor[i].closeRequest = FALSE;
+        g_Contactor[i].openRequest = FALSE;
+
+        g_Contactor[i].packVoltage = 0.0F;
+
+        g_Contactor[i].stateTimerMs = 0U;
+
+        Bms_Contactor_AllOff((Bms_PackIdType)i);
+    }
+
     g_BusVoltage = 0.0F;
-
-    g_StateTimerMs = 0U;
-
-    Bms_Contactor_AllOff();
 }
 
 
 /* ---------------------------------------------------------- */
 
-void Bms_Contactor_RequestClose(void)
+void Bms_Contactor_RequestClose(Bms_PackIdType packId)
 {
-    g_CloseRequest = TRUE;
-    g_OpenRequest = FALSE;
+    g_Contactor[packId].closeRequest = TRUE;
+    g_Contactor[packId].openRequest = FALSE;
 }
 
 
 /* ---------------------------------------------------------- */
 
-void Bms_Contactor_RequestOpen(void)
+void Bms_Contactor_RequestOpen(Bms_PackIdType packId)
 {
-    g_OpenRequest = TRUE;
-    g_CloseRequest = FALSE;
+    g_Contactor[packId].openRequest = TRUE;
+    g_Contactor[packId].closeRequest = FALSE;
 }
 
 
@@ -77,26 +100,49 @@ void Bms_Contactor_RequestOpen(void)
 
 void Bms_Contactor_MainFunction(void)
 {
-    if ((g_State == BMS_CONTACTOR_NEG_ON) ||
-    (g_State == BMS_CONTACTOR_PRECHARGE) ||
-    (g_State == BMS_CONTACTOR_POS_ON))
+    uint8 pack;
+
+    for (pack = 0U;
+         pack < BMS_PACK_COUNT;
+         pack++)
     {
-        g_StateTimerMs += BMS_CONTACTOR_TASK_PERIOD_MS;
+        Bms_Contactor_ProcessPack(
+                (Bms_PackIdType)pack);
+    }
+}
+
+
+/* ---------------------------------------------------------- */
+
+static void Bms_Contactor_ProcessPack(Bms_PackIdType packId)
+{
+    Bms_ContactorContextType *ctx;
+
+    ctx = &g_Contactor[packId];
+
+    if ((ctx->state == BMS_CONTACTOR_NEG_ON) ||
+    (ctx->state == BMS_CONTACTOR_PRECHARGE) ||
+    (ctx->state == BMS_CONTACTOR_POS_ON))
+    {
+        ctx->stateTimerMs += BMS_CONTACTOR_TASK_PERIOD_MS;
     }
 
 
     /*
      * Highest priority:
-     * critical fault
+     * critical fault (this pack or system-wide)
      */
-    if (FaultManager_HasCriticalFault() == TRUE)
+    if ((FaultManager_PackHasCriticalFault(
+             (FaultPackIdType)packId) == TRUE) ||
+        (FaultManager_SystemHasCriticalFault() == TRUE))
     {
-        Bms_Contactor_AllOff();
+        Bms_Contactor_AllOff(packId);
 
-        g_CloseRequest = FALSE;
-        g_OpenRequest = FALSE;
+        ctx->closeRequest = FALSE;
+        ctx->openRequest = FALSE;
 
         Bms_Contactor_EnterState(
+                packId,
                 BMS_CONTACTOR_FAULT);
 
         return;
@@ -106,38 +152,40 @@ void Bms_Contactor_MainFunction(void)
     /*
      * Open request always has priority
      */
-    if (g_OpenRequest == TRUE)
+    if (ctx->openRequest == TRUE)
     {
-        Bms_Contactor_AllOff();
+        Bms_Contactor_AllOff(packId);
 
-        g_OpenRequest = FALSE;
+        ctx->openRequest = FALSE;
 
         Bms_Contactor_EnterState(
+                packId,
                 BMS_CONTACTOR_OFF);
 
         return;
     }
 
 
-    switch (g_State)
+    switch (ctx->state)
     {
 
         /* =============================================== */
 
         case BMS_CONTACTOR_OFF:
 
-            Bms_Contactor_AllOff();
+            Bms_Contactor_AllOff(packId);
 
-            if (g_CloseRequest == TRUE)
+            if (ctx->closeRequest == TRUE)
             {
-                g_CloseRequest = FALSE;
+                ctx->closeRequest = FALSE;
 
                 /*
                  * Close negative contactor first
                  */
-                g_Output.negative = TRUE;
+                ctx->output.negative = TRUE;
 
                 Bms_Contactor_EnterState(
+                        packId,
                         BMS_CONTACTOR_NEG_ON);
             }
 
@@ -148,17 +196,18 @@ void Bms_Contactor_MainFunction(void)
 
         case BMS_CONTACTOR_NEG_ON:
 
-            g_Output.negative = TRUE;
+            ctx->output.negative = TRUE;
 
-            if (g_StateTimerMs >=
+            if (ctx->stateTimerMs >=
                     BMS_CONTACTOR_NEG_DELAY_MS)
             {
                 /*
                  * Start precharge
                  */
-                g_Output.precharge = TRUE;
+                ctx->output.precharge = TRUE;
 
                 Bms_Contactor_EnterState(
+                        packId,
                         BMS_CONTACTOR_PRECHARGE);
             }
 
@@ -169,28 +218,30 @@ void Bms_Contactor_MainFunction(void)
 
         case BMS_CONTACTOR_PRECHARGE:
 
-            g_Output.negative = TRUE;
-            g_Output.precharge = TRUE;
-            g_Output.positive = FALSE;
+            ctx->output.negative = TRUE;
+            ctx->output.precharge = TRUE;
+            ctx->output.positive = FALSE;
 
 
-            if ((g_PackVoltage > 0.0F) &&
+            if ((ctx->packVoltage > 0.0F) &&
                 (g_BusVoltage >=
-                 (g_PackVoltage *
+                 (ctx->packVoltage *
                   BMS_PRECHARGE_COMPLETE_RATIO)))
             {
                 /*
                  * Precharge success: close positive contactor
                  */
-                g_Output.positive = TRUE;
+                ctx->output.positive = TRUE;
 
                 Bms_Contactor_EnterState(
+                        packId,
                         BMS_CONTACTOR_POS_ON);
             }
-            else if (g_StateTimerMs >=
+            else if (ctx->stateTimerMs >=
                      BMS_PRECHARGE_TIMEOUT_MS)
             {
-                FaultManager_Set(
+                FaultManager_SetPack(
+                        (FaultPackIdType)packId,
                         FAULT_PRECHARGE_TIMEOUT);
             }
 
@@ -201,12 +252,12 @@ void Bms_Contactor_MainFunction(void)
 
         case BMS_CONTACTOR_POS_ON:
 
-            g_Output.negative = TRUE;
-            g_Output.positive = TRUE;
-            g_Output.precharge = TRUE;
+            ctx->output.negative = TRUE;
+            ctx->output.positive = TRUE;
+            ctx->output.precharge = TRUE;
 
 
-            if (g_StateTimerMs >=
+            if (ctx->stateTimerMs >=
                     BMS_CONTACTOR_POS_DELAY_MS)
             {
                 /*
@@ -214,9 +265,10 @@ void Bms_Contactor_MainFunction(void)
                  *
                  * Remove precharge resistor.
                  */
-                g_Output.precharge = FALSE;
+                ctx->output.precharge = FALSE;
 
                 Bms_Contactor_EnterState(
+                        packId,
                         BMS_CONTACTOR_RUN);
             }
 
@@ -227,9 +279,9 @@ void Bms_Contactor_MainFunction(void)
 
         case BMS_CONTACTOR_RUN:
 
-            g_Output.negative = TRUE;
-            g_Output.positive = TRUE;
-            g_Output.precharge = FALSE;
+            ctx->output.negative = TRUE;
+            ctx->output.positive = TRUE;
+            ctx->output.precharge = FALSE;
 
             break;
 
@@ -238,9 +290,10 @@ void Bms_Contactor_MainFunction(void)
 
         case BMS_CONTACTOR_OPENING:
 
-            Bms_Contactor_AllOff();
+            Bms_Contactor_AllOff(packId);
 
             Bms_Contactor_EnterState(
+                    packId,
                     BMS_CONTACTOR_OFF);
 
             break;
@@ -250,11 +303,14 @@ void Bms_Contactor_MainFunction(void)
 
         case BMS_CONTACTOR_FAULT:
 
-            Bms_Contactor_AllOff();
+            Bms_Contactor_AllOff(packId);
 
-            if (FaultManager_HasCriticalFault() == FALSE)
+            if ((FaultManager_PackHasCriticalFault(
+                     (FaultPackIdType)packId) == FALSE) &&
+                (FaultManager_SystemHasCriticalFault() == FALSE))
             {
                 Bms_Contactor_EnterState(
+                        packId,
                         BMS_CONTACTOR_OFF);
             }
 
@@ -265,9 +321,10 @@ void Bms_Contactor_MainFunction(void)
 
         default:
 
-            Bms_Contactor_AllOff();
+            Bms_Contactor_AllOff(packId);
 
             Bms_Contactor_EnterState(
+                    packId,
                     BMS_CONTACTOR_FAULT);
 
             break;
@@ -277,25 +334,27 @@ void Bms_Contactor_MainFunction(void)
 
 /* ---------------------------------------------------------- */
 
-Bms_ContactorStateType Bms_Contactor_GetState(void)
+Bms_ContactorStateType Bms_Contactor_GetState(Bms_PackIdType packId)
 {
-    return g_State;
+    return g_Contactor[packId].state;
 }
 
 
 /* ---------------------------------------------------------- */
 
-Bms_ContactorOutputType Bms_Contactor_GetOutputs(void)
+Bms_ContactorOutputType Bms_Contactor_GetOutputs(Bms_PackIdType packId)
 {
-    return g_Output;
+    return g_Contactor[packId].output;
 }
 
 
 /* ---------------------------------------------------------- */
 
-void Bms_Contactor_SetPackVoltage(float voltage)
+void Bms_Contactor_SetPackVoltage(
+        Bms_PackIdType packId,
+        float voltage)
 {
-    g_PackVoltage = voltage;
+    g_Contactor[packId].packVoltage = voltage;
 }
 
 

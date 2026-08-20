@@ -5,6 +5,15 @@
 
 typedef uint32 FaultMaskType;
 
+#define FAULT_PACK_COUNT    (3U)
+
+typedef enum
+{
+    FAULT_PACK_1 = 0U,
+    FAULT_PACK_2,
+    FAULT_PACK_3
+} FaultPackIdType;
+
 /* Fault bits */
 #define FAULT_NONE                     (0UL)
 
@@ -47,6 +56,37 @@ typedef uint32 FaultMaskType;
 
 
 void FaultManager_Init(void);
+
+void FaultManager_SetPack(
+        FaultPackIdType packId,
+        FaultMaskType fault);
+
+void FaultManager_ClearPack(
+        FaultPackIdType packId,
+        FaultMaskType fault);
+
+void FaultManager_ClearPackAll(
+        FaultPackIdType packId);
+
+FaultMaskType FaultManager_GetPackFaults(
+        FaultPackIdType packId);
+
+boolean FaultManager_IsPackFaultActive(
+        FaultPackIdType packId,
+        FaultMaskType fault);
+
+boolean FaultManager_PackHasCriticalFault(
+        FaultPackIdType packId);
+
+void FaultManager_SetSystem(FaultMaskType fault);
+
+void FaultManager_ClearSystem(FaultMaskType fault);
+
+void FaultManager_ClearSystemAll(void);
+
+FaultMaskType FaultManager_GetSystemFaults(void);
+
+boolean FaultManager_SystemHasCriticalFault(void);
 
 void FaultManager_Set(FaultMaskType fault);
 void FaultManager_Clear(FaultMaskType fault);

@@ -1,7 +1,6 @@
 #ifndef BMS_CONTACTOR_CFG_H
 #define BMS_CONTACTOR_CFG_H
 
-
 /*
  * State machine execution period
  */
