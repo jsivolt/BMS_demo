@@ -26,6 +26,12 @@
          </generated_project_files>
          <pins_profile>
             <processor_version>0.0.0</processor_version>
+            <pin_labels>
+               <pin_label pin_num="7" pin_signal="PTD1" label="BUS1_VOLTAGE"/>
+               <pin_label pin_num="8" pin_signal="PTD0" label="BUS2_VOLTAGE"/>
+               <pin_label pin_num="5" pin_signal="PTE15" label="BUS3_VOLTAGE"/>
+               <pin_label pin_num="4" pin_signal="PTE16" label="BUS_SPARE_VOLTAGE"/>
+            </pin_labels>
          </pins_profile>
          <functions_list>
             <function name="PortContainer_0_BOARD_InitPeripherals">
@@ -93,6 +99,10 @@
                         <pin_feature name="direction" value="OUTPUT"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="ADC0" signal="adc0_p0" pin_num="7" pin_signal="PTD1"/>
+                  <pin peripheral="ADC0" signal="adc0_p1" pin_num="8" pin_signal="PTD0"/>
+                  <pin peripheral="ADC0" signal="adc0_p3" pin_num="5" pin_signal="PTE15"/>
+                  <pin peripheral="ADC0" signal="adc0_p4" pin_num="4" pin_signal="PTE16"/>
                </pins>
             </function>
          </functions_list>
@@ -727,6 +737,70 @@
                                        <setting name="PortPinId" value="11"/>
                                        <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
                                     </struct>
+                                    <struct name="11">
+                                       <setting name="Name" value="PortPin_11"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="12"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
+                                    <struct name="12">
+                                       <setting name="Name" value="PortPin_12"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="13"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
+                                    <struct name="13">
+                                       <setting name="Name" value="PortPin_13"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="14"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
+                                    <struct name="14">
+                                       <setting name="Name" value="PortPin_14"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="15"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
                                  </array>
                               </struct>
                            </array>
@@ -1032,6 +1106,97 @@
                                  <struct name="6">
                                     <setting name="Name" value="AdcChannel_PackV3"/>
                                     <setting name="AdcChannelName" value="S12_ChanNum36"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                              </array>
+                              <array name="AdcThresholdControl"/>
+                           </struct>
+                           <struct name="1">
+                              <setting name="Name" value="AdcHwUnit_1"/>
+                              <setting name="AdcHwUnitId" value="ADC0"/>
+                              <setting name="AdcHwUnitConvMode" value="ADC_SAR_IP_CONV_MODE_ONESHOT"/>
+                              <setting name="AdcPrescale" value="1"/>
+                              <setting name="AdcCalibrationPrescale" value="1"/>
+                              <setting name="AdcHighSpeedEnable" value="false"/>
+                              <setting name="AdcPowerDownDelay" value="0"/>
+                              <setting name="AdcMuxDelay" value="0"/>
+                              <setting name="AdcAutoClockOff" value="false"/>
+                              <setting name="AdcBypassSampling" value="false"/>
+                              <setting name="AdcHwUnitOverwriteEn" value="false"/>
+                              <setting name="AdcPresamplingInternalSignal0" value="VREFL"/>
+                              <setting name="AdcPresamplingInternalSignal1" value="VREFL"/>
+                              <setting name="AdcPresamplingInternalSignal2" value="VREFL"/>
+                              <setting name="AdcHwUnitCtuMode" value="ADC_SAR_IP_CTU_MODE_DISABLED"/>
+                              <setting name="AdcHwUnitExtInjTrg" value="ADC_SAR_IP_EXT_TRIG_EDGE_DISABLED"/>
+                              <setting name="AdcHwUnitExtNrmTrg" value="ADC_SAR_IP_EXT_TRIG_EDGE_DISABLED"/>
+                              <setting name="AdcHwUnitPrimaryExtNrmTrg" value="true"/>
+                              <setting name="AdcHwUnitAuxiliaryExtNrmTrg" value="false"/>
+                              <setting name="AdcHwUnitUsrOffset" value="0"/>
+                              <setting name="AdcHwUnitUsrGain" value="0"/>
+                              <setting name="AdcHwUnitResolution" value="RESOLUTION_14"/>
+                              <setting name="AdcHwUnitBypassResolution" value="false"/>
+                              <setting name="AdcHwUnitDmaEnable" value="false"/>
+                              <setting name="AdcHwUnitDmaClearSource" value="DMA_REQ_CLEAR_ON_ACK"/>
+                              <setting name="AdcHwUnitNotifChainN" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifChainJ" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifCtu" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifEOC" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitNotifWdg" value="NULL_PTR"/>
+                              <setting name="AdcHwUnitDataAlign" value="ADC_SAR_IP_DATA_ALIGNED_RIGHT"/>
+                              <setting name="AdcSarHwUnitVref" value="53"/>
+                              <array name="AdcSelfTestThresholdConfiguration"/>
+                              <setting name="AdcHardwareAverageEnable" value="false"/>
+                              <setting name="AdcHardwareAverageSelect" value="SAMPLES_4"/>
+                              <setting name="AdcSamplingDurationNormal0" value="22"/>
+                              <setting name="AdcSamplingDurationNormal1" value="22"/>
+                              <setting name="AdcSamplingDurationNormal2" value="22"/>
+                              <array name="AdcChannel">
+                                 <struct name="0">
+                                    <setting name="Name" value="AdcChannel_0"/>
+                                    <setting name="AdcChannelName" value="P0_ChanNum0"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="1">
+                                    <setting name="Name" value="AdcChannel_1"/>
+                                    <setting name="AdcChannelName" value="P1_ChanNum1"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="2">
+                                    <setting name="Name" value="AdcChannel_3"/>
+                                    <setting name="AdcChannelName" value="P3_ChanNum3"/>
+                                    <setting name="NormalChnEn" value="true"/>
+                                    <setting name="InjectedChnEn" value="false"/>
+                                    <setting name="AdcEnablePresampling" value="false"/>
+                                    <setting name="AdcEnableThresholds" value="false"/>
+                                    <array name="AdcThresholdRegister"/>
+                                    <setting name="WdgEn" value="false"/>
+                                    <setting name="EOCEn" value="false"/>
+                                    <setting name="DmaEn" value="false"/>
+                                 </struct>
+                                 <struct name="3">
+                                    <setting name="Name" value="AdcChannel_4"/>
+                                    <setting name="AdcChannelName" value="P4_ChanNum4"/>
                                     <setting name="NormalChnEn" value="true"/>
                                     <setting name="InjectedChnEn" value="false"/>
                                     <setting name="AdcEnablePresampling" value="false"/>

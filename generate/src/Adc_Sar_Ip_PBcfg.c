@@ -92,6 +92,87 @@ extern "C"{
 
 
 
+const Adc_Sar_Ip_ConfigType AdcHwUnit_1 =
+{
+    ADC_SAR_IP_CONV_MODE_ONESHOT, /* ConvMode */
+#if (ADC_SAR_IP_SET_RESOLUTION == STD_ON)
+    ADC_SAR_IP_RESOLUTION_14, /* AdcResolution */
+    (boolean)FALSE, /* BypassResolution */
+#endif /* (ADC_SAR_IP_SET_RESOLUTION == STD_ON) */
+    ADC_SAR_IP_CLK_FULL_BUS, /* ClkSelect */
+    ADC_SAR_IP_CLK_FULL_BUS, /* CalibrationClkSelect */
+#if ADC_SAR_IP_HIGH_SPEED_ENABLE_AVAILABLE
+    (boolean)FALSE, /* HighSpeedConvEn */
+#endif /* ADC_SAR_IP_HIGH_SPEED_ENABLE_AVAILABLE */
+#if ADC_SAR_IP_HAS_CTU
+    ADC_SAR_IP_CTU_MODE_DISABLED, /* CtuMode */
+#endif /* ADC_SAR_IP_HAS_CTU */
+#if (ADC_SAR_IP_EXTERNAL_TRIGGER_ENABLE)
+#if ADC_SAR_IP_INJ_EXT_TRIGGER_AVAILABLE
+    ADC_SAR_IP_EXT_TRIG_EDGE_DISABLED, /* InjectedEdge */
+#endif /* ADC_SAR_IP_INJ_EXT_TRIGGER_AVAILABLE */
+#endif /* (ADC_SAR_IP_EXTERNAL_TRIGGER_ENABLE) */
+#if (ADC_SAR_IP_EXTERNAL_TRIGGER_ENABLE)
+#if ADC_SAR_IP_EXT_TRIGGER_AVAILABLE
+    ADC_SAR_IP_EXT_TRIG_EDGE_DISABLED, /* ExtTrigger */
+    (boolean)FALSE, /* NormalExtTrgEn */
+#if ADC_SAR_IP_AUX_EXT_TRIGGER_AVAILABLE
+    (boolean)FALSE, /* NormalAuxExtTrgEn */
+#endif /* ADC_SAR_IP_AUX_EXT_TRIGGER_AVAILABLE */
+#endif /* ADC_SAR_IP_EXT_TRIGGER_AVAILABLE */
+#endif /* (ADC_SAR_IP_EXTERNAL_TRIGGER_ENABLE) */
+#if ADC_SAR_IP_CONVERSION_TIMING_AVAILABLE
+    { 22U, 22U, 22U }, /* SampleTimeArr */
+#endif /* ADC_SAR_IP_CONVERSION_TIMING_AVAILABLE */
+#if ADC_SAR_IP_PRESAMPLING_AVAILABLE
+    (boolean)FALSE, /* BypassSampling */
+    { ADC_SAR_IP_PRESAMPLE_VREFL, ADC_SAR_IP_PRESAMPLE_VREFL, ADC_SAR_IP_PRESAMPLE_VREFL }, /* PresamplingSourceArr */
+#endif /* ADC_SAR_IP_PRESAMPLING_AVAILABLE */
+    (boolean)FALSE, /* AutoClockOff */
+    (boolean)FALSE, /* OverwriteEnable */
+    ADC_SAR_IP_DATA_ALIGNED_RIGHT, /* DataAlign */
+#if ADC_SAR_IP_DECODE_DELAY_AVAILABLE
+    0U, /* DecodeDelay */
+#endif /* ADC_SAR_IP_DECODE_DELAY_AVAILABLE */
+    0U, /* PowerDownDelay */
+#if (STD_ON == ADC_SAR_IP_SELFTEST_ENABLED)
+    NULL_PTR, /* SelfTestThresholdConfig */
+#endif /* (STD_ON == ADC_SAR_IP_SELFTEST_ENABLED) */
+#if ADC_SAR_IP_AVERAGING_AVAILABLE
+    (boolean)FALSE, /* AvgEn */
+    ADC_SAR_IP_AVG_4_CONV, /* AvgSel */
+#endif /* ADC_SAR_IP_AVERAGING_AVAILABLE */
+    0U, /* UsrOffset */
+    0U, /* UsrGain */
+    (boolean)FALSE, /* DmaEnable */
+    ADC_SAR_IP_DMA_REQ_CLEAR_ON_ACK, /* DmaClearSource */
+    { 0x1BU, 0x0U, 0x0U }, /* ChanMaskNormal */
+    { 0x0U, 0x0U, 0x0U }, /* ChanMaskInjected */
+    0U, /* NumChannels */
+    NULL_PTR, /* ChannelConfigsPtr */
+#if (STD_ON == ADC_SAR_IP_WDG_ENABLED)
+    0U, /* NumWdgThresholds */
+    NULL_PTR, /* WdgThresholds */
+#endif /* (STD_ON == ADC_SAR_IP_WDG_ENABLED) */
+#if (STD_ON == ADC_SAR_IP_ECH_ENABLED)
+    NULL_PTR, /* EndOfNormalChainNotification */
+#endif /* (STD_ON == ADC_SAR_IP_ECH_ENABLED) */
+#if (STD_ON == ADC_SAR_IP_JECH_ENABLED)
+    NULL_PTR, /* EndOfInjectedChainNotification */
+#endif /* (STD_ON == ADC_SAR_IP_JECH_ENABLED) */
+#if ADC_SAR_IP_HAS_CTU
+#if (STD_ON == ADC_SAR_IP_EOCTU_ENABLED)
+    NULL_PTR, /* EndOfCtuConversionNotification */
+#endif /* (STD_ON == ADC_SAR_IP_EOCTU_ENABLED) */
+#endif /* ADC_SAR_IP_HAS_CTU */
+#if (STD_ON == ADC_SAR_IP_EOC_ENABLED)
+    NULL_PTR, /* EndOfConvNotification */
+#endif /* (STD_ON == ADC_SAR_IP_EOC_ENABLED) */
+#if (STD_ON == ADC_SAR_IP_WDG_ENABLED)
+    NULL_PTR /* WdgOutOfRangeNotification */
+#endif /* (STD_ON == ADC_SAR_IP_WDG_ENABLED) */
+};
+
 const Adc_Sar_Ip_ConfigType AdcHwUnit_0 =
 {
     ADC_SAR_IP_CONV_MODE_ONESHOT, /* ConvMode */

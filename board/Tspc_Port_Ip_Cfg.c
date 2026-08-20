@@ -116,6 +116,10 @@ PortContainer_0_BOARD_InitPeripherals:
   - {pin_num: '2', peripheral: LPSPI1, signal: lpspi1_sck, pin_signal: PTA19, direction: OUTPUT}
   - {pin_num: '3', peripheral: LPSPI1, signal: lpspi1_sin, pin_signal: PTA20, direction: INPUT}
   - {pin_num: '6', peripheral: LPSPI1, signal: lpspi1_pcs0, pin_signal: PTA21, direction: OUTPUT}
+  - {pin_num: '7', peripheral: ADC0, signal: adc0_p0, pin_signal: PTD1}
+  - {pin_num: '8', peripheral: ADC0, signal: adc0_p1, pin_signal: PTD0}
+  - {pin_num: '5', peripheral: ADC0, signal: adc0_p3, pin_signal: PTE15}
+  - {pin_num: '4', peripheral: ADC0, signal: adc0_p4, pin_signal: PTE16}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */

@@ -86,9 +86,15 @@ extern "C"{
 *                                      DEFINES AND MACROS
 ==================================================================================================*/
 #define ADCHWUNIT_0_INSTANCE    (1U)
+#define ADCHWUNIT_1_INSTANCE    (0U)
 
 #define ADC_START_SEC_CONFIG_DATA_UNSPECIFIED
 #include "Adc_MemMap.h"
+
+/**
+* @brief          ADC SAR Ip Config for Hardware Unit ADC0 for configuration variant .
+*/
+extern const Adc_Sar_Ip_ConfigType AdcHwUnit_1;
 
 /**
 * @brief          ADC SAR Ip Config for Hardware Unit ADC1 for configuration variant .
