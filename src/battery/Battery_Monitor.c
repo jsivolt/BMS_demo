@@ -77,47 +77,47 @@ static void Battery_Monitor_CheckLimits(const Battery_Monitor_DataType * const d
 {
     if (data->packVoltage_mV > BATTERY_MONITOR_OVER_VOLTAGE_MV)
     {
-        Fault_Manager_ReportFault(FAULT_ID_OVER_VOLTAGE);
+        FaultManager_Set(FAULT_PACK_OV);
     }
     else
     {
-        Fault_Manager_ClearFault(FAULT_ID_OVER_VOLTAGE);
+        FaultManager_Clear(FAULT_PACK_OV);
     }
 
     if (data->packVoltage_mV < BATTERY_MONITOR_UNDER_VOLTAGE_MV)
     {
-        Fault_Manager_ReportFault(FAULT_ID_UNDER_VOLTAGE);
+        FaultManager_Set(FAULT_PACK_UV);
     }
     else
     {
-        Fault_Manager_ClearFault(FAULT_ID_UNDER_VOLTAGE);
+        FaultManager_Clear(FAULT_PACK_UV);
     }
 
     if ((data->packCurrent_mA > BATTERY_MONITOR_OVER_CURRENT_MA) ||
         (data->packCurrent_mA < -BATTERY_MONITOR_OVER_CURRENT_MA))
     {
-        Fault_Manager_ReportFault(FAULT_ID_OVER_CURRENT);
+        FaultManager_Set(FAULT_OVER_CURRENT);
     }
     else
     {
-        Fault_Manager_ClearFault(FAULT_ID_OVER_CURRENT);
+        FaultManager_Clear(FAULT_OVER_CURRENT);
     }
 
     if (data->packTemperature_dC > BATTERY_MONITOR_OVER_TEMP_DC)
     {
-        Fault_Manager_ReportFault(FAULT_ID_OVER_TEMPERATURE);
+        FaultManager_Set(FAULT_OVER_TEMP);
     }
     else
     {
-        Fault_Manager_ClearFault(FAULT_ID_OVER_TEMPERATURE);
+        FaultManager_Clear(FAULT_OVER_TEMP);
     }
 
     if (data->packTemperature_dC < BATTERY_MONITOR_UNDER_TEMP_DC)
     {
-        Fault_Manager_ReportFault(FAULT_ID_UNDER_TEMPERATURE);
+        FaultManager_Set(FAULT_UNDER_TEMP);
     }
     else
     {
-        Fault_Manager_ClearFault(FAULT_ID_UNDER_TEMPERATURE);
+        FaultManager_Clear(FAULT_UNDER_TEMP);
     }
 }

@@ -73,7 +73,8 @@ src/main.o: ../src/main.c ../RTD/include/Clock_Ip.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h \
  C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h \
  ../src/communication/Bms_Can.h ../src/communication/Bms_Spi.h \
- C\:/S32K344/workspace/BMS_demo/src/app/Bms_StateMachine.h
+ C\:/S32K344/workspace/BMS_demo/src/app/Bms_StateMachine.h \
+ ../src/safety/Fault_Manager.h ../src/control/Bms_Contactor.h
 ../RTD/include/Clock_Ip.h:
 ../RTD/include/Clock_Ip_Types.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
@@ -153,3 +154,5 @@ C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h:
 ../src/communication/Bms_Can.h:
 ../src/communication/Bms_Spi.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_StateMachine.h:
+../src/safety/Fault_Manager.h:
+../src/control/Bms_Contactor.h:

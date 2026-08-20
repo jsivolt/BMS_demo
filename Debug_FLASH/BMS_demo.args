@@ -80,6 +80,7 @@
 "./src/battery/Bms_Ntc.o"
 "./src/communication/Bms_Can.o"
 "./src/communication/Bms_Spi.o"
+"./src/control/Bms_Contactor.o"
 "./src/drivers/Bms_Gpio.o"
 "./src/drivers/Bms_Led.o"
 "./src/main.o"

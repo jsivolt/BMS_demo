@@ -53,6 +53,9 @@
 
 #include "Bms_StateMachine.h"
 
+#include "safety/Fault_Manager.h"
+#include "control/Bms_Contactor.h"
+
 /* ================================================================================================
  * PIT configuration
  * ============================================================================================== */
@@ -134,6 +137,8 @@ void Bms_Pit10msCallback(uint8 channel)
 static void Bms_MainFunction_10ms(void)
 {
     Bms_Adc_MainFunction();
+
+    Bms_Contactor_MainFunction();
 
     g_LedCounter++;
 
@@ -358,6 +363,17 @@ int main(void)
             /* SPI init failed */
         }
     }
+
+    /* Initialize application fault manager. */
+    FaultManager_Init();
+
+/* Initialize contactor / precharge state machine. */
+    Bms_Contactor_Init();
+
+    /* Temporary contactor state-machine test */
+    Bms_Contactor_SetPackVoltage(100.0F);
+    Bms_Contactor_SetBusVoltage(0.0F);
+    Bms_Contactor_RequestClose();
 
     /* Initialize BMS state machine. */
     Bms_StateMachine_Init();

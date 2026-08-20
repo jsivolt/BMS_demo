@@ -27,6 +27,7 @@ generate/src \
 src/app \
 src/battery \
 src/communication \
+src/control \
 src/drivers \
 src \
 src/safety \

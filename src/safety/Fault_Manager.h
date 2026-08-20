@@ -1,68 +1,61 @@
-/**
- *  @file       Fault_Manager.h
- *  @brief      BMS safety layer - fault detection and reporting.
- */
-
 #ifndef FAULT_MANAGER_H
 #define FAULT_MANAGER_H
 
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 #include "Std_Types.h"
 
-/*==================================================================================================
-*                                       TYPE DEFINITIONS
-==================================================================================================*/
+typedef uint32 FaultMaskType;
 
-/** @brief Identifiers for every fault the BMS is able to detect. */
-typedef enum
-{
-    FAULT_ID_OVER_VOLTAGE = 0,
-    FAULT_ID_UNDER_VOLTAGE,
-    FAULT_ID_OVER_CURRENT,
-    FAULT_ID_OVER_TEMPERATURE,
-    FAULT_ID_UNDER_TEMPERATURE,
-    FAULT_ID_CAN_COMM_LOSS,
-    FAULT_ID_COUNT
-} Fault_Manager_FaultIdType;
+/* Fault bits */
+#define FAULT_NONE                     (0UL)
 
-/*==================================================================================================
-*                                       FUNCTION PROTOTYPES
-==================================================================================================*/
+#define FAULT_PACK_OV                  (1UL << 0)
+#define FAULT_PACK_UV                  (1UL << 1)
 
-/**
- * @brief Initializes the fault manager, clearing every latched fault.
+#define FAULT_CELL_OV                  (1UL << 2)
+#define FAULT_CELL_UV                  (1UL << 3)
+
+#define FAULT_OVER_TEMP                (1UL << 4)
+#define FAULT_UNDER_TEMP               (1UL << 5)
+
+#define FAULT_AFE_COMM                 (1UL << 6)
+#define FAULT_CAN_TIMEOUT              (1UL << 7)
+#define FAULT_SPI_TIMEOUT              (1UL << 8)
+
+#define FAULT_PRECHARGE_TIMEOUT        (1UL << 9)
+#define FAULT_CONTACTOR_FEEDBACK       (1UL << 10)
+#define FAULT_CONTACTOR_WELD           (1UL << 11)
+
+#define FAULT_OVER_CURRENT             (1UL << 12)
+
+/*
+ * Add future faults here.
  */
-void Fault_Manager_Init(void);
 
-/**
- * @brief Latches a fault as active.
- * @param[in] faultId The fault being reported.
- */
-void Fault_Manager_ReportFault(Fault_Manager_FaultIdType faultId);
 
-/**
- * @brief Clears a previously latched fault.
- * @param[in] faultId The fault to clear.
- */
-void Fault_Manager_ClearFault(Fault_Manager_FaultIdType faultId);
+/* Critical faults that must open contactors */
+#define FAULT_CRITICAL_MASK            ( \
+        FAULT_PACK_OV              |   \
+        FAULT_PACK_UV              |   \
+        FAULT_CELL_OV              |   \
+        FAULT_CELL_UV              |   \
+        FAULT_OVER_TEMP            |   \
+        FAULT_AFE_COMM             |   \
+        FAULT_PRECHARGE_TIMEOUT    |   \
+        FAULT_CONTACTOR_FEEDBACK   |   \
+        FAULT_CONTACTOR_WELD      |   \
+        FAULT_OVER_CURRENT )
 
-/**
- * @brief Checks whether a fault is currently latched.
- * @param[in] faultId The fault to query.
- * @return TRUE if the fault is active, FALSE otherwise.
- */
-boolean Fault_Manager_IsFaultActive(Fault_Manager_FaultIdType faultId);
 
-/**
- * @brief Returns TRUE if any fault is currently active.
- */
-boolean Fault_Manager_HasActiveFaults(void);
+void FaultManager_Init(void);
 
-#ifdef __cplusplus
-}
+void FaultManager_Set(FaultMaskType fault);
+void FaultManager_Clear(FaultMaskType fault);
+void FaultManager_ClearAll(void);
+
+FaultMaskType FaultManager_GetActiveFaults(void);
+
+boolean FaultManager_IsActive(FaultMaskType fault);
+boolean FaultManager_HasAnyFault(void);
+boolean FaultManager_HasCriticalFault(void);
+
 #endif
-
-#endif /* FAULT_MANAGER_H */
