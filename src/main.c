@@ -350,6 +350,14 @@ int main(void)
         }
     }
 
+        /*
+    * Initialize 3-channel NTC temperature monitor.
+    *
+    * NTC1 / NTC2 / NTC3 will use ADC results from Bms_Adc.
+    */
+    Bms_Ntc_Init();
+
+
     /* Initialize CAN (FlexCAN) for BMS communication. */
     if (Bms_Can_Init() != (Std_ReturnType)E_OK)
     {
