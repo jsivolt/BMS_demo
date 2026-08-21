@@ -45,6 +45,7 @@
 #include "Pit_Ip_Cfg.h"
 
 #include "Bms_Scheduler.h"
+#include "Bms_App.h"
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
@@ -137,20 +138,22 @@ static void Bms_MainFunction_10ms(void)
 {
     Bms_Adc_MainFunction();
 
-    if (Bms_Adc_IsPackValid() == TRUE)
-    {
-        Bms_Contactor_SetPackVoltage(
-            BMS_PACK_1,
-            (float)Bms_Adc_GetPackV1VoltageMv());
+    Bms_App_MainFunction();
 
-        Bms_Contactor_SetPackVoltage(
-            BMS_PACK_2,
-            (float)Bms_Adc_GetPackV2VoltageMv());
+    // if (Bms_Adc_IsPackValid() == TRUE)
+    // {
+    //     Bms_Contactor_SetPackVoltage(
+    //         BMS_PACK_1,
+    //         (float)Bms_Adc_GetPackV1VoltageMv());
 
-        Bms_Contactor_SetPackVoltage(
-            BMS_PACK_3,
-            (float)Bms_Adc_GetPackV3VoltageMv());
-    }
+    //     Bms_Contactor_SetPackVoltage(
+    //         BMS_PACK_2,
+    //         (float)Bms_Adc_GetPackV2VoltageMv());
+
+    //     Bms_Contactor_SetPackVoltage(
+    //         BMS_PACK_3,
+    //         (float)Bms_Adc_GetPackV3VoltageMv());
+    // }
 
     Bms_Contactor_MainFunction();
 
@@ -386,6 +389,8 @@ int main(void)
 
     /* Initialize BMS state machine. */
     Bms_StateMachine_Init();
+
+    Bms_App_Init();
 
 
     /* ============================================================================================

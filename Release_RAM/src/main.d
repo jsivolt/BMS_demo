@@ -70,6 +70,7 @@ src/main.o: ../src/main.c ../RTD/include/Clock_Ip.h \
  ../RTD/include/SchM_Gpt.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Rte_MemMap.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Scheduler.h \
+ C\:/S32K344/workspace/BMS_demo/src/app/Bms_App.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h \
  C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h \
  ../src/communication/Bms_Can.h ../src/communication/Bms_Spi.h \
@@ -149,6 +150,7 @@ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1
 ../RTD/include/SchM_Gpt.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Rte_MemMap.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_Scheduler.h:
+C\:/S32K344/workspace/BMS_demo/src/app/Bms_App.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h:
 C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h:
 ../src/communication/Bms_Can.h:

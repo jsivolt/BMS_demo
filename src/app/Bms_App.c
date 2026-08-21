@@ -1,11 +1,15 @@
-/**
- *  @file       Bms_App.c
- *  @brief      BMS application module.
- */
-
 #include "Bms_App.h"
+#include "Battery_Monitor.h"
+
 
 void Bms_App_Init(void)
 {
-    /* TODO: application-level initialization. */
+    BatteryMonitor_Init();
+}
+
+
+
+void Bms_App_MainFunction(void)
+{
+    BatteryMonitor_MainFunction();
 }

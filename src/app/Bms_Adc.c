@@ -396,3 +396,4 @@ boolean Bms_Adc_IsBusValid(void)
 {
     return g_BmsAdcBusValid;
 }
+

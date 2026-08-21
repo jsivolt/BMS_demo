@@ -55,6 +55,7 @@ uint16 Bms_Adc_GetBus2VoltageMv(void);
 uint16 Bms_Adc_GetBus3VoltageMv(void);
 uint16 Bms_Adc_GetBusSpareVoltageMv(void);
 
+
 /**
  * @brief Returns the latest ADC1_P1 voltage in millivolts.
  */
