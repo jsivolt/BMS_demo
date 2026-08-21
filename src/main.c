@@ -137,7 +137,7 @@ static void Bms_MainFunction_10ms(void)
 {
     Bms_Adc_MainFunction();
 
-    if (Bms_Adc_IsValid() == TRUE)
+    if (Bms_Adc_IsPackValid() == TRUE)
     {
         Bms_Contactor_SetPackVoltage(
             BMS_PACK_1,

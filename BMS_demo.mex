@@ -453,6 +453,11 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
+            <dependency resourceType="Tool" resourceId="Clocks" description="The Clocks tool is required by the Peripherals tool, but it is disabled." problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data>true</data>
+               </feature>
+            </dependency>
          </dependencies>
          <generated_project_files>
             <file path="generate/include/Adc_Sar_Ip_Cfg.h" update_enabled="true"/>
@@ -996,7 +1001,7 @@
                               <setting name="AdcHwUnitId" value="ADC1"/>
                               <setting name="AdcHwUnitConvMode" value="ADC_SAR_IP_CONV_MODE_ONESHOT"/>
                               <setting name="AdcPrescale" value="1"/>
-                              <setting name="AdcCalibrationPrescale" value="1"/>
+                              <setting name="AdcCalibrationPrescale" value="4"/>
                               <setting name="AdcHighSpeedEnable" value="false"/>
                               <setting name="AdcPowerDownDelay" value="0"/>
                               <setting name="AdcMuxDelay" value="0"/>
@@ -1123,7 +1128,7 @@
                               <setting name="AdcHwUnitId" value="ADC0"/>
                               <setting name="AdcHwUnitConvMode" value="ADC_SAR_IP_CONV_MODE_ONESHOT"/>
                               <setting name="AdcPrescale" value="1"/>
-                              <setting name="AdcCalibrationPrescale" value="1"/>
+                              <setting name="AdcCalibrationPrescale" value="4"/>
                               <setting name="AdcHighSpeedEnable" value="false"/>
                               <setting name="AdcPowerDownDelay" value="0"/>
                               <setting name="AdcMuxDelay" value="0"/>

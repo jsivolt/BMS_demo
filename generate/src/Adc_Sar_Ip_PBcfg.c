@@ -100,7 +100,7 @@ const Adc_Sar_Ip_ConfigType AdcHwUnit_1 =
     (boolean)FALSE, /* BypassResolution */
 #endif /* (ADC_SAR_IP_SET_RESOLUTION == STD_ON) */
     ADC_SAR_IP_CLK_FULL_BUS, /* ClkSelect */
-    ADC_SAR_IP_CLK_FULL_BUS, /* CalibrationClkSelect */
+    ADC_SAR_IP_CLK_QUARTER_BUS, /* CalibrationClkSelect */
 #if ADC_SAR_IP_HIGH_SPEED_ENABLE_AVAILABLE
     (boolean)FALSE, /* HighSpeedConvEn */
 #endif /* ADC_SAR_IP_HIGH_SPEED_ENABLE_AVAILABLE */
@@ -181,7 +181,7 @@ const Adc_Sar_Ip_ConfigType AdcHwUnit_0 =
     (boolean)FALSE, /* BypassResolution */
 #endif /* (ADC_SAR_IP_SET_RESOLUTION == STD_ON) */
     ADC_SAR_IP_CLK_FULL_BUS, /* ClkSelect */
-    ADC_SAR_IP_CLK_FULL_BUS, /* CalibrationClkSelect */
+    ADC_SAR_IP_CLK_QUARTER_BUS, /* CalibrationClkSelect */
 #if ADC_SAR_IP_HIGH_SPEED_ENABLE_AVAILABLE
     (boolean)FALSE, /* HighSpeedConvEn */
 #endif /* ADC_SAR_IP_HIGH_SPEED_ENABLE_AVAILABLE */
