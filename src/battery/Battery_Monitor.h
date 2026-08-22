@@ -3,6 +3,8 @@
 
 #include "Std_Types.h"
 
+#define BATTERY_MONITOR_PACK_COUNT    (3U)
+
 typedef enum
 {
     BAT_MON_STATUS_OK = 0,
@@ -15,14 +17,48 @@ typedef enum
 
 typedef struct
 {
+    /* Pack voltage */
     float PackV1;
     float PackV2;
     float PackV3;
 
+    /* Reserved for future AFE cell voltages */
     float CellVoltage[16];
 
-    float Temperature;
+    /*
+     * Pack temperature.
+     *
+     * [0] = Pack 1 / NTC1
+     * [1] = Pack 2 / NTC2
+     * [2] = Pack 3 / NTC3
+     *
+     * Unit: 0.1 degC
+     *
+     * Example:
+     * 253 = 25.3 degC
+     */
+    sint16 PackTemperature_dC[BATTERY_MONITOR_PACK_COUNT];
 
+    /*
+     * TRUE when corresponding NTC temperature is valid.
+     */
+    boolean PackTemperatureValid[BATTERY_MONITOR_PACK_COUNT];
+
+    /*
+     * Temperature summary across VALID packs only.
+     */
+    sint16 MinPackTemperature_dC;
+    sint16 MaxPackTemperature_dC;
+    sint16 DeltaPackTemperature_dC;
+
+    /*
+     * TRUE if at least one valid pack temperature is available.
+     */
+    boolean TemperatureSummaryValid;
+
+    /*
+     * Existing overall pack-voltage validity.
+     */
     boolean Valid;
 
     BatteryMonitor_StatusType Status;

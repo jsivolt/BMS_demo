@@ -46,6 +46,7 @@
 
 #include "Bms_Scheduler.h"
 #include "Bms_App.h"
+#include "Battery_Monitor.h"
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
@@ -205,13 +206,15 @@ static void Bms_MainFunction_10ms(void)
 
 static void Bms_MainFunction_100ms(void)
 {
-	 Bms_Ntc_MainFunction();
+    Bms_Ntc_MainFunction();
 
-     Bms_Can_MainFunction();
+    BatteryMonitor_MainFunction();
 
-     Bms_StateMachine_MainFunction();
-     
-	 Bms_Can_SendTest();
+    Bms_Can_MainFunction();
+
+    Bms_StateMachine_MainFunction();
+
+    Bms_Can_SendTest();
 }
 
 static void Bms_MainFunction_1000ms(void)
@@ -399,6 +402,8 @@ int main(void)
     Bms_StateMachine_Init();
 
     Bms_App_Init();
+
+    BatteryMonitor_Init();
 
 
     /* ============================================================================================
