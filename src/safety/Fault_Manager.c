@@ -117,6 +117,13 @@ void FaultManager_ClearSystemAll(void)
     g_SystemFaults = FAULT_NONE;
 }
 
+boolean FaultManager_IsSystemFaultActive(FaultMaskType fault)
+{
+    return ((g_SystemFaults & fault) != 0UL)
+            ? TRUE
+            : FALSE;
+}
+
 FaultMaskType FaultManager_GetSystemFaults(void)
 {
     return g_SystemFaults;

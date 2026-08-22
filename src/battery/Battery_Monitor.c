@@ -4,9 +4,14 @@
 #include "Bms_Ntc.h"
 #include "Fault_Manager.h"
 
-#define BMS_TEMP_HIGH_FAULT_DC      (600)    /* 60.0 °C */
-#define BMS_TEMP_LOW_FAULT_DC       (-200)   /* -20.0 °C */
-#define BMS_TEMP_DELTA_FAULT_DC     (150)    /* 15.0 °C */
+#define BMS_TEMP_HIGH_FAULT_SET_DC        (600)    /* 60.0°C */
+#define BMS_TEMP_HIGH_FAULT_CLEAR_DC      (550)    /* 55.0°C */
+
+#define BMS_TEMP_LOW_FAULT_SET_DC         (-200)   /* -20.0°C */
+#define BMS_TEMP_LOW_FAULT_CLEAR_DC       (-150)   /* -15.0°C */
+
+#define BMS_TEMP_DELTA_FAULT_SET_DC       (150)    /* 15.0°C */
+#define BMS_TEMP_DELTA_FAULT_CLEAR_DC     (100)    /* 10.0°C */
 
 static BatteryMonitor_DataType g_BatteryData;
 
@@ -225,6 +230,7 @@ static void BatteryMonitor_UpdateTemperatureFaults(void)
 {
     uint8 i;
     FaultPackIdType packId;
+    sint16 temperature_dC;
 
     /*
      * Check each battery pack independently.
@@ -234,17 +240,23 @@ static void BatteryMonitor_UpdateTemperatureFaults(void)
         packId = (FaultPackIdType)i;
 
         /*
-         * NTC sensor invalid.
+         * ============================================================
+         * NTC sensor validity
+         * ============================================================
          */
         if (g_BatteryData.PackTemperatureValid[i] == FALSE)
         {
+            /*
+             * Sensor data is invalid.
+             */
             FaultManager_SetPack(
                 packId,
                 FAULT_TEMP_SENSOR);
 
             /*
-             * Temperature itself cannot be trusted.
-             * Clear temperature threshold faults.
+             * Temperature value cannot be trusted.
+             *
+             * Clear threshold-based temperature faults.
              */
             FaultManager_ClearPack(
                 packId,
@@ -263,57 +275,141 @@ static void BatteryMonitor_UpdateTemperatureFaults(void)
                 packId,
                 FAULT_TEMP_SENSOR);
 
-            /*
-             * Over-temperature.
-             */
-            if (g_BatteryData.PackTemperature_dC[i] >=
-                BMS_TEMP_HIGH_FAULT_DC)
-            {
-                FaultManager_SetPack(
-                    packId,
-                    FAULT_OVER_TEMP);
-            }
-            else
-            {
-                FaultManager_ClearPack(
-                    packId,
-                    FAULT_OVER_TEMP);
-            }
+            temperature_dC =
+                g_BatteryData.PackTemperature_dC[i];
+
 
             /*
-             * Under-temperature.
+             * ========================================================
+             * Over-temperature hysteresis
+             *
+             * SET   >= 60.0°C
+             * CLEAR <= 55.0°C
+             * ========================================================
              */
-            if (g_BatteryData.PackTemperature_dC[i] <=
-                BMS_TEMP_LOW_FAULT_DC)
-            {
-                FaultManager_SetPack(
+            if (FaultManager_IsPackFaultActive(
                     packId,
-                    FAULT_UNDER_TEMP);
+                    FAULT_OVER_TEMP) == TRUE)
+            {
+                /*
+                 * Fault is already active.
+                 *
+                 * Only clear after temperature drops
+                 * below the clear threshold.
+                 */
+                if (temperature_dC <=
+                    BMS_TEMP_HIGH_FAULT_CLEAR_DC)
+                {
+                    FaultManager_ClearPack(
+                        packId,
+                        FAULT_OVER_TEMP);
+                }
             }
             else
             {
-                FaultManager_ClearPack(
+                /*
+                 * Fault is currently inactive.
+                 *
+                 * Set only after temperature reaches
+                 * the set threshold.
+                 */
+                if (temperature_dC >=
+                    BMS_TEMP_HIGH_FAULT_SET_DC)
+                {
+                    FaultManager_SetPack(
+                        packId,
+                        FAULT_OVER_TEMP);
+                }
+            }
+
+
+            /*
+             * ========================================================
+             * Under-temperature hysteresis
+             *
+             * SET   <= -20.0°C
+             * CLEAR >= -15.0°C
+             * ========================================================
+             */
+            if (FaultManager_IsPackFaultActive(
                     packId,
-                    FAULT_UNDER_TEMP);
+                    FAULT_UNDER_TEMP) == TRUE)
+            {
+                /*
+                 * Fault is already active.
+                 */
+                if (temperature_dC >=
+                    BMS_TEMP_LOW_FAULT_CLEAR_DC)
+                {
+                    FaultManager_ClearPack(
+                        packId,
+                        FAULT_UNDER_TEMP);
+                }
+            }
+            else
+            {
+                /*
+                 * Fault is currently inactive.
+                 */
+                if (temperature_dC <=
+                    BMS_TEMP_LOW_FAULT_SET_DC)
+                {
+                    FaultManager_SetPack(
+                        packId,
+                        FAULT_UNDER_TEMP);
+                }
             }
         }
     }
 
 
     /*
-     * Temperature delta fault.
+     * ================================================================
+     * Pack-to-pack temperature delta hysteresis
      *
-     * Only evaluate delta if the temperature summary is valid.
+     * SET   >= 15.0°C
+     * CLEAR <= 10.0°C
+     * ================================================================
+     *
+     * Only evaluate the delta fault when all three NTC sensors
+     * are currently valid.
      */
-    if ((g_BatteryData.TemperatureSummaryValid == TRUE) &&
-        (g_BatteryData.DeltaPackTemperature_dC >=
-         BMS_TEMP_DELTA_FAULT_DC))
+    if ((g_BatteryData.PackTemperatureValid[0] == TRUE) &&
+        (g_BatteryData.PackTemperatureValid[1] == TRUE) &&
+        (g_BatteryData.PackTemperatureValid[2] == TRUE))
     {
-        FaultManager_SetSystem(
-            FAULT_TEMP_DELTA);
+        if (FaultManager_IsSystemFaultActive(
+                FAULT_TEMP_DELTA) == TRUE)
+        {
+            /*
+             * Delta fault is already active.
+             */
+            if (g_BatteryData.DeltaPackTemperature_dC <=
+                BMS_TEMP_DELTA_FAULT_CLEAR_DC)
+            {
+                FaultManager_ClearSystem(
+                    FAULT_TEMP_DELTA);
+            }
+        }
+        else
+        {
+            /*
+             * Delta fault is currently inactive.
+             */
+            if (g_BatteryData.DeltaPackTemperature_dC >=
+                BMS_TEMP_DELTA_FAULT_SET_DC)
+            {
+                FaultManager_SetSystem(
+                    FAULT_TEMP_DELTA);
+            }
+        }
     }
     else
     {
+        /*
+         * Temperature delta cannot be evaluated reliably
+         * unless all three pack temperatures are valid.
+         */
         FaultManager_ClearSystem(
             FAULT_TEMP_DELTA);
     }

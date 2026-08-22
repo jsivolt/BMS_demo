@@ -88,6 +88,8 @@ void FaultManager_ClearSystem(FaultMaskType fault);
 
 void FaultManager_ClearSystemAll(void);
 
+boolean FaultManager_IsSystemFaultActive(FaultMaskType fault);
+
 FaultMaskType FaultManager_GetSystemFaults(void);
 
 boolean FaultManager_SystemHasCriticalFault(void);
