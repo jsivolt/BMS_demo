@@ -190,5 +190,21 @@ boolean FaultManager_HasAnyFault(void)
 
 boolean FaultManager_HasCriticalFault(void)
 {
-    return FaultManager_SystemHasCriticalFault();
+    uint32 i;
+
+    if (FaultManager_SystemHasCriticalFault() == TRUE)
+    {
+        return TRUE;
+    }
+
+    for (i = 0U; i < FAULT_PACK_COUNT; i++)
+    {
+        if (FaultManager_PackHasCriticalFault(
+                (FaultPackIdType)i) == TRUE)
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }

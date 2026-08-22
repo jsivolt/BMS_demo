@@ -2,9 +2,14 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "Fault_Manager.h"
 
+#define BMS_TEMP_HIGH_FAULT_DC      (600)    /* 60.0 °C */
+#define BMS_TEMP_LOW_FAULT_DC       (-200)   /* -20.0 °C */
+#define BMS_TEMP_DELTA_FAULT_DC     (150)    /* 15.0 °C */
 
 static BatteryMonitor_DataType g_BatteryData;
+
 
 
 /* ================================================================================================
@@ -12,6 +17,7 @@ static BatteryMonitor_DataType g_BatteryData;
  * ============================================================================================== */
 
 static void BatteryMonitor_UpdateTemperatureSummary(void);
+static void BatteryMonitor_UpdateTemperatureFaults(void);
 
 
 /* ================================================================================================
@@ -130,6 +136,11 @@ void BatteryMonitor_MainFunction(void)
      * Calculate Min / Max / Delta using VALID packs only.
      */
     BatteryMonitor_UpdateTemperatureSummary();
+
+    /*
+    * Update temperature-related pack/system faults.
+    */
+    BatteryMonitor_UpdateTemperatureFaults();
 }
 
 
@@ -203,6 +214,108 @@ static void BatteryMonitor_UpdateTemperatureSummary(void)
          * No valid temperature sensors.
          */
         g_BatteryData.TemperatureSummaryValid = FALSE;
+    }
+}
+
+/* ================================================================================================
+ * Temperature fault monitoring
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdateTemperatureFaults(void)
+{
+    uint8 i;
+    FaultPackIdType packId;
+
+    /*
+     * Check each battery pack independently.
+     */
+    for (i = 0U; i < BATTERY_MONITOR_PACK_COUNT; i++)
+    {
+        packId = (FaultPackIdType)i;
+
+        /*
+         * NTC sensor invalid.
+         */
+        if (g_BatteryData.PackTemperatureValid[i] == FALSE)
+        {
+            FaultManager_SetPack(
+                packId,
+                FAULT_TEMP_SENSOR);
+
+            /*
+             * Temperature itself cannot be trusted.
+             * Clear temperature threshold faults.
+             */
+            FaultManager_ClearPack(
+                packId,
+                FAULT_OVER_TEMP);
+
+            FaultManager_ClearPack(
+                packId,
+                FAULT_UNDER_TEMP);
+        }
+        else
+        {
+            /*
+             * Sensor is valid.
+             */
+            FaultManager_ClearPack(
+                packId,
+                FAULT_TEMP_SENSOR);
+
+            /*
+             * Over-temperature.
+             */
+            if (g_BatteryData.PackTemperature_dC[i] >=
+                BMS_TEMP_HIGH_FAULT_DC)
+            {
+                FaultManager_SetPack(
+                    packId,
+                    FAULT_OVER_TEMP);
+            }
+            else
+            {
+                FaultManager_ClearPack(
+                    packId,
+                    FAULT_OVER_TEMP);
+            }
+
+            /*
+             * Under-temperature.
+             */
+            if (g_BatteryData.PackTemperature_dC[i] <=
+                BMS_TEMP_LOW_FAULT_DC)
+            {
+                FaultManager_SetPack(
+                    packId,
+                    FAULT_UNDER_TEMP);
+            }
+            else
+            {
+                FaultManager_ClearPack(
+                    packId,
+                    FAULT_UNDER_TEMP);
+            }
+        }
+    }
+
+
+    /*
+     * Temperature delta fault.
+     *
+     * Only evaluate delta if the temperature summary is valid.
+     */
+    if ((g_BatteryData.TemperatureSummaryValid == TRUE) &&
+        (g_BatteryData.DeltaPackTemperature_dC >=
+         BMS_TEMP_DELTA_FAULT_DC))
+    {
+        FaultManager_SetSystem(
+            FAULT_TEMP_DELTA);
+    }
+    else
+    {
+        FaultManager_ClearSystem(
+            FAULT_TEMP_DELTA);
     }
 }
 

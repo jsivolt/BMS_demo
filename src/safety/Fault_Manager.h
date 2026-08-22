@@ -36,6 +36,9 @@ typedef enum
 
 #define FAULT_OVER_CURRENT             (1UL << 12)
 
+#define FAULT_TEMP_SENSOR              (1UL << 13)
+#define FAULT_TEMP_DELTA               (1UL << 14)
+
 /*
  * Add future faults here.
  */
@@ -48,10 +51,11 @@ typedef enum
         FAULT_CELL_OV              |   \
         FAULT_CELL_UV              |   \
         FAULT_OVER_TEMP            |   \
+        FAULT_TEMP_SENSOR          |   \
         FAULT_AFE_COMM             |   \
         FAULT_PRECHARGE_TIMEOUT    |   \
         FAULT_CONTACTOR_FEEDBACK   |   \
-        FAULT_CONTACTOR_WELD      |   \
+        FAULT_CONTACTOR_WELD       |   \
         FAULT_OVER_CURRENT )
 
 
