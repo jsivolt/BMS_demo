@@ -78,6 +78,8 @@ volatile boolean g_BmsClearFaultRequest = FALSE;
 volatile uint32 g_DebugEnableRequestAddr = 0U;
 volatile uint32 g_DebugDisableRequestAddr = 0U;
 
+static uint8 g_BmsCanPackStatusAliveCounter = 0U;
+
 volatile uint8 g_BmsCanRxData[8] =
 {
     0U, 0U, 0U, 0U,
@@ -443,7 +445,9 @@ void Bms_Can_SendPackStatus(void)
     txData[4] = (uint8)(pack3Raw & 0xFFU);
     txData[5] = (uint8)((pack3Raw >> 8U) & 0xFFU);
 
-    txData[6] = (uint8)batteryData->Status;
+    txData[6] =
+        ((uint8)batteryData->Status & 0x0FU) |
+        ((g_BmsCanPackStatusAliveCounter & 0x0FU) << 4U);
 
     txData[7] = 0U;
 
@@ -467,6 +471,16 @@ void Bms_Can_SendPackStatus(void)
             txData,
             BMS_CAN_TX_TIMEOUT_MS
         );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanPackStatusAliveCounter++;
+
+        if (g_BmsCanPackStatusAliveCounter >= 16U)
+        {
+            g_BmsCanPackStatusAliveCounter = 0U;
+        }
+    }
 }
 
 
