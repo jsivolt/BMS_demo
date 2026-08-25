@@ -474,12 +474,8 @@ void Bms_Can_SendPackStatus(void)
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
     {
-        g_BmsCanPackStatusAliveCounter++;
-
-        if (g_BmsCanPackStatusAliveCounter >= 16U)
-        {
-            g_BmsCanPackStatusAliveCounter = 0U;
-        }
+        g_BmsCanPackStatusAliveCounter =
+            (uint8)((g_BmsCanPackStatusAliveCounter + 1U) & 0x0FU);
     }
 }
 
