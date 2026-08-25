@@ -6,6 +6,10 @@
 #include "Siul2_Dio_Ip.h"
 #include "Siul2_Dio_Ip_Cfg.h"
 
+#include "../battery/Battery_Monitor.h"
+#include "../app/Bms_StateMachine.h"
+#include "../safety/Fault_Manager.h"
+
 
 #define BMS_CAN_TX_TIMEOUT_MS   (100U)
 #define BMS_CAN_LED_PORT         PTA_H_HALF
@@ -271,17 +275,95 @@ Std_ReturnType Bms_Can_Init(void)
 
 
 /* ================================================================================================
- * CAN TX test
+ * CAN TX status frame
  * ============================================================================================== */
 
-void Bms_Can_SendTest(void)
+void Bms_Can_SendStatus(void)
 {
-    static const uint8 testData[8] =
-    {
-        0x11U, 0x22U, 0x33U, 0x44U,
-        0x55U, 0x66U, 0x77U, 0x88U
-    };
+    uint8 txData[8];
 
+    const BatteryMonitor_DataType *batteryData;
+
+    sint16 temp1;
+    sint16 temp2;
+    sint16 temp3;
+
+    uint8 flags = 0U;
+
+    batteryData = BatteryMonitor_GetData();
+
+    temp1 = batteryData->PackTemperature_dC[0];
+    temp2 = batteryData->PackTemperature_dC[1];
+    temp3 = batteryData->PackTemperature_dC[2];
+
+    /*
+     * Byte 0:
+     * BMS state
+     *
+     * 0 = INIT
+     * 1 = STANDBY
+     * 2 = ACTIVE
+     * 3 = FAULT
+     */
+    txData[0] =
+        (uint8)Bms_StateMachine_GetState();
+
+    /*
+     * Bytes 1-2:
+     * Pack1 temperature, little endian
+     */
+    txData[1] = (uint8)((uint16)temp1 & 0xFFU);
+    txData[2] = (uint8)(((uint16)temp1 >> 8U) & 0xFFU);
+
+    /*
+     * Bytes 3-4:
+     * Pack2 temperature
+     */
+    txData[3] = (uint8)((uint16)temp2 & 0xFFU);
+    txData[4] = (uint8)(((uint16)temp2 >> 8U) & 0xFFU);
+
+    /*
+     * Bytes 5-6:
+     * Pack3 temperature
+     */
+    txData[5] = (uint8)((uint16)temp3 & 0xFFU);
+    txData[6] = (uint8)(((uint16)temp3 >> 8U) & 0xFFU);
+
+    /*
+     * Byte 7:
+     *
+     * bit0 = critical fault
+     * bit1 = any fault
+     * bit2 = Pack1 temperature valid
+     * bit3 = Pack2 temperature valid
+     * bit4 = Pack3 temperature valid
+     */
+    if (FaultManager_HasCriticalFault() == TRUE)
+    {
+        flags |= (1U << 0U);
+    }
+
+    if (FaultManager_HasAnyFault() == TRUE)
+    {
+        flags |= (1U << 1U);
+    }
+
+    if (batteryData->PackTemperatureValid[0] == TRUE)
+    {
+        flags |= (1U << 2U);
+    }
+
+    if (batteryData->PackTemperatureValid[1] == TRUE)
+    {
+        flags |= (1U << 3U);
+    }
+
+    if (batteryData->PackTemperatureValid[2] == TRUE)
+    {
+        flags |= (1U << 4U);
+    }
+
+    txData[7] = flags;
 
     /*
      * Handle previous polling TX completion.
@@ -291,15 +373,15 @@ void Bms_Can_SendTest(void)
         BMS_CAN_CFG_TX_MB_INDEX
     );
 
-
-    g_BmsCanTxStatus = FlexCAN_Ip_SendBlocking(
-        BMS_CAN_CFG_INSTANCE,
-        BMS_CAN_CFG_TX_MB_INDEX,
-        &g_BmsCanTxInfo,
-        BMS_CAN_CFG_TX_STATUS_ID,
-        testData,
-        BMS_CAN_TX_TIMEOUT_MS
-    );
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_STATUS_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
 }
 
 

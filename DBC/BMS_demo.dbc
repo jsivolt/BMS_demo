@@ -1,0 +1,75 @@
+VERSION "BMS_demo v0.1"
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_:
+
+BU_: S32K344_BMS PCAN
+
+
+BO_ 512 BMS_DebugCommand: 1 PCAN
+ SG_ DebugCommand : 0|8@1+ (1,0) [0|255] "" S32K344_BMS
+
+BO_ 513 BMS_ControlCommand: 1 PCAN
+ SG_ ControlCommand : 0|8@1+ (1,0) [0|3] "" S32K344_BMS
+
+BO_ 768 BMS_Status: 8 S32K344_BMS
+ SG_ BMS_State : 0|8@1+ (1,0) [0|3] "" PCAN
+ SG_ Pack1_Temperature : 8|16@1- (0.1,0) [-100|200] "degC" PCAN
+ SG_ Pack2_Temperature : 24|16@1- (0.1,0) [-100|200] "degC" PCAN
+ SG_ Pack3_Temperature : 40|16@1- (0.1,0) [-100|200] "degC" PCAN
+ SG_ CriticalFault : 56|1@1+ (1,0) [0|1] "" PCAN
+ SG_ AnyFault : 57|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1TempValid : 58|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2TempValid : 59|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3TempValid : 60|1@1+ (1,0) [0|1] "" PCAN
+
+
+VAL_ 512 DebugCommand 0 "NOP" 1 "LED2_On" 2 "LED2_Off" 3 "Reset_Rx_Count";
+VAL_ 513 ControlCommand 0 "NOP" 1 "Enable" 2 "Disable" 3 "ClearFault";
+VAL_ 768 BMS_State 0 "INIT" 1 "STANDBY" 2 "ACTIVE" 3 "FAULT";
+VAL_ 768 CriticalFault 0 "No" 1 "Yes";
+VAL_ 768 AnyFault 0 "No" 1 "Yes";
+VAL_ 768 Pack1TempValid 0 "Invalid" 1 "Valid";
+VAL_ 768 Pack2TempValid 0 "Invalid" 1 "Valid";
+VAL_ 768 Pack3TempValid 0 "Invalid" 1 "Valid";
+
+CM_ BO_ 512 "Existing debug command frame handled by Bms_Can_ProcessRxMessage(). CAN ID 0x200.";
+CM_ BO_ 513 "Existing BMS control command frame. CAN ID 0x201. Byte0: 0=NOP, 1=Enable, 2=Disable, 3=ClearFault.";
+CM_ BO_ 768 "Proposed 100 ms BMS status frame. CAN ID 0x300. Match BMS_CAN_CFG_TX_STATUS_ID to 0x300 before using this DBC.";
+CM_ SG_ 768 Pack1_Temperature "Pack 1 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+CM_ SG_ 768 Pack2_Temperature "Pack 2 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+CM_ SG_ 768 Pack3_Temperature "Pack 3 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+CM_ SG_ 768 CriticalFault "1 when FaultManager_HasCriticalFault() is TRUE.";
+CM_ SG_ 768 AnyFault "1 when FaultManager_HasAnyFault() is TRUE.";
+CM_ SG_ 768 Pack1TempValid "Pack 1 NTC validity.";
+CM_ SG_ 768 Pack2TempValid "Pack 2 NTC validity.";
+CM_ SG_ 768 Pack3TempValid "Pack 3 NTC validity.";

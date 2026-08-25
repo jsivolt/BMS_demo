@@ -32,7 +32,7 @@ extern "C" {
 #define BMS_CAN_CFG_BAUDRATE_BPS        (500000U)
 
 /** @brief CAN identifier used to broadcast BMS status frames. */
-#define BMS_CAN_CFG_TX_STATUS_ID          (0x100U)
+#define BMS_CAN_CFG_TX_STATUS_ID          (0x300U)
 
 /** @brief CAN identifier used for incoming debug frames. */
 #define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)

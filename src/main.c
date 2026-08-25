@@ -214,7 +214,7 @@ static void Bms_MainFunction_100ms(void)
 
     Bms_StateMachine_MainFunction();
 
-    Bms_Can_SendTest();
+    Bms_Can_SendStatus();
 }
 
 static void Bms_MainFunction_1000ms(void)

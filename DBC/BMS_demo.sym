@@ -1,0 +1,34 @@
+FormatVersion=5.0 // Do not edit this line!
+Title="BMS_demo"
+
+{ENUMS}
+enum VtSig_DebugCommand(0="NOP", 1="LED2_On", 2="LED2_Off", 3="Reset_Rx_Count")
+enum VtSig_ControlCommand(0="NOP", 1="Enable", 2="Disable", 3="ClearFault")
+enum VtSig_BMS_State(0="INIT", 1="STANDBY", 2="ACTIVE", 3="FAULT")
+enum VtSig_CriticalFault(0="No", 1="Yes")
+enum VtSig_Pack1TempValid(0="Invalid", 1="Valid")
+
+{SENDRECEIVE}
+
+[BMS_DebugCommand]
+ID=200h // Existing debug command frame handled by Bms_Can_ProcessRxMessage(). CAN ID 0x200.
+DLC=1
+Var=DebugCommand unsigned 0,8 /e:VtSig_DebugCommand
+
+[BMS_ControlCommand]
+ID=201h // Existing BMS control command frame. CAN ID 0x201. Byte0: 0=NOP, 1=Enable, 2=Disable, 3=ClearFault.
+DLC=1
+Var=ControlCommand unsigned 0,8 /max:3 /e:VtSig_ControlCommand
+
+[BMS_Status]
+ID=300h // Proposed 100 ms BMS status frame. CAN ID 0x300. Match BMS_CAN_CFG_TX_STATUS_ID to 0x300 before using this DBC.
+DLC=8
+Var=BMS_State unsigned 0,8 /max:3 /e:VtSig_BMS_State
+Var=Pack1_Temperature signed 8,16 /u:degC /f:0.1 /min:-100 /max:200 // Pack 1 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.
+Var=Pack2_Temperature signed 24,16 /u:degC /f:0.1 /min:-100 /max:200 // Pack 2 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.
+Var=Pack3_Temperature signed 40,16 /u:degC /f:0.1 /min:-100 /max:200 // Pack 3 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.
+Var=CriticalFault bit 56,1 /e:VtSig_CriticalFault // 1 when FaultManager_HasCriticalFault() is TRUE.
+Var=AnyFault bit 57,1 /e:VtSig_CriticalFault // 1 when FaultManager_HasAnyFault() is TRUE.
+Var=Pack1TempValid bit 58,1 /e:VtSig_Pack1TempValid // Pack 1 NTC validity.
+Var=Pack2TempValid bit 59,1 /e:VtSig_Pack1TempValid // Pack 2 NTC validity.
+Var=Pack3TempValid bit 60,1 /e:VtSig_Pack1TempValid // Pack 3 NTC validity.
