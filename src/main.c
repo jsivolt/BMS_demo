@@ -217,6 +217,8 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendStatus();
 
     Bms_Can_SendPackStatus();
+
+    Bms_Can_SendContactorStatus();
 }
 
 static void Bms_MainFunction_1000ms(void)

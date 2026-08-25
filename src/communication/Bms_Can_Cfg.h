@@ -37,8 +37,8 @@ extern "C" {
 /** @brief CAN identifier used to broadcast pack voltage/status frames. */
 #define BMS_CAN_CFG_TX_PACK_STATUS_ID     (0x301U)
 
-/** @brief CAN identifier used to broadcast pack temperature frames. */
-#define BMS_CAN_CFG_TX_PACK_TEMPERATURE_ID    (0x302U)
+/** @brief CAN identifier used to broadcast contactor status frames. */
+#define BMS_CAN_CFG_TX_CONTACTOR_STATUS_ID    (0x302U)
 
 /** @brief CAN identifier used for incoming debug frames. */
 #define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)

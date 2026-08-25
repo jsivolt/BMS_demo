@@ -1,4 +1,4 @@
-VERSION "BMS_demo v0.4"
+VERSION "BMS_demo v0.5"
 
 NS_ :
     NS_DESC_
@@ -41,6 +41,7 @@ BO_ 512 BMS_DebugCommand: 1 PCAN
 BO_ 513 BMS_ControlCommand: 1 PCAN
  SG_ ControlCommand : 0|8@1+ (1,0) [0|3] "" S32K344_BMS
 
+
 BO_ 768 BMS_Status: 8 S32K344_BMS
  SG_ BMS_State : 0|8@1+ (1,0) [0|3] "" PCAN
  SG_ Pack1_Temperature : 8|16@1- (0.1,0) [-100|200] "degC" PCAN
@@ -52,17 +53,48 @@ BO_ 768 BMS_Status: 8 S32K344_BMS
  SG_ Pack2TempValid : 59|1@1+ (1,0) [0|1] "" PCAN
  SG_ Pack3TempValid : 60|1@1+ (1,0) [0|1] "" PCAN
 
+
 BO_ 769 BMS_PackStatus: 8 S32K344_BMS
  SG_ Pack1Voltage : 0|16@1+ (0.1,0) [0|6553.5] "V" PCAN
  SG_ Pack2Voltage : 16|16@1+ (0.1,0) [0|6553.5] "V" PCAN
  SG_ Pack3Voltage : 32|16@1+ (0.1,0) [0|6553.5] "V" PCAN
  SG_ BatteryMonitorStatus : 48|4@1+ (1,0) [0|15] "" PCAN
- SG_ AliveCounter : 52|4@1+ (1,0) [0|15] "" PCAN
+ SG_ PackStatusAliveCounter : 52|4@1+ (1,0) [0|15] "" PCAN
  SG_ PackVoltageValid : 56|1@1+ (1,0) [0|1] "" PCAN
 
 
-VAL_ 512 DebugCommand 0 "NOP" 1 "LED2_On" 2 "LED2_Off" 3 "Reset_Rx_Count";
-VAL_ 513 ControlCommand 0 "NOP" 1 "Enable" 2 "Disable" 3 "ClearFault";
+BO_ 770 BMS_ContactorStatus: 8 S32K344_BMS
+ SG_ Pack1ContactorState : 0|8@1+ (1,0) [0|6] "" PCAN
+ SG_ Pack2ContactorState : 8|8@1+ (1,0) [0|6] "" PCAN
+ SG_ Pack3ContactorState : 16|8@1+ (1,0) [0|6] "" PCAN
+
+ SG_ Pack1NegativeContactor : 24|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1PositiveContactor : 25|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1PrechargeContactor : 26|1@1+ (1,0) [0|1] "" PCAN
+
+ SG_ Pack2NegativeContactor : 32|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2PositiveContactor : 33|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2PrechargeContactor : 34|1@1+ (1,0) [0|1] "" PCAN
+
+ SG_ Pack3NegativeContactor : 40|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3PositiveContactor : 41|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3PrechargeContactor : 42|1@1+ (1,0) [0|1] "" PCAN
+
+ SG_ ContactorAliveCounter : 48|4@1+ (1,0) [0|15] "" PCAN
+
+
+VAL_ 512 DebugCommand
+ 0 "NOP"
+ 1 "LED2_On"
+ 2 "LED2_Off"
+ 3 "Reset_Rx_Count";
+
+VAL_ 513 ControlCommand
+ 0 "NOP"
+ 1 "Enable"
+ 2 "Disable"
+ 3 "ClearFault";
+
 
 VAL_ 768 BMS_State
  0 "INIT"
@@ -70,12 +102,26 @@ VAL_ 768 BMS_State
  2 "ACTIVE"
  3 "FAULT";
 
-VAL_ 768 CriticalFault 0 "No" 1 "Yes";
-VAL_ 768 AnyFault 0 "No" 1 "Yes";
+VAL_ 768 CriticalFault
+ 0 "No"
+ 1 "Yes";
 
-VAL_ 768 Pack1TempValid 0 "Invalid" 1 "Valid";
-VAL_ 768 Pack2TempValid 0 "Invalid" 1 "Valid";
-VAL_ 768 Pack3TempValid 0 "Invalid" 1 "Valid";
+VAL_ 768 AnyFault
+ 0 "No"
+ 1 "Yes";
+
+VAL_ 768 Pack1TempValid
+ 0 "Invalid"
+ 1 "Valid";
+
+VAL_ 768 Pack2TempValid
+ 0 "Invalid"
+ 1 "Valid";
+
+VAL_ 768 Pack3TempValid
+ 0 "Invalid"
+ 1 "Valid";
+
 
 VAL_ 769 BatteryMonitorStatus
  0 "OK"
@@ -89,30 +135,162 @@ VAL_ 769 PackVoltageValid
  1 "Valid";
 
 
-CM_ BO_ 512 "Existing debug command frame handled by Bms_Can_ProcessRxMessage(). CAN ID 0x200.";
+VAL_ 770 Pack1ContactorState
+ 0 "OFF"
+ 1 "NEG_ON"
+ 2 "PRECHARGE"
+ 3 "POS_ON"
+ 4 "RUN"
+ 5 "OPENING"
+ 6 "FAULT";
 
-CM_ BO_ 513 "Existing BMS control command frame. CAN ID 0x201. Byte0: 0=NOP, 1=Enable, 2=Disable, 3=ClearFault.";
+VAL_ 770 Pack2ContactorState
+ 0 "OFF"
+ 1 "NEG_ON"
+ 2 "PRECHARGE"
+ 3 "POS_ON"
+ 4 "RUN"
+ 5 "OPENING"
+ 6 "FAULT";
 
-CM_ BO_ 768 "BMS status frame. CAN ID 0x300.";
+VAL_ 770 Pack3ContactorState
+ 0 "OFF"
+ 1 "NEG_ON"
+ 2 "PRECHARGE"
+ 3 "POS_ON"
+ 4 "RUN"
+ 5 "OPENING"
+ 6 "FAULT";
 
-CM_ SG_ 768 Pack1_Temperature "Pack 1 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
-CM_ SG_ 768 Pack2_Temperature "Pack 2 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
-CM_ SG_ 768 Pack3_Temperature "Pack 3 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+VAL_ 770 Pack1NegativeContactor
+ 0 "Off"
+ 1 "On";
 
-CM_ SG_ 768 CriticalFault "1 when FaultManager_HasCriticalFault() is TRUE.";
-CM_ SG_ 768 AnyFault "1 when FaultManager_HasAnyFault() is TRUE.";
+VAL_ 770 Pack1PositiveContactor
+ 0 "Off"
+ 1 "On";
 
-CM_ SG_ 768 Pack1TempValid "Pack 1 NTC validity.";
-CM_ SG_ 768 Pack2TempValid "Pack 2 NTC validity.";
-CM_ SG_ 768 Pack3TempValid "Pack 3 NTC validity.";
+VAL_ 770 Pack1PrechargeContactor
+ 0 "Off"
+ 1 "On";
+
+VAL_ 770 Pack2NegativeContactor
+ 0 "Off"
+ 1 "On";
+
+VAL_ 770 Pack2PositiveContactor
+ 0 "Off"
+ 1 "On";
+
+VAL_ 770 Pack2PrechargeContactor
+ 0 "Off"
+ 1 "On";
+
+VAL_ 770 Pack3NegativeContactor
+ 0 "Off"
+ 1 "On";
+
+VAL_ 770 Pack3PositiveContactor
+ 0 "Off"
+ 1 "On";
+
+VAL_ 770 Pack3PrechargeContactor
+ 0 "Off"
+ 1 "On";
 
 
-CM_ BO_ 769 "Pack voltage and Battery Monitor status frame. CAN ID 0x301.";
+CM_ BO_ 512 "Debug command frame. CAN ID 0x200.";
 
-CM_ SG_ 769 Pack1Voltage "Pack 1 voltage. Unsigned 16-bit little-endian, 0.1 V/bit.";
-CM_ SG_ 769 Pack2Voltage "Pack 2 voltage. Unsigned 16-bit little-endian, 0.1 V/bit.";
-CM_ SG_ 769 Pack3Voltage "Pack 3 voltage. Unsigned 16-bit little-endian, 0.1 V/bit.";
+CM_ BO_ 513 "BMS control command frame. CAN ID 0x201.";
 
-CM_ SG_ 769 BatteryMonitorStatus "BatteryMonitor_StatusType in byte 6 bits 0-3.";
-CM_ SG_ 769 AliveCounter "4-bit rolling alive counter in byte 6 bits 4-7. Expected sequence 0..15 then wrap to 0.";
-CM_ SG_ 769 PackVoltageValid "Overall pack-voltage validity from BatteryMonitor_DataType.Valid, byte 7 bit 0.";
+
+CM_ BO_ 768 "BMS general status frame. CAN ID 0x300.";
+
+CM_ SG_ 768 Pack1_Temperature
+ "Pack 1 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+
+CM_ SG_ 768 Pack2_Temperature
+ "Pack 2 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+
+CM_ SG_ 768 Pack3_Temperature
+ "Pack 3 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
+
+CM_ SG_ 768 CriticalFault
+ "1 when a critical fault is active.";
+
+CM_ SG_ 768 AnyFault
+ "1 when any BMS fault is active.";
+
+CM_ SG_ 768 Pack1TempValid
+ "Pack 1 temperature validity.";
+
+CM_ SG_ 768 Pack2TempValid
+ "Pack 2 temperature validity.";
+
+CM_ SG_ 768 Pack3TempValid
+ "Pack 3 temperature validity.";
+
+
+CM_ BO_ 769
+ "Pack voltage and Battery Monitor status frame. CAN ID 0x301.";
+
+CM_ SG_ 769 Pack1Voltage
+ "Pack 1 voltage. Unsigned 16-bit little-endian, 0.1 V/bit.";
+
+CM_ SG_ 769 Pack2Voltage
+ "Pack 2 voltage. Unsigned 16-bit little-endian, 0.1 V/bit.";
+
+CM_ SG_ 769 Pack3Voltage
+ "Pack 3 voltage. Unsigned 16-bit little-endian, 0.1 V/bit.";
+
+CM_ SG_ 769 BatteryMonitorStatus
+ "BatteryMonitor status in byte 6 bits 0-3.";
+
+CM_ SG_ 769 PackStatusAliveCounter
+ "4-bit rolling alive counter in byte 6 bits 4-7.";
+
+CM_ SG_ 769 PackVoltageValid
+ "Overall pack voltage validity in byte 7 bit 0.";
+
+
+CM_ BO_ 770
+ "Three-pack contactor status frame. CAN ID 0x302.";
+
+CM_ SG_ 770 Pack1ContactorState
+ "Pack 1 contactor state.";
+
+CM_ SG_ 770 Pack2ContactorState
+ "Pack 2 contactor state.";
+
+CM_ SG_ 770 Pack3ContactorState
+ "Pack 3 contactor state.";
+
+CM_ SG_ 770 Pack1NegativeContactor
+ "Pack 1 negative contactor command/output state.";
+
+CM_ SG_ 770 Pack1PositiveContactor
+ "Pack 1 positive contactor command/output state.";
+
+CM_ SG_ 770 Pack1PrechargeContactor
+ "Pack 1 precharge contactor command/output state.";
+
+CM_ SG_ 770 Pack2NegativeContactor
+ "Pack 2 negative contactor command/output state.";
+
+CM_ SG_ 770 Pack2PositiveContactor
+ "Pack 2 positive contactor command/output state.";
+
+CM_ SG_ 770 Pack2PrechargeContactor
+ "Pack 2 precharge contactor command/output state.";
+
+CM_ SG_ 770 Pack3NegativeContactor
+ "Pack 3 negative contactor command/output state.";
+
+CM_ SG_ 770 Pack3PositiveContactor
+ "Pack 3 positive contactor command/output state.";
+
+CM_ SG_ 770 Pack3PrechargeContactor
+ "Pack 3 precharge contactor command/output state.";
+
+CM_ SG_ 770 ContactorAliveCounter
+ "4-bit rolling alive counter in byte 6 bits 0-3.";

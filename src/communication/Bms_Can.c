@@ -10,6 +10,8 @@
 #include "../app/Bms_StateMachine.h"
 #include "../safety/Fault_Manager.h"
 
+#include "../control/Bms_Contactor.h"
+
 
 #define BMS_CAN_TX_TIMEOUT_MS   (100U)
 #define BMS_CAN_LED_PORT         PTA_H_HALF
@@ -79,6 +81,7 @@ volatile uint32 g_DebugEnableRequestAddr = 0U;
 volatile uint32 g_DebugDisableRequestAddr = 0U;
 
 static uint8 g_BmsCanPackStatusAliveCounter = 0U;
+static uint8 g_BmsCanContactorAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -476,6 +479,118 @@ void Bms_Can_SendPackStatus(void)
     {
         g_BmsCanPackStatusAliveCounter =
             (uint8)((g_BmsCanPackStatusAliveCounter + 1U) & 0x0FU);
+    }
+}
+
+
+/* ================================================================================================
+ * CAN TX contactor status frame
+ * ============================================================================================== */
+
+void Bms_Can_SendContactorStatus(void)
+{
+    uint8 txData[8] = {0U};
+
+    Bms_ContactorOutputType pack1Output;
+    Bms_ContactorOutputType pack2Output;
+    Bms_ContactorOutputType pack3Output;
+
+    txData[0] =
+        (uint8)Bms_Contactor_GetState(BMS_PACK_1);
+
+    txData[1] =
+        (uint8)Bms_Contactor_GetState(BMS_PACK_2);
+
+    txData[2] =
+        (uint8)Bms_Contactor_GetState(BMS_PACK_3);
+
+    pack1Output =
+        Bms_Contactor_GetOutputs(BMS_PACK_1);
+
+    pack2Output =
+        Bms_Contactor_GetOutputs(BMS_PACK_2);
+
+    pack3Output =
+        Bms_Contactor_GetOutputs(BMS_PACK_3);
+
+    /*
+     * Pack 1 contactor outputs
+     */
+    if (pack1Output.negative == TRUE)
+    {
+        txData[3] |= 0x01U;
+    }
+
+    if (pack1Output.positive == TRUE)
+    {
+        txData[3] |= 0x02U;
+    }
+
+    if (pack1Output.precharge == TRUE)
+    {
+        txData[3] |= 0x04U;
+    }
+
+    /*
+     * Pack 2 contactor outputs
+     */
+    if (pack2Output.negative == TRUE)
+    {
+        txData[4] |= 0x01U;
+    }
+
+    if (pack2Output.positive == TRUE)
+    {
+        txData[4] |= 0x02U;
+    }
+
+    if (pack2Output.precharge == TRUE)
+    {
+        txData[4] |= 0x04U;
+    }
+
+    /*
+     * Pack 3 contactor outputs
+     */
+    if (pack3Output.negative == TRUE)
+    {
+        txData[5] |= 0x01U;
+    }
+
+    if (pack3Output.positive == TRUE)
+    {
+        txData[5] |= 0x02U;
+    }
+
+    if (pack3Output.precharge == TRUE)
+    {
+        txData[5] |= 0x04U;
+    }
+
+    txData[6] =
+        (uint8)(g_BmsCanContactorAliveCounter & 0x0FU);
+
+    txData[7] = 0U;
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_CONTACTOR_STATUS_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanContactorAliveCounter =
+            (uint8)((g_BmsCanContactorAliveCounter + 1U) & 0x0FU);
     }
 }
 
