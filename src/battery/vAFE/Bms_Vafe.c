@@ -2,6 +2,8 @@
 
 Bms_Vafe_DataType g_BmsVafeData;
 
+static boolean g_BmsVafeFrameReceived[BMS_VAFE_FRAME_COUNT];
+
 static void Bms_Vafe_Decode4Cells(
     uint8 startIndex,
     const uint8 *data
@@ -20,6 +22,44 @@ static void Bms_Vafe_Decode4Cells(
         ((uint16)data[7] << 8U) | (uint16)data[6];
 }
 
+static void Bms_Vafe_UpdateStatistics(void)
+{
+    uint8 i;
+    uint16 minVoltage;
+    uint16 maxVoltage;
+    uint8 minIndex;
+    uint8 maxIndex;
+
+    minVoltage = g_BmsVafeData.CellVoltage_mV[0];
+    maxVoltage = g_BmsVafeData.CellVoltage_mV[0];
+
+    minIndex = 0U;
+    maxIndex = 0U;
+
+    for (i = 1U; i < BMS_VAFE_CELL_COUNT; i++)
+    {
+        if (g_BmsVafeData.CellVoltage_mV[i] < minVoltage)
+        {
+            minVoltage = g_BmsVafeData.CellVoltage_mV[i];
+            minIndex = i;
+        }
+
+        if (g_BmsVafeData.CellVoltage_mV[i] > maxVoltage)
+        {
+            maxVoltage = g_BmsVafeData.CellVoltage_mV[i];
+            maxIndex = i;
+        }
+    }
+
+    g_BmsVafeData.MinCellVoltage_mV = minVoltage;
+    g_BmsVafeData.MaxCellVoltage_mV = maxVoltage;
+    g_BmsVafeData.DeltaCellVoltage_mV =
+        (uint16)(maxVoltage - minVoltage);
+
+    g_BmsVafeData.MinCellIndex = minIndex;
+    g_BmsVafeData.MaxCellIndex = maxIndex;
+}
+
 void Bms_Vafe_Init(void)
 {
     uint8 i;
@@ -28,6 +68,18 @@ void Bms_Vafe_Init(void)
     {
         g_BmsVafeData.CellVoltage_mV[i] = 0U;
     }
+
+    for (i = 0U; i < BMS_VAFE_FRAME_COUNT; i++)
+    {
+        g_BmsVafeFrameReceived[i] = FALSE;
+    }
+
+    g_BmsVafeData.MinCellVoltage_mV = 0U;
+    g_BmsVafeData.MaxCellVoltage_mV = 0U;
+    g_BmsVafeData.DeltaCellVoltage_mV = 0U;
+
+    g_BmsVafeData.MinCellIndex = 0U;
+    g_BmsVafeData.MaxCellIndex = 0U;
 
     g_BmsVafeData.DataValid = FALSE;
 }
@@ -43,25 +95,35 @@ void Bms_Vafe_ProcessFrame(uint32 canId, const uint8 *data, uint8 dlc)
     {
         case 0x401U:
             Bms_Vafe_Decode4Cells(0U, data);
-            g_BmsVafeData.DataValid = TRUE;
+            g_BmsVafeFrameReceived[0] = TRUE;
             break;
 
         case 0x402U:
             Bms_Vafe_Decode4Cells(4U, data);
-            g_BmsVafeData.DataValid = TRUE;
+            g_BmsVafeFrameReceived[1] = TRUE;
             break;
 
         case 0x403U:
             Bms_Vafe_Decode4Cells(8U, data);
-            g_BmsVafeData.DataValid = TRUE;
+            g_BmsVafeFrameReceived[2] = TRUE;
             break;
 
         case 0x404U:
             Bms_Vafe_Decode4Cells(12U, data);
-            g_BmsVafeData.DataValid = TRUE;
+            g_BmsVafeFrameReceived[3] = TRUE;
             break;
 
         default:
-            break;
+            return;
+    }
+
+    if ((g_BmsVafeFrameReceived[0] == TRUE) &&
+        (g_BmsVafeFrameReceived[1] == TRUE) &&
+        (g_BmsVafeFrameReceived[2] == TRUE) &&
+        (g_BmsVafeFrameReceived[3] == TRUE))
+    {
+        Bms_Vafe_UpdateStatistics();
+
+        g_BmsVafeData.DataValid = TRUE;
     }
 }
