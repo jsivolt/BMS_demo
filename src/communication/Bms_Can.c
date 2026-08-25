@@ -71,6 +71,9 @@ volatile boolean g_BmsEnableRequest = FALSE;
 volatile boolean g_BmsDisableRequest = FALSE;
 volatile boolean g_BmsClearFaultRequest = FALSE;
 
+volatile uint32 g_DebugEnableRequestAddr = 0U;
+volatile uint32 g_DebugDisableRequestAddr = 0U;
+
 volatile uint8 g_BmsCanRxData[8] =
 {
     0U, 0U, 0U, 0U,
@@ -172,6 +175,10 @@ static void Bms_Can_ProcessControlCommand(const uint8 *data, uint8 dlc)
 
 Std_ReturnType Bms_Can_Init(void)
 {
+    g_DebugEnableRequestAddr = (uint32)&g_BmsEnableRequest;
+
+    g_DebugDisableRequestAddr = (uint32)&g_BmsDisableRequest;
+
     g_BmsCanInitStatus = FlexCAN_Ip_Init(
         BMS_CAN_CFG_INSTANCE,
         &FlexCAN_State0,

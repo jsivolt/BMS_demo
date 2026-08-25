@@ -1,9 +1,11 @@
 #include "Bms_StateMachine.h"
+#include "../control/Bms_Contactor.h"
 
 #include "Siul2_Dio_Ip.h"
 #include "Siul2_Dio_Ip_Cfg.h"
 
 #include "Fault_Manager.h"
+
 
 
 #define BMS_STATE_LED_PORT    PTA_H_HALF
@@ -142,6 +144,9 @@ void Bms_StateMachine_MainFunction(void)
             /*
              * Critical fault always has the highest priority.
              */
+            g_BmsClearFaultRequest = FALSE;
+            g_BmsDisableRequest = FALSE;
+
             if (FaultManager_HasCriticalFault() == TRUE)
             {
                 /*
@@ -157,6 +162,14 @@ void Bms_StateMachine_MainFunction(void)
                  * Enable request accepted.
                  */
                 g_BmsEnableRequest = FALSE;
+
+                /*
+                 * Request all three battery packs to start
+                 * the normal contactor/precharge close sequence.
+                 */
+                Bms_Contactor_RequestClose(BMS_PACK_1);
+                Bms_Contactor_RequestClose(BMS_PACK_2);
+                Bms_Contactor_RequestClose(BMS_PACK_3);
 
                 g_BmsState = BMS_STATE_ACTIVE;
             }
@@ -190,6 +203,10 @@ void Bms_StateMachine_MainFunction(void)
              * - Contactor fault
              * - Over-current
              */
+
+            g_BmsClearFaultRequest = FALSE;
+            g_BmsEnableRequest = FALSE;
+
             if (FaultManager_HasCriticalFault() == TRUE)
             {
                 /*
@@ -206,6 +223,14 @@ void Bms_StateMachine_MainFunction(void)
                  * Normal operator/system disable request.
                  */
                 g_BmsDisableRequest = FALSE;
+
+                /*
+                 * Request all three battery packs
+                 * to open their contactors.
+                 */
+                Bms_Contactor_RequestOpen(BMS_PACK_1);
+                Bms_Contactor_RequestOpen(BMS_PACK_2);
+                Bms_Contactor_RequestOpen(BMS_PACK_3);
 
                 g_BmsState = BMS_STATE_STANDBY;
             }

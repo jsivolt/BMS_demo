@@ -2,6 +2,7 @@
 #include "Bms_Contactor_Cfg.h"
 #include "Fault_Manager.h"
 
+#define BMS_CONTACTOR_SIMULATION_MODE    (1U)
 
 typedef struct
 {
@@ -223,14 +224,37 @@ static void Bms_Contactor_ProcessPack(Bms_PackIdType packId)
             ctx->output.positive = FALSE;
 
 
+#if (BMS_CONTACTOR_SIMULATION_MODE == 1U)
+
+            /*
+             * Simulation mode:
+             * no real precharge hardware / bus voltage available.
+             *
+             * Stay in PRECHARGE for a short period, then
+             * simulate successful precharge.
+             */
+            if (ctx->stateTimerMs >=
+                BMS_CONTACTOR_POS_DELAY_MS)
+            {
+                ctx->output.positive = TRUE;
+
+                Bms_Contactor_EnterState(
+                        packId,
+                        BMS_CONTACTOR_POS_ON);
+            }
+
+#else
+
+            /*
+             * Real hardware mode:
+             * bus voltage must reach the configured fraction
+             * of pack voltage before positive contactor closes.
+             */
             if ((ctx->packVoltage > 0.0F) &&
                 (g_BusVoltage >=
                  (ctx->packVoltage *
                   BMS_PRECHARGE_COMPLETE_RATIO)))
             {
-                /*
-                 * Precharge success: close positive contactor
-                 */
                 ctx->output.positive = TRUE;
 
                 Bms_Contactor_EnterState(
@@ -244,6 +268,8 @@ static void Bms_Contactor_ProcessPack(Bms_PackIdType packId)
                         (FaultPackIdType)packId,
                         FAULT_PRECHARGE_TIMEOUT);
             }
+
+#endif
 
             break;
 
