@@ -118,6 +118,18 @@ static uint16 Bms_Can_VoltageToRaw(float voltage)
 }
 
 
+/* Packs a uint32 into 4 bytes, little endian. */
+static void Bms_Can_PackUint32LE(
+        uint8 *data,
+        uint32 value)
+{
+    data[0] = (uint8)(value & 0xFFUL);
+    data[1] = (uint8)((value >> 8U) & 0xFFUL);
+    data[2] = (uint8)((value >> 16U) & 0xFFUL);
+    data[3] = (uint8)((value >> 24U) & 0xFFUL);
+}
+
+
 static void Bms_Can_ProcessRxMessage(void)
 {
     if (g_BmsCanRxId != BMS_CAN_CFG_RX_DEBUG_ID)
@@ -592,6 +604,112 @@ void Bms_Can_SendContactorStatus(void)
         g_BmsCanContactorAliveCounter =
             (uint8)((g_BmsCanContactorAliveCounter + 1U) & 0x0FU);
     }
+}
+
+
+/* ================================================================================================
+ * CAN TX Pack1 + Pack2 fault frame
+ * CAN ID: 0x303
+ * ============================================================================================== */
+
+void Bms_Can_SendFaultStatus1(void)
+{
+    uint8 txData[8];
+
+    FaultMaskType pack1Faults;
+    FaultMaskType pack2Faults;
+
+    pack1Faults =
+        FaultManager_GetPackFaults(FAULT_PACK_1);
+
+    pack2Faults =
+        FaultManager_GetPackFaults(FAULT_PACK_2);
+
+    /*
+     * Bytes 0-3:
+     * Pack1 fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[0],
+        (uint32)pack1Faults
+    );
+
+    /*
+     * Bytes 4-7:
+     * Pack2 fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[4],
+        (uint32)pack2Faults
+    );
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_FAULT_12_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+/* ================================================================================================
+ * CAN TX Pack3 + System fault frame
+ * CAN ID: 0x304
+ * ============================================================================================== */
+
+void Bms_Can_SendFaultStatus2(void)
+{
+    uint8 txData[8];
+
+    FaultMaskType pack3Faults;
+    FaultMaskType systemFaults;
+
+    pack3Faults =
+        FaultManager_GetPackFaults(FAULT_PACK_3);
+
+    systemFaults =
+        FaultManager_GetSystemFaults();
+
+    /*
+     * Bytes 0-3:
+     * Pack3 fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[0],
+        (uint32)pack3Faults
+    );
+
+    /*
+     * Bytes 4-7:
+     * System fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[4],
+        (uint32)systemFaults
+    );
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_FAULT_3_SYSTEM_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
 }
 
 

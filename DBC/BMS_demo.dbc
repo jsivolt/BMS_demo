@@ -1,4 +1,4 @@
-VERSION "BMS_demo v0.5"
+VERSION "BMS_demo v0.6"
 
 NS_ :
     NS_DESC_
@@ -83,6 +83,80 @@ BO_ 770 BMS_ContactorStatus: 8 S32K344_BMS
  SG_ ContactorAliveCounter : 48|4@1+ (1,0) [0|15] "" PCAN
 
 
+BO_ 771 BMS_Pack12Fault: 8 S32K344_BMS
+ SG_ Pack1FaultMask : 0|32@1+ (1,0) [0|4294967295] "" PCAN
+ SG_ Pack2FaultMask : 32|32@1+ (1,0) [0|4294967295] "" PCAN
+
+ SG_ Pack1_PackOV : 0|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_PackUV : 1|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_CellOV : 2|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_CellUV : 3|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_OverTemp : 4|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_UnderTemp : 5|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_AfeComm : 6|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_CanTimeout : 7|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_SpiTimeout : 8|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_PrechargeTimeout : 9|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_ContactorFeedback : 10|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_ContactorWeld : 11|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_OverCurrent : 12|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_TempSensor : 13|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1_TempDelta : 14|1@1+ (1,0) [0|1] "" PCAN
+
+ SG_ Pack2_PackOV : 32|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_PackUV : 33|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_CellOV : 34|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_CellUV : 35|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_OverTemp : 36|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_UnderTemp : 37|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_AfeComm : 38|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_CanTimeout : 39|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_SpiTimeout : 40|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_PrechargeTimeout : 41|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_ContactorFeedback : 42|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_ContactorWeld : 43|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_OverCurrent : 44|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_TempSensor : 45|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack2_TempDelta : 46|1@1+ (1,0) [0|1] "" PCAN
+
+
+BO_ 772 BMS_Pack3SystemFault: 8 S32K344_BMS
+ SG_ Pack3FaultMask : 0|32@1+ (1,0) [0|4294967295] "" PCAN
+ SG_ SystemFaultMask : 32|32@1+ (1,0) [0|4294967295] "" PCAN
+
+ SG_ Pack3_PackOV : 0|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_PackUV : 1|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_CellOV : 2|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_CellUV : 3|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_OverTemp : 4|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_UnderTemp : 5|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_AfeComm : 6|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_CanTimeout : 7|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_SpiTimeout : 8|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_PrechargeTimeout : 9|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_ContactorFeedback : 10|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_ContactorWeld : 11|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_OverCurrent : 12|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_TempSensor : 13|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack3_TempDelta : 14|1@1+ (1,0) [0|1] "" PCAN
+
+ SG_ System_PackOV : 32|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_PackUV : 33|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_CellOV : 34|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_CellUV : 35|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_OverTemp : 36|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_UnderTemp : 37|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_AfeComm : 38|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_CanTimeout : 39|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_SpiTimeout : 40|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_PrechargeTimeout : 41|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_ContactorFeedback : 42|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_ContactorWeld : 43|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_OverCurrent : 44|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_TempSensor : 45|1@1+ (1,0) [0|1] "" PCAN
+ SG_ System_TempDelta : 46|1@1+ (1,0) [0|1] "" PCAN
+
+
 VAL_ 512 DebugCommand
  0 "NOP"
  1 "LED2_On"
@@ -162,49 +236,95 @@ VAL_ 770 Pack3ContactorState
  5 "OPENING"
  6 "FAULT";
 
-VAL_ 770 Pack1NegativeContactor
- 0 "Off"
- 1 "On";
 
-VAL_ 770 Pack1PositiveContactor
- 0 "Off"
- 1 "On";
+VAL_ 770 Pack1NegativeContactor 0 "Off" 1 "On";
+VAL_ 770 Pack1PositiveContactor 0 "Off" 1 "On";
+VAL_ 770 Pack1PrechargeContactor 0 "Off" 1 "On";
 
-VAL_ 770 Pack1PrechargeContactor
- 0 "Off"
- 1 "On";
+VAL_ 770 Pack2NegativeContactor 0 "Off" 1 "On";
+VAL_ 770 Pack2PositiveContactor 0 "Off" 1 "On";
+VAL_ 770 Pack2PrechargeContactor 0 "Off" 1 "On";
 
-VAL_ 770 Pack2NegativeContactor
- 0 "Off"
- 1 "On";
-
-VAL_ 770 Pack2PositiveContactor
- 0 "Off"
- 1 "On";
-
-VAL_ 770 Pack2PrechargeContactor
- 0 "Off"
- 1 "On";
-
-VAL_ 770 Pack3NegativeContactor
- 0 "Off"
- 1 "On";
-
-VAL_ 770 Pack3PositiveContactor
- 0 "Off"
- 1 "On";
-
-VAL_ 770 Pack3PrechargeContactor
- 0 "Off"
- 1 "On";
+VAL_ 770 Pack3NegativeContactor 0 "Off" 1 "On";
+VAL_ 770 Pack3PositiveContactor 0 "Off" 1 "On";
+VAL_ 770 Pack3PrechargeContactor 0 "Off" 1 "On";
 
 
-CM_ BO_ 512 "Debug command frame. CAN ID 0x200.";
+VAL_ 771 Pack1_PackOV 0 "No" 1 "Yes";
+VAL_ 771 Pack1_PackUV 0 "No" 1 "Yes";
+VAL_ 771 Pack1_CellOV 0 "No" 1 "Yes";
+VAL_ 771 Pack1_CellUV 0 "No" 1 "Yes";
+VAL_ 771 Pack1_OverTemp 0 "No" 1 "Yes";
+VAL_ 771 Pack1_UnderTemp 0 "No" 1 "Yes";
+VAL_ 771 Pack1_AfeComm 0 "No" 1 "Yes";
+VAL_ 771 Pack1_CanTimeout 0 "No" 1 "Yes";
+VAL_ 771 Pack1_SpiTimeout 0 "No" 1 "Yes";
+VAL_ 771 Pack1_PrechargeTimeout 0 "No" 1 "Yes";
+VAL_ 771 Pack1_ContactorFeedback 0 "No" 1 "Yes";
+VAL_ 771 Pack1_ContactorWeld 0 "No" 1 "Yes";
+VAL_ 771 Pack1_OverCurrent 0 "No" 1 "Yes";
+VAL_ 771 Pack1_TempSensor 0 "No" 1 "Yes";
+VAL_ 771 Pack1_TempDelta 0 "No" 1 "Yes";
 
-CM_ BO_ 513 "BMS control command frame. CAN ID 0x201.";
+VAL_ 771 Pack2_PackOV 0 "No" 1 "Yes";
+VAL_ 771 Pack2_PackUV 0 "No" 1 "Yes";
+VAL_ 771 Pack2_CellOV 0 "No" 1 "Yes";
+VAL_ 771 Pack2_CellUV 0 "No" 1 "Yes";
+VAL_ 771 Pack2_OverTemp 0 "No" 1 "Yes";
+VAL_ 771 Pack2_UnderTemp 0 "No" 1 "Yes";
+VAL_ 771 Pack2_AfeComm 0 "No" 1 "Yes";
+VAL_ 771 Pack2_CanTimeout 0 "No" 1 "Yes";
+VAL_ 771 Pack2_SpiTimeout 0 "No" 1 "Yes";
+VAL_ 771 Pack2_PrechargeTimeout 0 "No" 1 "Yes";
+VAL_ 771 Pack2_ContactorFeedback 0 "No" 1 "Yes";
+VAL_ 771 Pack2_ContactorWeld 0 "No" 1 "Yes";
+VAL_ 771 Pack2_OverCurrent 0 "No" 1 "Yes";
+VAL_ 771 Pack2_TempSensor 0 "No" 1 "Yes";
+VAL_ 771 Pack2_TempDelta 0 "No" 1 "Yes";
 
 
-CM_ BO_ 768 "BMS general status frame. CAN ID 0x300.";
+VAL_ 772 Pack3_PackOV 0 "No" 1 "Yes";
+VAL_ 772 Pack3_PackUV 0 "No" 1 "Yes";
+VAL_ 772 Pack3_CellOV 0 "No" 1 "Yes";
+VAL_ 772 Pack3_CellUV 0 "No" 1 "Yes";
+VAL_ 772 Pack3_OverTemp 0 "No" 1 "Yes";
+VAL_ 772 Pack3_UnderTemp 0 "No" 1 "Yes";
+VAL_ 772 Pack3_AfeComm 0 "No" 1 "Yes";
+VAL_ 772 Pack3_CanTimeout 0 "No" 1 "Yes";
+VAL_ 772 Pack3_SpiTimeout 0 "No" 1 "Yes";
+VAL_ 772 Pack3_PrechargeTimeout 0 "No" 1 "Yes";
+VAL_ 772 Pack3_ContactorFeedback 0 "No" 1 "Yes";
+VAL_ 772 Pack3_ContactorWeld 0 "No" 1 "Yes";
+VAL_ 772 Pack3_OverCurrent 0 "No" 1 "Yes";
+VAL_ 772 Pack3_TempSensor 0 "No" 1 "Yes";
+VAL_ 772 Pack3_TempDelta 0 "No" 1 "Yes";
+
+VAL_ 772 System_PackOV 0 "No" 1 "Yes";
+VAL_ 772 System_PackUV 0 "No" 1 "Yes";
+VAL_ 772 System_CellOV 0 "No" 1 "Yes";
+VAL_ 772 System_CellUV 0 "No" 1 "Yes";
+VAL_ 772 System_OverTemp 0 "No" 1 "Yes";
+VAL_ 772 System_UnderTemp 0 "No" 1 "Yes";
+VAL_ 772 System_AfeComm 0 "No" 1 "Yes";
+VAL_ 772 System_CanTimeout 0 "No" 1 "Yes";
+VAL_ 772 System_SpiTimeout 0 "No" 1 "Yes";
+VAL_ 772 System_PrechargeTimeout 0 "No" 1 "Yes";
+VAL_ 772 System_ContactorFeedback 0 "No" 1 "Yes";
+VAL_ 772 System_ContactorWeld 0 "No" 1 "Yes";
+VAL_ 772 System_OverCurrent 0 "No" 1 "Yes";
+VAL_ 772 System_TempSensor 0 "No" 1 "Yes";
+VAL_ 772 System_TempDelta 0 "No" 1 "Yes";
+
+
+CM_ BO_ 512
+ "Debug command frame. CAN ID 0x200.";
+
+CM_ BO_ 513
+ "BMS control command frame. CAN ID 0x201.";
+
+
+CM_ BO_ 768
+ "BMS general status frame. CAN ID 0x300.";
 
 CM_ SG_ 768 Pack1_Temperature
  "Pack 1 NTC temperature. Signed 16-bit little-endian, 0.1 degC/bit.";
@@ -220,15 +340,6 @@ CM_ SG_ 768 CriticalFault
 
 CM_ SG_ 768 AnyFault
  "1 when any BMS fault is active.";
-
-CM_ SG_ 768 Pack1TempValid
- "Pack 1 temperature validity.";
-
-CM_ SG_ 768 Pack2TempValid
- "Pack 2 temperature validity.";
-
-CM_ SG_ 768 Pack3TempValid
- "Pack 3 temperature validity.";
 
 
 CM_ BO_ 769
@@ -256,41 +367,25 @@ CM_ SG_ 769 PackVoltageValid
 CM_ BO_ 770
  "Three-pack contactor status frame. CAN ID 0x302.";
 
-CM_ SG_ 770 Pack1ContactorState
- "Pack 1 contactor state.";
-
-CM_ SG_ 770 Pack2ContactorState
- "Pack 2 contactor state.";
-
-CM_ SG_ 770 Pack3ContactorState
- "Pack 3 contactor state.";
-
-CM_ SG_ 770 Pack1NegativeContactor
- "Pack 1 negative contactor command/output state.";
-
-CM_ SG_ 770 Pack1PositiveContactor
- "Pack 1 positive contactor command/output state.";
-
-CM_ SG_ 770 Pack1PrechargeContactor
- "Pack 1 precharge contactor command/output state.";
-
-CM_ SG_ 770 Pack2NegativeContactor
- "Pack 2 negative contactor command/output state.";
-
-CM_ SG_ 770 Pack2PositiveContactor
- "Pack 2 positive contactor command/output state.";
-
-CM_ SG_ 770 Pack2PrechargeContactor
- "Pack 2 precharge contactor command/output state.";
-
-CM_ SG_ 770 Pack3NegativeContactor
- "Pack 3 negative contactor command/output state.";
-
-CM_ SG_ 770 Pack3PositiveContactor
- "Pack 3 positive contactor command/output state.";
-
-CM_ SG_ 770 Pack3PrechargeContactor
- "Pack 3 precharge contactor command/output state.";
-
 CM_ SG_ 770 ContactorAliveCounter
  "4-bit rolling alive counter in byte 6 bits 0-3.";
+
+
+CM_ BO_ 771
+ "Pack 1 and Pack 2 fault masks. CAN ID 0x303. Bytes 0-3 = Pack1FaultMask, bytes 4-7 = Pack2FaultMask.";
+
+CM_ SG_ 771 Pack1FaultMask
+ "Raw 32-bit Pack 1 fault mask, little-endian.";
+
+CM_ SG_ 771 Pack2FaultMask
+ "Raw 32-bit Pack 2 fault mask, little-endian.";
+
+
+CM_ BO_ 772
+ "Pack 3 and System fault masks. CAN ID 0x304. Bytes 0-3 = Pack3FaultMask, bytes 4-7 = SystemFaultMask.";
+
+CM_ SG_ 772 Pack3FaultMask
+ "Raw 32-bit Pack 3 fault mask, little-endian.";
+
+CM_ SG_ 772 SystemFaultMask
+ "Raw 32-bit System fault mask, little-endian.";

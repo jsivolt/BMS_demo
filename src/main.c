@@ -219,6 +219,10 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendPackStatus();
 
     Bms_Can_SendContactorStatus();
+
+    Bms_Can_SendFaultStatus1();
+
+    Bms_Can_SendFaultStatus2();
 }
 
 static void Bms_MainFunction_1000ms(void)
