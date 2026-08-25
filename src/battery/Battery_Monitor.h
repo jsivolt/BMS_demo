@@ -22,8 +22,20 @@ typedef struct
     float PackV2;
     float PackV3;
 
-    /* Reserved for future AFE cell voltages */
+    /* Cell voltages from AFE / vAFE. Unit: V */
     float CellVoltage[16];
+
+    /* Cell voltage summary. Unit: V */
+    float MinCellVoltage;
+    float MaxCellVoltage;
+    float DeltaCellVoltage;
+
+    /* 0-based cell index */
+    uint8 MinCellIndex;
+    uint8 MaxCellIndex;
+
+    /* TRUE when a complete valid AFE cell dataset is available */
+    boolean CellVoltageValid;
 
     /*
      * Pack temperature.

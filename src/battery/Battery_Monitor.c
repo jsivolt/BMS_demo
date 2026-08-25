@@ -2,7 +2,15 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "vAFE/Bms_Vafe.h"
 #include "Fault_Manager.h"
+
+/* Simulation-stage cell voltage fault thresholds, tune per cell chemistry later */
+#define BMS_CELL_OV_FAULT_SET_MV       (4250U)
+#define BMS_CELL_OV_FAULT_CLEAR_MV     (4150U)
+
+#define BMS_CELL_UV_FAULT_SET_MV       (2500U)
+#define BMS_CELL_UV_FAULT_CLEAR_MV     (2700U)
 
 #define BMS_TEMP_HIGH_FAULT_SET_DC        (600)    /* 60.0°C */
 #define BMS_TEMP_HIGH_FAULT_CLEAR_DC      (550)    /* 55.0°C */
@@ -21,6 +29,8 @@ static BatteryMonitor_DataType g_BatteryData;
  * Local function prototypes
  * ============================================================================================== */
 
+static void BatteryMonitor_UpdateCellVoltages(void);
+static void BatteryMonitor_UpdateCellVoltageFaults(void);
 static void BatteryMonitor_UpdateTemperatureSummary(void);
 static void BatteryMonitor_UpdateTemperatureFaults(void);
 
@@ -41,6 +51,15 @@ void BatteryMonitor_Init(void)
     {
         g_BatteryData.CellVoltage[i] = 0.0f;
     }
+
+    g_BatteryData.MinCellVoltage = 0.0f;
+    g_BatteryData.MaxCellVoltage = 0.0f;
+    g_BatteryData.DeltaCellVoltage = 0.0f;
+
+    g_BatteryData.MinCellIndex = 0U;
+    g_BatteryData.MaxCellIndex = 0U;
+
+    g_BatteryData.CellVoltageValid = FALSE;
 
     for (i = 0U; i < BATTERY_MONITOR_PACK_COUNT; i++)
     {
@@ -91,6 +110,17 @@ void BatteryMonitor_MainFunction(void)
         g_BatteryData.Valid = FALSE;
         g_BatteryData.Status = BAT_MON_STATUS_INVALID;
     }
+
+
+    /*
+     * ==========================================================================
+     * Cell voltages from vAFE
+     * ==========================================================================
+     */
+
+    BatteryMonitor_UpdateCellVoltages();
+
+    BatteryMonitor_UpdateCellVoltageFaults();
 
 
     /*
@@ -146,6 +176,121 @@ void BatteryMonitor_MainFunction(void)
     * Update temperature-related pack/system faults.
     */
     BatteryMonitor_UpdateTemperatureFaults();
+}
+
+
+/* ================================================================================================
+ * Cell voltage update (vAFE)
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdateCellVoltages(void)
+{
+    uint8 i;
+
+    if (g_BmsVafeData.DataValid == TRUE)
+    {
+        for (i = 0U; i < 16U; i++)
+        {
+            g_BatteryData.CellVoltage[i] =
+                (float)g_BmsVafeData.CellVoltage_mV[i] / 1000.0f;
+        }
+
+        g_BatteryData.MinCellVoltage =
+            (float)g_BmsVafeData.MinCellVoltage_mV / 1000.0f;
+
+        g_BatteryData.MaxCellVoltage =
+            (float)g_BmsVafeData.MaxCellVoltage_mV / 1000.0f;
+
+        g_BatteryData.DeltaCellVoltage =
+            (float)g_BmsVafeData.DeltaCellVoltage_mV / 1000.0f;
+
+        g_BatteryData.MinCellIndex =
+            g_BmsVafeData.MinCellIndex;
+
+        g_BatteryData.MaxCellIndex =
+            g_BmsVafeData.MaxCellIndex;
+
+        g_BatteryData.CellVoltageValid = TRUE;
+    }
+    else
+    {
+        g_BatteryData.CellVoltageValid = FALSE;
+    }
+}
+
+
+/* ================================================================================================
+ * Cell voltage fault monitoring
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdateCellVoltageFaults(void)
+{
+    if (g_BatteryData.CellVoltageValid == FALSE)
+    {
+        /*
+         * vAFE data is not trustworthy, raise AFE comm fault.
+         *
+         * Clear threshold-based cell voltage faults.
+         */
+        FaultManager_SetSystem(FAULT_AFE_COMM);
+
+        FaultManager_ClearSystem(FAULT_CELL_OV);
+        FaultManager_ClearSystem(FAULT_CELL_UV);
+
+        return;
+    }
+
+    FaultManager_ClearSystem(FAULT_AFE_COMM);
+
+    /*
+     * ================================================================
+     * Cell over-voltage hysteresis
+     *
+     * SET   >= 4.250 V
+     * CLEAR <= 4.150 V
+     * ================================================================
+     */
+    if (FaultManager_IsSystemFaultActive(FAULT_CELL_OV) == TRUE)
+    {
+        if (g_BmsVafeData.MaxCellVoltage_mV <=
+            BMS_CELL_OV_FAULT_CLEAR_MV)
+        {
+            FaultManager_ClearSystem(FAULT_CELL_OV);
+        }
+    }
+    else
+    {
+        if (g_BmsVafeData.MaxCellVoltage_mV >=
+            BMS_CELL_OV_FAULT_SET_MV)
+        {
+            FaultManager_SetSystem(FAULT_CELL_OV);
+        }
+    }
+
+    /*
+     * ================================================================
+     * Cell under-voltage hysteresis
+     *
+     * SET   <= 2.500 V
+     * CLEAR >= 2.700 V
+     * ================================================================
+     */
+    if (FaultManager_IsSystemFaultActive(FAULT_CELL_UV) == TRUE)
+    {
+        if (g_BmsVafeData.MinCellVoltage_mV >=
+            BMS_CELL_UV_FAULT_CLEAR_MV)
+        {
+            FaultManager_ClearSystem(FAULT_CELL_UV);
+        }
+    }
+    else
+    {
+        if (g_BmsVafeData.MinCellVoltage_mV <=
+            BMS_CELL_UV_FAULT_SET_MV)
+        {
+            FaultManager_SetSystem(FAULT_CELL_UV);
+        }
+    }
 }
 
 
