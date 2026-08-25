@@ -19,8 +19,23 @@ extern "C" {
 /** @brief FlexCAN hardware instance used by the BMS application. */
 #define BMS_CAN_CFG_INSTANCE              (0U)
 
+/** @brief FlexCAN hardware instance 1 (CAN1) used by the BMS application. */
+#define BMS_CAN1_CFG_INSTANCE             (1U)
+
 /** @brief Message buffer index reserved for transmission. */
 #define BMS_CAN_CFG_TX_MB_INDEX           (0U)
+
+/** @brief CAN1 message buffer index reserved for transmission. */
+#define BMS_CAN1_CFG_TX_MB_INDEX          (0U)
+
+/** @brief CAN1 test CAN identifier used for transmission. */
+#define BMS_CAN1_CFG_TX_TEST_ID           (0x400U)
+
+/** @brief CAN1 message buffer index reserved for reception. */
+#define BMS_CAN1_CFG_RX_MB_INDEX          (1U)
+
+/** @brief CAN1 test CAN identifier used for reception. */
+#define BMS_CAN1_CFG_RX_TEST_ID           (0x401U)
 
 /** @brief Message buffer index reserved for debug reception. */
 #define BMS_CAN_CFG_RX_DEBUG_MB_INDEX     (1U)

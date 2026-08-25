@@ -69,6 +69,20 @@ volatile Flexcan_Ip_StatusType g_BmsCanTxStatus;
 volatile Flexcan_Ip_StatusType g_BmsCanRxDebugStatus;
 volatile Flexcan_Ip_StatusType g_BmsCanRxControlStatus;
 
+volatile Flexcan_Ip_StatusType g_BmsCan1InitStatus;
+volatile Flexcan_Ip_StatusType g_BmsCan1TxStatus;
+volatile Flexcan_Ip_StatusType g_BmsCan1RxStatus;
+
+volatile uint32 g_BmsCan1RxCount = 0U;
+volatile uint32 g_BmsCan1RxId = 0U;
+volatile uint8  g_BmsCan1RxDlc = 0U;
+
+volatile uint8 g_BmsCan1RxData[8] =
+{
+    0U, 0U, 0U, 0U,
+    0U, 0U, 0U, 0U
+};
+
 volatile uint32 g_BmsCanRxCount = 0U;
 volatile uint32 g_BmsCanRxInvalidCount = 0U;
 volatile uint32 g_BmsCanRxId = 0U;
@@ -95,6 +109,7 @@ volatile uint8 g_BmsCanRxData[8] =
  */
 static Flexcan_Ip_MsgBuffType g_BmsCanRxDebugMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage;
 
 
 /* Converts a voltage (V) to a saturated 0.1V-resolution raw value for CAN payloads. */
@@ -307,6 +322,53 @@ Std_ReturnType Bms_Can_Init(void)
         return (Std_ReturnType)E_NOT_OK;
     }
 
+
+    /*
+     * Initialize CAN1.
+     */
+    g_BmsCan1InitStatus = FlexCAN_Ip_Init(
+        BMS_CAN1_CFG_INSTANCE,
+        &FlexCAN_State1,
+        &FlexCAN_Config1
+    );
+
+    if (g_BmsCan1InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    g_BmsCan1InitStatus = FlexCAN_Ip_ConfigRxMb(
+        BMS_CAN1_CFG_INSTANCE,
+        BMS_CAN1_CFG_RX_MB_INDEX,
+        &g_BmsCanRxInfo,
+        BMS_CAN1_CFG_RX_TEST_ID
+    );
+
+    if (g_BmsCan1InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    g_BmsCan1InitStatus = FlexCAN_Ip_SetStartMode(
+        BMS_CAN1_CFG_INSTANCE
+    );
+
+    if (g_BmsCan1InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    g_BmsCan1RxStatus = FlexCAN_Ip_Receive(
+        BMS_CAN1_CFG_INSTANCE,
+        BMS_CAN1_CFG_RX_MB_INDEX,
+        &g_BmsCan1RxMessage,
+        TRUE
+    );
+
+    if (g_BmsCan1RxStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
 
     return (Std_ReturnType)E_OK;
 }
@@ -786,4 +848,72 @@ void Bms_Can_MainFunction(void)
             TRUE
         );
     }
+
+
+    /* Process CAN1 0x401 test mailbox. */
+    FlexCAN_Ip_MainFunctionRead(
+        BMS_CAN1_CFG_INSTANCE,
+        BMS_CAN1_CFG_RX_MB_INDEX
+    );
+
+    g_BmsCan1RxStatus = FlexCAN_Ip_GetTransferStatus(
+        BMS_CAN1_CFG_INSTANCE,
+        BMS_CAN1_CFG_RX_MB_INDEX
+    );
+
+    if (g_BmsCan1RxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCan1RxId  = g_BmsCan1RxMessage.msgId;
+        g_BmsCan1RxDlc = g_BmsCan1RxMessage.dataLen;
+
+        if (g_BmsCan1RxDlc > 8U)
+        {
+            g_BmsCan1RxDlc = 8U;
+        }
+
+        for (i = 0U; i < g_BmsCan1RxDlc; i++)
+        {
+            g_BmsCan1RxData[i] = g_BmsCan1RxMessage.data[i];
+        }
+
+        g_BmsCan1RxCount++;
+
+        g_BmsCan1RxStatus = FlexCAN_Ip_Receive(
+            BMS_CAN1_CFG_INSTANCE,
+            BMS_CAN1_CFG_RX_MB_INDEX,
+            &g_BmsCan1RxMessage,
+            TRUE
+        );
+    }
+}
+
+
+void Bms_Can1_SendTest(void)
+{
+    uint8 txData[8] =
+    {
+        0x11U,
+        0x22U,
+        0x33U,
+        0x44U,
+        0x55U,
+        0x66U,
+        0x77U,
+        0x88U
+    };
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN1_CFG_INSTANCE,
+        BMS_CAN1_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCan1TxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN1_CFG_INSTANCE,
+            BMS_CAN1_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN1_CFG_TX_TEST_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
 }
