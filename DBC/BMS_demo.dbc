@@ -427,3 +427,27 @@ BO_ 1028 vAFE_CellVoltage_13_16: 8 vAFE
  SG_ Cell14Voltage : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
  SG_ Cell15Voltage : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
  SG_ Cell16Voltage : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+ BO_ 1025 vAFE_CellVoltage_1_4: 8 vAFE
+ SG_ Cell1Voltage  : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell2Voltage  : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell3Voltage  : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell4Voltage  : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+BO_ 1026 vAFE_CellVoltage_5_8: 8 vAFE
+ SG_ Cell5Voltage  : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell6Voltage  : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell7Voltage  : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell8Voltage  : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+BO_ 1027 vAFE_CellVoltage_9_12: 8 vAFE
+ SG_ Cell9Voltage   : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell10Voltage  : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell11Voltage  : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell12Voltage  : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+BO_ 1028 vAFE_CellVoltage_13_16: 8 vAFE
+ SG_ Cell13Voltage  : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell14Voltage  : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell15Voltage  : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell16Voltage  : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS

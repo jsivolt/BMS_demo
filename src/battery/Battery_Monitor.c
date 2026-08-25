@@ -21,6 +21,9 @@
 #define BMS_TEMP_DELTA_FAULT_SET_DC       (150)    /* 15.0°C */
 #define BMS_TEMP_DELTA_FAULT_CLEAR_DC     (100)    /* 10.0°C */
 
+#define BMS_CELL_IMBALANCE_SET_MV      (300U)
+#define BMS_CELL_IMBALANCE_CLEAR_MV    (200U)
+
 static BatteryMonitor_DataType g_BatteryData;
 
 
@@ -31,6 +34,7 @@ static BatteryMonitor_DataType g_BatteryData;
 
 static void BatteryMonitor_UpdateCellVoltages(void);
 static void BatteryMonitor_UpdateCellVoltageFaults(void);
+static void BatteryMonitor_UpdateCellImbalanceFault(void);
 static void BatteryMonitor_UpdateTemperatureSummary(void);
 static void BatteryMonitor_UpdateTemperatureFaults(void);
 
@@ -121,6 +125,8 @@ void BatteryMonitor_MainFunction(void)
     BatteryMonitor_UpdateCellVoltages();
 
     BatteryMonitor_UpdateCellVoltageFaults();
+
+    BatteryMonitor_UpdateCellImbalanceFault();
 
 
     /*
@@ -289,6 +295,36 @@ static void BatteryMonitor_UpdateCellVoltageFaults(void)
             BMS_CELL_UV_FAULT_SET_MV)
         {
             FaultManager_SetSystem(FAULT_CELL_UV);
+        }
+    }
+}
+
+
+static void BatteryMonitor_UpdateCellImbalanceFault(void)
+{
+    if (g_BatteryData.CellVoltageValid == FALSE)
+    {
+        FaultManager_ClearSystem(FAULT_CELL_IMBALANCE);
+        return;
+    }
+
+    if (FaultManager_IsSystemFaultActive(
+            FAULT_CELL_IMBALANCE) == TRUE)
+    {
+        if (g_BmsVafeData.DeltaCellVoltage_mV <=
+            BMS_CELL_IMBALANCE_CLEAR_MV)
+        {
+            FaultManager_ClearSystem(
+                FAULT_CELL_IMBALANCE);
+        }
+    }
+    else
+    {
+        if (g_BmsVafeData.DeltaCellVoltage_mV >=
+            BMS_CELL_IMBALANCE_SET_MV)
+        {
+            FaultManager_SetSystem(
+                FAULT_CELL_IMBALANCE);
         }
     }
 }

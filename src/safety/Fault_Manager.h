@@ -39,6 +39,8 @@ typedef enum
 #define FAULT_TEMP_SENSOR              (1UL << 13)
 #define FAULT_TEMP_DELTA               (1UL << 14)
 
+#define FAULT_CELL_IMBALANCE           (1UL << 15)
+
 /*
  * Add future faults here.
  */
