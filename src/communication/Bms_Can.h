@@ -6,6 +6,7 @@
 Std_ReturnType Bms_Can_Init(void);
 
 void Bms_Can_SendStatus(void);
+void Bms_Can_SendPackStatus(void);
 
 /*
  * Poll CAN RX mailbox.

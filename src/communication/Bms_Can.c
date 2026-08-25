@@ -92,6 +92,27 @@ static Flexcan_Ip_MsgBuffType g_BmsCanRxDebugMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
 
 
+/* Converts a voltage (V) to a saturated 0.1V-resolution raw value for CAN payloads. */
+static uint16 Bms_Can_VoltageToRaw(float voltage)
+{
+    float scaled;
+
+    if (voltage <= 0.0F)
+    {
+        return 0U;
+    }
+
+    scaled = voltage * 10.0F;
+
+    if (scaled > 65535.0F)
+    {
+        return 65535U;
+    }
+
+    return (uint16)(scaled + 0.5F);
+}
+
+
 static void Bms_Can_ProcessRxMessage(void)
 {
     if (g_BmsCanRxId != BMS_CAN_CFG_RX_DEBUG_ID)
@@ -292,6 +313,11 @@ void Bms_Can_SendStatus(void)
 
     batteryData = BatteryMonitor_GetData();
 
+    if (batteryData == NULL_PTR)
+    {
+        return;
+    }
+
     temp1 = batteryData->PackTemperature_dC[0];
     temp2 = batteryData->PackTemperature_dC[1];
     temp3 = batteryData->PackTemperature_dC[2];
@@ -379,6 +405,65 @@ void Bms_Can_SendStatus(void)
             BMS_CAN_CFG_TX_MB_INDEX,
             &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_STATUS_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+/* ================================================================================================
+ * CAN TX pack status frame
+ * ============================================================================================== */
+
+void Bms_Can_SendPackStatus(void)
+{
+    const BatteryMonitor_DataType *batteryData;
+    uint8 txData[8];
+    uint16 pack1Raw;
+    uint16 pack2Raw;
+    uint16 pack3Raw;
+
+    batteryData = BatteryMonitor_GetData();
+
+    if (batteryData == NULL_PTR)
+    {
+        return;
+    }
+
+    pack1Raw = Bms_Can_VoltageToRaw(batteryData->PackV1);
+    pack2Raw = Bms_Can_VoltageToRaw(batteryData->PackV2);
+    pack3Raw = Bms_Can_VoltageToRaw(batteryData->PackV3);
+
+    txData[0] = (uint8)(pack1Raw & 0xFFU);
+    txData[1] = (uint8)((pack1Raw >> 8U) & 0xFFU);
+
+    txData[2] = (uint8)(pack2Raw & 0xFFU);
+    txData[3] = (uint8)((pack2Raw >> 8U) & 0xFFU);
+
+    txData[4] = (uint8)(pack3Raw & 0xFFU);
+    txData[5] = (uint8)((pack3Raw >> 8U) & 0xFFU);
+
+    txData[6] = (uint8)batteryData->Status;
+
+    txData[7] = 0U;
+
+    if (batteryData->Valid == TRUE)
+    {
+        txData[7] |= 0x01U;
+    }
+
+    /* Handle previous polling TX completion. */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_PACK_STATUS_ID,
             txData,
             BMS_CAN_TX_TIMEOUT_MS
         );
