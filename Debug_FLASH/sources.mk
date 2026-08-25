@@ -26,6 +26,7 @@ board \
 generate/src \
 src/app \
 src/battery \
+src/battery/vAFE \
 src/communication \
 src/control \
 src/drivers \

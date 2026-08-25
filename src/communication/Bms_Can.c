@@ -12,6 +12,8 @@
 
 #include "../control/Bms_Contactor.h"
 
+#include "../battery/vAFE/Bms_Vafe.h"
+
 
 #define BMS_CAN_TX_TIMEOUT_MS   (100U)
 #define BMS_CAN_LED_PORT         PTA_H_HALF
@@ -71,16 +73,18 @@ volatile Flexcan_Ip_StatusType g_BmsCanRxControlStatus;
 
 volatile Flexcan_Ip_StatusType g_BmsCan1InitStatus;
 volatile Flexcan_Ip_StatusType g_BmsCan1TxStatus;
-volatile Flexcan_Ip_StatusType g_BmsCan1RxStatus;
+volatile Flexcan_Ip_StatusType g_BmsCan1RxStatus[BMS_CAN1_CFG_RX_MB_COUNT];
 
-volatile uint32 g_BmsCan1RxCount = 0U;
-volatile uint32 g_BmsCan1RxId = 0U;
-volatile uint8  g_BmsCan1RxDlc = 0U;
+volatile uint32 g_BmsCan1RxCount[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U };
+volatile uint32 g_BmsCan1RxId[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U };
+volatile uint8  g_BmsCan1RxDlc[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U };
 
-volatile uint8 g_BmsCan1RxData[8] =
+volatile uint8 g_BmsCan1RxData[BMS_CAN1_CFG_RX_MB_COUNT][8] =
 {
-    0U, 0U, 0U, 0U,
-    0U, 0U, 0U, 0U
+    { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
+    { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
+    { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
+    { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U }
 };
 
 volatile uint32 g_BmsCanRxCount = 0U;
@@ -109,7 +113,24 @@ volatile uint8 g_BmsCanRxData[8] =
  */
 static Flexcan_Ip_MsgBuffType g_BmsCanRxDebugMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
-static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage[BMS_CAN1_CFG_RX_MB_COUNT];
+
+/* CAN1 RX mailbox index/ID lookup tables, indexed by mailbox slot 0..3. */
+static const uint8 g_BmsCan1RxMbIndex[BMS_CAN1_CFG_RX_MB_COUNT] =
+{
+    BMS_CAN1_CFG_RX_MB0_INDEX,
+    BMS_CAN1_CFG_RX_MB1_INDEX,
+    BMS_CAN1_CFG_RX_MB2_INDEX,
+    BMS_CAN1_CFG_RX_MB3_INDEX
+};
+
+static const uint32 g_BmsCan1RxMbId[BMS_CAN1_CFG_RX_MB_COUNT] =
+{
+    BMS_CAN1_CFG_RX_MB0_ID,
+    BMS_CAN1_CFG_RX_MB1_ID,
+    BMS_CAN1_CFG_RX_MB2_ID,
+    BMS_CAN1_CFG_RX_MB3_ID
+};
 
 
 /* Converts a voltage (V) to a saturated 0.1V-resolution raw value for CAN payloads. */
@@ -232,6 +253,8 @@ static void Bms_Can_ProcessControlCommand(const uint8 *data, uint8 dlc)
 
 Std_ReturnType Bms_Can_Init(void)
 {
+    uint8 i;
+
     g_DebugEnableRequestAddr = (uint32)&g_BmsEnableRequest;
 
     g_DebugDisableRequestAddr = (uint32)&g_BmsDisableRequest;
@@ -337,16 +360,19 @@ Std_ReturnType Bms_Can_Init(void)
         return (Std_ReturnType)E_NOT_OK;
     }
 
-    g_BmsCan1InitStatus = FlexCAN_Ip_ConfigRxMb(
-        BMS_CAN1_CFG_INSTANCE,
-        BMS_CAN1_CFG_RX_MB_INDEX,
-        &g_BmsCanRxInfo,
-        BMS_CAN1_CFG_RX_TEST_ID
-    );
-
-    if (g_BmsCan1InitStatus != FLEXCAN_STATUS_SUCCESS)
+    for (i = 0U; i < BMS_CAN1_CFG_RX_MB_COUNT; i++)
     {
-        return (Std_ReturnType)E_NOT_OK;
+        g_BmsCan1InitStatus = FlexCAN_Ip_ConfigRxMb(
+            BMS_CAN1_CFG_INSTANCE,
+            g_BmsCan1RxMbIndex[i],
+            &g_BmsCanRxInfo,
+            g_BmsCan1RxMbId[i]
+        );
+
+        if (g_BmsCan1InitStatus != FLEXCAN_STATUS_SUCCESS)
+        {
+            return (Std_ReturnType)E_NOT_OK;
+        }
     }
 
     g_BmsCan1InitStatus = FlexCAN_Ip_SetStartMode(
@@ -358,16 +384,19 @@ Std_ReturnType Bms_Can_Init(void)
         return (Std_ReturnType)E_NOT_OK;
     }
 
-    g_BmsCan1RxStatus = FlexCAN_Ip_Receive(
-        BMS_CAN1_CFG_INSTANCE,
-        BMS_CAN1_CFG_RX_MB_INDEX,
-        &g_BmsCan1RxMessage,
-        TRUE
-    );
-
-    if (g_BmsCan1RxStatus != FLEXCAN_STATUS_SUCCESS)
+    for (i = 0U; i < BMS_CAN1_CFG_RX_MB_COUNT; i++)
     {
-        return (Std_ReturnType)E_NOT_OK;
+        g_BmsCan1RxStatus[i] = FlexCAN_Ip_Receive(
+            BMS_CAN1_CFG_INSTANCE,
+            g_BmsCan1RxMbIndex[i],
+            &g_BmsCan1RxMessage[i],
+            TRUE
+        );
+
+        if (g_BmsCan1RxStatus[i] != FLEXCAN_STATUS_SUCCESS)
+        {
+            return (Std_ReturnType)E_NOT_OK;
+        }
     }
 
     return (Std_ReturnType)E_OK;
@@ -850,40 +879,51 @@ void Bms_Can_MainFunction(void)
     }
 
 
-    /* Process CAN1 0x401 test mailbox. */
-    FlexCAN_Ip_MainFunctionRead(
-        BMS_CAN1_CFG_INSTANCE,
-        BMS_CAN1_CFG_RX_MB_INDEX
-    );
-
-    g_BmsCan1RxStatus = FlexCAN_Ip_GetTransferStatus(
-        BMS_CAN1_CFG_INSTANCE,
-        BMS_CAN1_CFG_RX_MB_INDEX
-    );
-
-    if (g_BmsCan1RxStatus == FLEXCAN_STATUS_SUCCESS)
+    /* Process CAN1 RX mailboxes (MB0..MB3). */
+    for (i = 0U; i < BMS_CAN1_CFG_RX_MB_COUNT; i++)
     {
-        g_BmsCan1RxId  = g_BmsCan1RxMessage.msgId;
-        g_BmsCan1RxDlc = g_BmsCan1RxMessage.dataLen;
-
-        if (g_BmsCan1RxDlc > 8U)
-        {
-            g_BmsCan1RxDlc = 8U;
-        }
-
-        for (i = 0U; i < g_BmsCan1RxDlc; i++)
-        {
-            g_BmsCan1RxData[i] = g_BmsCan1RxMessage.data[i];
-        }
-
-        g_BmsCan1RxCount++;
-
-        g_BmsCan1RxStatus = FlexCAN_Ip_Receive(
+        FlexCAN_Ip_MainFunctionRead(
             BMS_CAN1_CFG_INSTANCE,
-            BMS_CAN1_CFG_RX_MB_INDEX,
-            &g_BmsCan1RxMessage,
-            TRUE
+            g_BmsCan1RxMbIndex[i]
         );
+
+        g_BmsCan1RxStatus[i] = FlexCAN_Ip_GetTransferStatus(
+            BMS_CAN1_CFG_INSTANCE,
+            g_BmsCan1RxMbIndex[i]
+        );
+
+        if (g_BmsCan1RxStatus[i] == FLEXCAN_STATUS_SUCCESS)
+        {
+            uint8 j;
+
+            g_BmsCan1RxId[i]  = g_BmsCan1RxMessage[i].msgId;
+            g_BmsCan1RxDlc[i] = g_BmsCan1RxMessage[i].dataLen;
+
+            if (g_BmsCan1RxDlc[i] > 8U)
+            {
+                g_BmsCan1RxDlc[i] = 8U;
+            }
+
+            for (j = 0U; j < g_BmsCan1RxDlc[i]; j++)
+            {
+                g_BmsCan1RxData[i][j] = g_BmsCan1RxMessage[i].data[j];
+            }
+
+            g_BmsCan1RxCount[i]++;
+
+            Bms_Vafe_ProcessFrame(
+                g_BmsCan1RxId[i],
+                (const uint8 *)g_BmsCan1RxData[i],
+                g_BmsCan1RxDlc[i]
+            );
+
+            g_BmsCan1RxStatus[i] = FlexCAN_Ip_Receive(
+                BMS_CAN1_CFG_INSTANCE,
+                g_BmsCan1RxMbIndex[i],
+                &g_BmsCan1RxMessage[i],
+                TRUE
+            );
+        }
     }
 }
 

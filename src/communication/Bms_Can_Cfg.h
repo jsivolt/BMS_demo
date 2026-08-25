@@ -31,11 +31,32 @@ extern "C" {
 /** @brief CAN1 test CAN identifier used for transmission. */
 #define BMS_CAN1_CFG_TX_TEST_ID           (0x400U)
 
-/** @brief CAN1 message buffer index reserved for reception. */
-#define BMS_CAN1_CFG_RX_MB_INDEX          (1U)
+/** @brief CAN1 message buffer index reserved for RX mailbox 0. */
+#define BMS_CAN1_CFG_RX_MB0_INDEX         (1U)
 
-/** @brief CAN1 test CAN identifier used for reception. */
-#define BMS_CAN1_CFG_RX_TEST_ID           (0x401U)
+/** @brief CAN1 CAN identifier for RX mailbox 0. */
+#define BMS_CAN1_CFG_RX_MB0_ID            (0x401U)
+
+/** @brief CAN1 message buffer index reserved for RX mailbox 1. */
+#define BMS_CAN1_CFG_RX_MB1_INDEX         (2U)
+
+/** @brief CAN1 CAN identifier for RX mailbox 1. */
+#define BMS_CAN1_CFG_RX_MB1_ID            (0x402U)
+
+/** @brief CAN1 message buffer index reserved for RX mailbox 2. */
+#define BMS_CAN1_CFG_RX_MB2_INDEX         (3U)
+
+/** @brief CAN1 CAN identifier for RX mailbox 2. */
+#define BMS_CAN1_CFG_RX_MB2_ID            (0x403U)
+
+/** @brief CAN1 message buffer index reserved for RX mailbox 3. */
+#define BMS_CAN1_CFG_RX_MB3_INDEX         (4U)
+
+/** @brief CAN1 CAN identifier for RX mailbox 3. */
+#define BMS_CAN1_CFG_RX_MB3_ID            (0x404U)
+
+/** @brief Number of CAN1 RX mailboxes. */
+#define BMS_CAN1_CFG_RX_MB_COUNT          (4U)
 
 /** @brief Message buffer index reserved for debug reception. */
 #define BMS_CAN_CFG_RX_DEBUG_MB_INDEX     (1U)

@@ -50,6 +50,7 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "battery/vAFE/Bms_Vafe.h"
 #include "communication/Bms_Can.h"
 #include "communication/Bms_Spi.h"
 
@@ -412,6 +413,8 @@ int main(void)
     Bms_StateMachine_Init();
 
     Bms_App_Init();
+
+    Bms_Vafe_Init();
 
     BatteryMonitor_Init();
 
