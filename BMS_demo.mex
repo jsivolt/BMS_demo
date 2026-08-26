@@ -35,6 +35,8 @@
                <pin_label pin_num="97" pin_signal="PTC9" label="CAN_vAFE_rx"/>
                <pin_label pin_num="102" pin_signal="PTA6" label="CAN_main_rx"/>
                <pin_label pin_num="100" pin_signal="PTA7" label="CAN_main_tx"/>
+               <pin_label pin_num="158" pin_signal="PTE25" label="CAN_vAFE_pack_rx"/>
+               <pin_label pin_num="157" pin_signal="PTE24" label="CAN_vAFE_pack_tx"/>
             </pin_labels>
          </pins_profile>
          <functions_list>
@@ -109,6 +111,8 @@
                   <pin peripheral="CAN0" signal="can0_tx" pin_num="100" pin_signal="PTA7"/>
                   <pin peripheral="CAN1" signal="can1_tx" pin_num="98" pin_signal="PTC8"/>
                   <pin peripheral="CAN1" signal="can1_rx" pin_num="97" pin_signal="PTC9"/>
+                  <pin peripheral="CAN2" signal="can2_rx" pin_num="158" pin_signal="PTE25"/>
+                  <pin peripheral="CAN2" signal="can2_tx" pin_num="157" pin_signal="PTE24"/>
                </pins>
             </function>
          </functions_list>
@@ -844,6 +848,38 @@
                                        <setting name="PortPinId" value="17"/>
                                        <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
                                     </struct>
+                                    <struct name="17">
+                                       <setting name="Name" value="PortPin_17"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="18"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
+                                    <struct name="18">
+                                       <setting name="Name" value="PortPin_18"/>
+                                       <setting name="PortPinPue" value="false"/>
+                                       <setting name="PortPinPus" value="false"/>
+                                       <setting name="PortPinSafeMode" value="false"/>
+                                       <setting name="PortPinDse" value="false"/>
+                                       <setting name="PortPinWithReadBack" value="false"/>
+                                       <setting name="PortPinPke" value="false"/>
+                                       <setting name="PortPinIfe" value="false"/>
+                                       <setting name="PortPinDirectionChangeable" value="true"/>
+                                       <setting name="PortPinModeChangeable" value="true"/>
+                                       <setting name="PortPinInvertControl" value="false"/>
+                                       <setting name="PortPinSiul2Instance" value="SIUL2_0"/>
+                                       <setting name="PortPinId" value="19"/>
+                                       <setting name="PortPinInitialMode" value="PORT_GPIO_MODE"/>
+                                    </struct>
                                  </array>
                               </struct>
                            </array>
@@ -1341,7 +1377,7 @@
                               <setting name="timeStampSurce" value="FLEXCAN_CAN_CLK_TIMESTAMP_SRC"/>
                               <setting name="msgBuffTimeStampType" value="FLEXCAN_MSGBUFFTIMESTAMP_TIMER"/>
                               <setting name="hrConfigType" value="FLEXCAN_TIMESTAMPCAPTURE_DISABLE"/>
-                              <setting name="pe_clock_frequency" value="1"/>
+                              <setting name="pe_clock_frequency" value="24000000"/>
                               <struct name="flexcan_time_segment">
                                  <setting name="Name" value="FlexCAN_Ip_TimeSeg1"/>
                                  <setting name="flexcan_cfg_propSeg" value="7"/>
@@ -1352,6 +1388,57 @@
                               </struct>
                               <struct name="flexcan_time_segment_cbt">
                                  <setting name="Name" value="FlexCAN_Ip_TimeSegCBT1"/>
+                                 <setting name="flexcan_cfg_propSeg" value="7"/>
+                                 <setting name="flexcan_cfg_phaseSeg1" value="6"/>
+                                 <setting name="flexcan_cfg_phaseSeg2" value="2"/>
+                                 <setting name="flexcan_cfg_preDivider" value="5"/>
+                                 <setting name="flexcan_cfg_rJumpwidth" value="2"/>
+                              </struct>
+                              <setting name="FlexCanCallback" value="NULL_PTR"/>
+                              <setting name="FlexCanErrorCallback" value="NULL_PTR"/>
+                              <setting name="num_enhanced_std_id_filters" value="0"/>
+                              <setting name="num_enhanced_ext_id_filters" value="0"/>
+                              <setting name="num_enhanced_watermark" value="0"/>
+                              <setting name="is_enhanced_rx_fifo_needed" value="false"/>
+                           </struct>
+                           <struct name="2">
+                              <setting name="CanHwChannel" value="FLEXCAN_2"/>
+                              <setting name="Name" value="FlexCAN_Config2"/>
+                              <setting name="max_num_mb" value="16"/>
+                              <setting name="num_id_filters" value="FLEXCAN_RX_FIFO_ID_FILTERS_8"/>
+                              <setting name="is_rx_fifo_needed" value="false"/>
+                              <setting name="fd_enable" value="false"/>
+                              <setting name="flexcanMode" value="FLEXCAN_NORMAL_MODE"/>
+                              <struct name="FlexCANRamBlock">
+                                 <setting name="Name" value="FlexCANRamBlock"/>
+                                 <setting name="Choice" value="FlexCANRamBlockUnified"/>
+                                 <struct name="FlexCANRamBlockUnified">
+                                    <setting name="Name" value="FlexCANRamBlock"/>
+                                    <setting name="RamBlockUnifiedPayloadLength" value="FLEXCAN_PAYLOAD_SIZE_8"/>
+                                 </struct>
+                              </struct>
+                              <setting name="transfer_type" value="FLEXCAN_RXFIFO_USING_INTERRUPTS"/>
+                              <setting name="rxFifoDMAChannel" value="0"/>
+                              <setting name="extCbtEnable" value="false"/>
+                              <setting name="bitRateSwitch" value="false"/>
+                              <setting name="CanControllerFdISO" value="true"/>
+                              <setting name="CanControllerAutoBusOff" value="true"/>
+                              <setting name="CanRemoteRequestStore" value="false"/>
+                              <setting name="CanLowestBufferTransmittedFirst" value="false"/>
+                              <setting name="timeStampSurce" value="FLEXCAN_CAN_CLK_TIMESTAMP_SRC"/>
+                              <setting name="msgBuffTimeStampType" value="FLEXCAN_MSGBUFFTIMESTAMP_TIMER"/>
+                              <setting name="hrConfigType" value="FLEXCAN_TIMESTAMPCAPTURE_DISABLE"/>
+                              <setting name="pe_clock_frequency" value="24000000"/>
+                              <struct name="flexcan_time_segment">
+                                 <setting name="Name" value="FlexCAN_Ip_TimeSeg2"/>
+                                 <setting name="flexcan_cfg_propSeg" value="7"/>
+                                 <setting name="flexcan_cfg_phaseSeg1" value="6"/>
+                                 <setting name="flexcan_cfg_phaseSeg2" value="2"/>
+                                 <setting name="flexcan_cfg_preDivider" value="3"/>
+                                 <setting name="flexcan_cfg_rJumpwidth" value="2"/>
+                              </struct>
+                              <struct name="flexcan_time_segment_cbt">
+                                 <setting name="Name" value="FlexCAN_Ip_TimeSegCBT2"/>
                                  <setting name="flexcan_cfg_propSeg" value="7"/>
                                  <setting name="flexcan_cfg_phaseSeg1" value="6"/>
                                  <setting name="flexcan_cfg_phaseSeg2" value="2"/>

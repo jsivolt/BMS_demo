@@ -87,6 +87,19 @@ volatile uint8 g_BmsCan1RxData[BMS_CAN1_CFG_RX_MB_COUNT][8] =
     { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U }
 };
 
+volatile Flexcan_Ip_StatusType g_BmsCan2InitStatus;
+volatile Flexcan_Ip_StatusType g_BmsCan2RxStatus;
+
+volatile uint32 g_BmsCan2RxCount = 0U;
+volatile uint32 g_BmsCan2RxId = 0U;
+volatile uint8  g_BmsCan2RxDlc = 0U;
+
+volatile uint8 g_BmsCan2RxData[8] =
+{
+    0U, 0U, 0U, 0U,
+    0U, 0U, 0U, 0U
+};
+
 volatile uint32 g_BmsCanRxCount = 0U;
 volatile uint32 g_BmsCanRxInvalidCount = 0U;
 volatile uint32 g_BmsCanRxId = 0U;
@@ -114,6 +127,7 @@ volatile uint8 g_BmsCanRxData[8] =
 static Flexcan_Ip_MsgBuffType g_BmsCanRxDebugMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage[BMS_CAN1_CFG_RX_MB_COUNT];
+static Flexcan_Ip_MsgBuffType g_BmsCan2RxMessage;
 
 /* CAN1 RX mailbox index/ID lookup tables, indexed by mailbox slot 0..3. */
 static const uint8 g_BmsCan1RxMbIndex[BMS_CAN1_CFG_RX_MB_COUNT] =
@@ -397,6 +411,63 @@ Std_ReturnType Bms_Can_Init(void)
         {
             return (Std_ReturnType)E_NOT_OK;
         }
+    }
+
+    /*
+     * Initialize CAN2.
+     * CAN2 is reserved for ADBMS2950 simulation.
+     */
+    g_BmsCan2InitStatus = FlexCAN_Ip_Init(
+        BMS_CAN2_CFG_INSTANCE,
+        &FlexCAN_State2,
+        &FlexCAN_Config2
+    );
+
+    if (g_BmsCan2InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Configure CAN2 RX MB for the initial 0x410 bring-up frame.
+     */
+    g_BmsCan2InitStatus = FlexCAN_Ip_ConfigRxMb(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_MB_INDEX,
+        &g_BmsCanRxInfo,
+        BMS_CAN2_CFG_RX_TEST_ID
+    );
+
+    if (g_BmsCan2InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Start CAN2.
+     */
+    g_BmsCan2InitStatus = FlexCAN_Ip_SetStartMode(
+        BMS_CAN2_CFG_INSTANCE
+    );
+
+    if (g_BmsCan2InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Arm CAN2 RX.
+     */
+    g_BmsCan2RxStatus = FlexCAN_Ip_Receive(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_MB_INDEX,
+        &g_BmsCan2RxMessage,
+        TRUE
+    );
+
+    if (g_BmsCan2RxStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
     }
 
     return (Std_ReturnType)E_OK;
@@ -1010,6 +1081,50 @@ void Bms_Can_MainFunction(void)
                 TRUE
             );
         }
+    }
+
+    /*
+     * Process CAN2 ADBMS2950 simulator RX.
+     */
+    FlexCAN_Ip_MainFunctionRead(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_MB_INDEX
+    );
+
+    g_BmsCan2RxStatus = FlexCAN_Ip_GetTransferStatus(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_MB_INDEX
+    );
+
+    if (g_BmsCan2RxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        uint8 j;
+
+        g_BmsCan2RxId  = g_BmsCan2RxMessage.msgId;
+        g_BmsCan2RxDlc = g_BmsCan2RxMessage.dataLen;
+
+        if (g_BmsCan2RxDlc > 8U)
+        {
+            g_BmsCan2RxDlc = 8U;
+        }
+
+        for (j = 0U; j < g_BmsCan2RxDlc; j++)
+        {
+            g_BmsCan2RxData[j] =
+                g_BmsCan2RxMessage.data[j];
+        }
+
+        g_BmsCan2RxCount++;
+
+        /*
+         * Re-arm CAN2 RX MB.
+         */
+        g_BmsCan2RxStatus = FlexCAN_Ip_Receive(
+            BMS_CAN2_CFG_INSTANCE,
+            BMS_CAN2_CFG_RX_MB_INDEX,
+            &g_BmsCan2RxMessage,
+            TRUE
+        );
     }
 }
 

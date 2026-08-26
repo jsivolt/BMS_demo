@@ -58,6 +58,15 @@ extern "C" {
 /** @brief Number of CAN1 RX mailboxes. */
 #define BMS_CAN1_CFG_RX_MB_COUNT          (4U)
 
+/** @brief FlexCAN hardware instance 2 (CAN2), used for ADBMS2950 simulation. */
+#define BMS_CAN2_CFG_INSTANCE             (2U)
+
+/** @brief CAN2 RX message buffer. */
+#define BMS_CAN2_CFG_RX_MB_INDEX          (1U)
+
+/** @brief CAN2 test RX CAN identifier. */
+#define BMS_CAN2_CFG_RX_TEST_ID           (0x410U)
+
 /** @brief Message buffer index reserved for debug reception. */
 #define BMS_CAN_CFG_RX_DEBUG_MB_INDEX     (1U)
 
