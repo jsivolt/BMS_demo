@@ -451,3 +451,60 @@ BO_ 1028 vAFE_CellVoltage_13_16: 8 vAFE
  SG_ Cell14Voltage  : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
  SG_ Cell15Voltage  : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
  SG_ Cell16Voltage  : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+ BO_ 773 BMS_CellSummary: 8 S32K344_BMS
+ SG_ MinCellVoltage       : 0|16@1+  (0.001,0) [0|6.5535] "V" PCAN
+ SG_ MaxCellVoltage       : 16|16@1+ (0.001,0) [0|6.5535] "V" PCAN
+ SG_ DeltaCellVoltage     : 32|16@1+ (0.001,0) [0|6.5535] "V" PCAN
+ SG_ MinCellIndex         : 48|4@1+  (1,0)     [0|15] "" PCAN
+ SG_ MaxCellIndex         : 52|4@1+  (1,0)     [0|15] "" PCAN
+ SG_ CellVoltageValid     : 56|1@1+  (1,0)     [0|1] "" PCAN
+ SG_ CellImbalanceFault   : 57|1@1+  (1,0)     [0|1] "" PCAN
+
+
+BO_ 1024 vAFE_TestTx: 8 S32K344_BMS
+ SG_ vAFE_TestByte0 : 0|8@1+  (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte1 : 8|8@1+  (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte2 : 16|8@1+ (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte3 : 24|8@1+ (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte4 : 32|8@1+ (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte5 : 40|8@1+ (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte6 : 48|8@1+ (1,0) [0|255] "" PCAN
+ SG_ vAFE_TestByte7 : 56|8@1+ (1,0) [0|255] "" PCAN
+
+
+BO_ 1025 vAFE_CellVoltage_1_4: 8 vAFE
+ SG_ Cell1Voltage : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell2Voltage : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell3Voltage : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell4Voltage : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+
+BO_ 1026 vAFE_CellVoltage_5_8: 8 vAFE
+ SG_ Cell5Voltage : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell6Voltage : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell7Voltage : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell8Voltage : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+
+BO_ 1027 vAFE_CellVoltage_9_12: 8 vAFE
+ SG_ Cell9Voltage  : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell10Voltage : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell11Voltage : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell12Voltage : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+
+BO_ 1028 vAFE_CellVoltage_13_16: 8 vAFE
+ SG_ Cell13Voltage : 0|16@1+  (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell14Voltage : 16|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell15Voltage : 32|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+ SG_ Cell16Voltage : 48|16@1+ (0.001,0) [0|6.5535] "V" S32K344_BMS
+
+
+VAL_ 773 CellVoltageValid
+ 0 "Invalid"
+ 1 "Valid";
+
+VAL_ 773 CellImbalanceFault
+ 0 "No Fault"
+ 1 "Imbalance";

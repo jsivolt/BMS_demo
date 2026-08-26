@@ -82,6 +82,9 @@ extern "C" {
 /** @brief CAN identifier used to broadcast Pack3/system fault mask frames. */
 #define BMS_CAN_CFG_TX_FAULT_3_SYSTEM_ID       (0x304U)
 
+/** @brief CAN identifier used to broadcast cell voltage summary. */
+#define BMS_CAN_CFG_TX_CELL_SUMMARY_ID    (0x305U)
+
 /** @brief CAN identifier used for incoming debug frames. */
 #define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)
 

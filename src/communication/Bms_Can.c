@@ -805,6 +805,92 @@ void Bms_Can_SendFaultStatus2(void)
 
 
 /* ================================================================================================
+ * CAN TX cell summary frame
+ * CAN ID: 0x305
+ * ============================================================================================== */
+
+void Bms_Can_SendCellSummary(void)
+{
+    uint8 txData[8];
+    uint16 minCell_mV;
+    uint16 maxCell_mV;
+    uint16 deltaCell_mV;
+    uint8 minIndex;
+    uint8 maxIndex;
+    uint8 statusByte;
+
+    minCell_mV = g_BmsVafeData.MinCellVoltage_mV;
+    maxCell_mV = g_BmsVafeData.MaxCellVoltage_mV;
+    deltaCell_mV = g_BmsVafeData.DeltaCellVoltage_mV;
+
+    minIndex = g_BmsVafeData.MinCellIndex;
+    maxIndex = g_BmsVafeData.MaxCellIndex;
+
+    /*
+     * Byte0-1: MinCellVoltage, little-endian, 1 mV/bit
+     */
+    txData[0] = (uint8)(minCell_mV & 0xFFU);
+    txData[1] = (uint8)((minCell_mV >> 8U) & 0xFFU);
+
+    /*
+     * Byte2-3: MaxCellVoltage
+     */
+    txData[2] = (uint8)(maxCell_mV & 0xFFU);
+    txData[3] = (uint8)((maxCell_mV >> 8U) & 0xFFU);
+
+    /*
+     * Byte4-5: DeltaCellVoltage
+     */
+    txData[4] = (uint8)(deltaCell_mV & 0xFFU);
+    txData[5] = (uint8)((deltaCell_mV >> 8U) & 0xFFU);
+
+    /*
+     * Byte6:
+     * bit0-3 = MinCellIndex
+     * bit4-7 = MaxCellIndex
+     */
+    txData[6] =
+        (uint8)((minIndex & 0x0FU) |
+               ((maxIndex & 0x0FU) << 4U));
+
+    /*
+     * Byte7:
+     * bit0 = CellVoltageValid
+     * bit1 = CellImbalanceFault
+     */
+    statusByte = 0U;
+
+    if (g_BmsVafeData.DataValid == TRUE)
+    {
+        statusByte |= 0x01U;
+    }
+
+    if (FaultManager_IsSystemFaultActive(
+            FAULT_CELL_IMBALANCE) == TRUE)
+    {
+        statusByte |= 0x02U;
+    }
+
+    txData[7] = statusByte;
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_CELL_SUMMARY_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+/* ================================================================================================
  * CAN RX polling
  * ============================================================================================== */
 
