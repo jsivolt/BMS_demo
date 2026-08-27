@@ -13,6 +13,7 @@
 #include "../control/Bms_Contactor.h"
 
 #include "../battery/vAFE/Bms_Vafe.h"
+#include "../battery/vPACK/Bms_Vpack.h"
 
 
 #define BMS_CAN_TX_TIMEOUT_MS   (100U)
@@ -1115,6 +1116,12 @@ void Bms_Can_MainFunction(void)
         }
 
         g_BmsCan2RxCount++;
+
+        Bms_Vpack_ProcessFrame(
+            g_BmsCan2RxMessage.msgId,
+            g_BmsCan2RxMessage.dataLen,
+            g_BmsCan2RxMessage.data
+        );
 
         /*
          * Re-arm CAN2 RX MB.

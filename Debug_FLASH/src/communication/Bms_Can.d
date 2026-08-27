@@ -107,7 +107,8 @@ src/communication/Bms_Can.o: ../src/communication/Bms_Can.c \
  ../src/communication/../app/Bms_StateMachine.h \
  ../src/communication/../safety/Fault_Manager.h \
  ../src/communication/../control/Bms_Contactor.h \
- ../src/communication/../battery/vAFE/Bms_Vafe.h
+ ../src/communication/../battery/vAFE/Bms_Vafe.h \
+ ../src/communication/../battery/vPACK/Bms_Vpack.h
 ../src/communication/Bms_Can.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Platform_Types.h:
@@ -220,3 +221,4 @@ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1
 ../src/communication/../safety/Fault_Manager.h:
 ../src/communication/../control/Bms_Contactor.h:
 ../src/communication/../battery/vAFE/Bms_Vafe.h:
+../src/communication/../battery/vPACK/Bms_Vpack.h:

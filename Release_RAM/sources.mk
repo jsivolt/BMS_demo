@@ -27,6 +27,7 @@ generate/src \
 src/app \
 src/battery \
 src/battery/vAFE \
+src/battery/vPACK \
 src/communication \
 src/control \
 src/drivers \
