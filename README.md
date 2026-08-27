@@ -79,7 +79,7 @@ accumulated ticks so no period is lost if the loop falls behind.
 | Task | Period | Contents |
 | --- | --- | --- |
 | `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, contactor state machine, 1 Hz LED blink |
-| `Bms_MainFunction_100ms` | 100 ms | NTC, battery monitor, CAN RX poll, state machine, TX of 0x300–0x305 and 0x400 |
+| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, state machine, TX of 0x300–0x305 and 0x400 |
 | `Bms_MainFunction_1000ms` | 1000 ms | Reserved |
 
 ---

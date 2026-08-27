@@ -17,6 +17,14 @@
 #define BMS_VPACK_STATUS_COMM_FAULT     (0x04U)
 
 /*
+ * Communication health.
+ *
+ * Bms_Vpack_MainFunction() is called from the 100 ms task, so 1 tick = 100 ms.
+ */
+#define BMS_VPACK_TIMEOUT_TICKS         (2U)    /* 2 x 100 ms = 200 ms */
+#define BMS_VPACK_ALIVE_MAX_VALUE       (15U)
+
+/*
  * Decoded ADBMS2950 simulated measurements
  */
 typedef struct
@@ -30,6 +38,9 @@ typedef struct
     uint8 AliveCounter;
     uint8 Status;
 
+    boolean CurrentValid;
+    boolean VoltageValid;
+    boolean AliveValid;
     boolean Valid;
 
 } Bms_Vpack_DataType;
@@ -60,5 +71,14 @@ void Bms_Vpack_ProcessFrame(
     uint8 dlc,
     const uint8 *data
 );
+
+
+/*
+ * Update communication timeout / alive-counter health.
+ *
+ * Must be called once per 100 ms task, after Bms_Vpack_ProcessFrame()
+ * and before BatteryMonitor_MainFunction().
+ */
+void Bms_Vpack_MainFunction(void);
 
 #endif /* BMS_VPACK_H */

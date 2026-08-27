@@ -3,16 +3,25 @@
 
 volatile Bms_Vpack_DataType g_BmsVpackData =
 {
-    0,
-    0,
-    0U,
-    0U,
-    0U,
-    0U,
-    FALSE
+    .PackCurrent_mA = 0,
+    .ShuntVoltage_uV = 0,
+    .PackVoltage_mV = 0U,
+    .BusVoltage_mV = 0U,
+    .AliveCounter = 0U,
+    .Status = 0U,
+    .CurrentValid = FALSE,
+    .VoltageValid = FALSE,
+    .AliveValid = FALSE,
+    .Valid = FALSE
 };
 
 volatile uint32 g_BmsVpackFrameCount = 0U;
+
+static uint16 g_BmsVpackCurrentTimeoutTicks = 0U;
+static uint16 g_BmsVpackVoltageTimeoutTicks = 0U;
+
+static uint8 g_BmsVpackLastAliveCounter = 0U;
+static boolean g_BmsVpackAliveInitialized = FALSE;
 
 
 /*
@@ -71,9 +80,18 @@ void Bms_Vpack_Init(void)
     g_BmsVpackData.AliveCounter = 0U;
     g_BmsVpackData.Status = 0U;
 
+    g_BmsVpackData.CurrentValid = FALSE;
+    g_BmsVpackData.VoltageValid = FALSE;
+    g_BmsVpackData.AliveValid = FALSE;
     g_BmsVpackData.Valid = FALSE;
 
     g_BmsVpackFrameCount = 0U;
+
+    g_BmsVpackCurrentTimeoutTicks = 0U;
+    g_BmsVpackVoltageTimeoutTicks = 0U;
+
+    g_BmsVpackLastAliveCounter = 0U;
+    g_BmsVpackAliveInitialized = FALSE;
 }
 
 
@@ -123,7 +141,31 @@ void Bms_Vpack_ProcessFrame(
         g_BmsVpackData.Status =
             data[7];
 
-        g_BmsVpackData.Valid = TRUE;
+        g_BmsVpackCurrentTimeoutTicks = 0U;
+        g_BmsVpackData.CurrentValid = TRUE;
+
+        if (g_BmsVpackAliveInitialized == FALSE)
+        {
+            g_BmsVpackLastAliveCounter =
+                g_BmsVpackData.AliveCounter;
+
+            g_BmsVpackAliveInitialized = TRUE;
+            g_BmsVpackData.AliveValid = TRUE;
+        }
+        else
+        {
+            uint8 expectedAlive;
+
+            expectedAlive =
+                (uint8)((g_BmsVpackLastAliveCounter + 1U)
+                & BMS_VPACK_ALIVE_MAX_VALUE);
+
+            g_BmsVpackData.AliveValid =
+                (boolean)(g_BmsVpackData.AliveCounter == expectedAlive);
+
+            g_BmsVpackLastAliveCounter =
+                g_BmsVpackData.AliveCounter;
+        }
 
         g_BmsVpackFrameCount++;
     }
@@ -148,8 +190,40 @@ void Bms_Vpack_ProcessFrame(
         g_BmsVpackData.BusVoltage_mV =
             Bms_Vpack_ReadU32LE(&data[4]);
 
-        g_BmsVpackData.Valid = TRUE;
+        g_BmsVpackVoltageTimeoutTicks = 0U;
+        g_BmsVpackData.VoltageValid = TRUE;
 
         g_BmsVpackFrameCount++;
     }
+}
+
+
+void Bms_Vpack_MainFunction(void)
+{
+    if (g_BmsVpackCurrentTimeoutTicks < BMS_VPACK_TIMEOUT_TICKS)
+    {
+        g_BmsVpackCurrentTimeoutTicks++;
+    }
+
+    if (g_BmsVpackVoltageTimeoutTicks < BMS_VPACK_TIMEOUT_TICKS)
+    {
+        g_BmsVpackVoltageTimeoutTicks++;
+    }
+
+    if (g_BmsVpackCurrentTimeoutTicks >= BMS_VPACK_TIMEOUT_TICKS)
+    {
+        g_BmsVpackData.CurrentValid = FALSE;
+    }
+
+    if (g_BmsVpackVoltageTimeoutTicks >= BMS_VPACK_TIMEOUT_TICKS)
+    {
+        g_BmsVpackData.VoltageValid = FALSE;
+    }
+
+    g_BmsVpackData.Valid =
+        (boolean)(
+            (g_BmsVpackData.CurrentValid == TRUE) &&
+            (g_BmsVpackData.VoltageValid == TRUE) &&
+            (g_BmsVpackData.AliveValid == TRUE)
+        );
 }

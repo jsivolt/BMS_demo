@@ -210,9 +210,16 @@ static void Bms_MainFunction_100ms(void)
 {
     Bms_Ntc_MainFunction();
 
-    BatteryMonitor_MainFunction();
-
+    /*
+     * CAN RX (Bms_Vpack_ProcessFrame) must run before the vPACK
+     * comm-health check, which must run before the battery monitor
+     * consumes g_BmsVpackData.
+     */
     Bms_Can_MainFunction();
+
+    Bms_Vpack_MainFunction();
+
+    BatteryMonitor_MainFunction();
 
     Bms_StateMachine_MainFunction();
 
