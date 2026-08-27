@@ -35,6 +35,7 @@ static BatteryMonitor_DataType g_BatteryData;
 
 static void BatteryMonitor_UpdateCellVoltages(void);
 static void BatteryMonitor_UpdatePackMonitor(void);
+static void BatteryMonitor_UpdateVpackFaults(void);
 static void BatteryMonitor_UpdateCellVoltageFaults(void);
 static void BatteryMonitor_UpdateCellImbalanceFault(void);
 static void BatteryMonitor_UpdateTemperatureSummary(void);
@@ -62,6 +63,9 @@ void BatteryMonitor_Init(void)
     g_BatteryData.VpackAliveCounter = 0U;
     g_BatteryData.VpackStatus = 0U;
 
+    g_BatteryData.VpackCurrentValid = FALSE;
+    g_BatteryData.VpackVoltageValid = FALSE;
+    g_BatteryData.VpackAliveValid = FALSE;
     g_BatteryData.VpackValid = FALSE;
 
     for (i = 0U; i < 16U; i++)
@@ -136,6 +140,8 @@ void BatteryMonitor_MainFunction(void)
      */
 
     BatteryMonitor_UpdatePackMonitor();
+
+    BatteryMonitor_UpdateVpackFaults();
 
 
     /*
@@ -213,6 +219,25 @@ void BatteryMonitor_MainFunction(void)
 
 static void BatteryMonitor_UpdatePackMonitor(void)
 {
+    /*
+     * Always copy communication health flags.
+     */
+    g_BatteryData.VpackCurrentValid =
+        g_BmsVpackData.CurrentValid;
+
+    g_BatteryData.VpackVoltageValid =
+        g_BmsVpackData.VoltageValid;
+
+    g_BatteryData.VpackAliveValid =
+        g_BmsVpackData.AliveValid;
+
+    g_BatteryData.VpackValid =
+        g_BmsVpackData.Valid;
+
+    /*
+     * Only overwrite measurement data when the overall
+     * vPACK dataset is valid.
+     */
     if (g_BmsVpackData.Valid == TRUE)
     {
         g_BatteryData.PackCurrent_mA =
@@ -232,12 +257,58 @@ static void BatteryMonitor_UpdatePackMonitor(void)
 
         g_BatteryData.VpackStatus =
             g_BmsVpackData.Status;
+    }
+}
 
-        g_BatteryData.VpackValid = TRUE;
+
+/* ================================================================================================
+ * Vpack (ADBMS2950) fault evaluation
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdateVpackFaults(void)
+{
+    /*
+     * ADBMS2950 communication timeout:
+     * either required frame is missing.
+     */
+    if ((g_BatteryData.VpackCurrentValid == FALSE) ||
+        (g_BatteryData.VpackVoltageValid == FALSE))
+    {
+        FaultManager_SetSystem(
+            FAULT_VPACK_COMM_TIMEOUT);
     }
     else
     {
-        g_BatteryData.VpackValid = FALSE;
+        FaultManager_ClearSystem(
+            FAULT_VPACK_COMM_TIMEOUT);
+    }
+
+    /*
+     * Alive counter error.
+     */
+    if (g_BatteryData.VpackAliveValid == FALSE)
+    {
+        FaultManager_SetSystem(
+            FAULT_VPACK_ALIVE_ERROR);
+    }
+    else
+    {
+        FaultManager_ClearSystem(
+            FAULT_VPACK_ALIVE_ERROR);
+    }
+
+    /*
+     * ADBMS2950-reported device status.
+     */
+    if (g_BatteryData.VpackStatus != 0U)
+    {
+        FaultManager_SetSystem(
+            FAULT_VPACK_DEVICE_FAULT);
+    }
+    else
+    {
+        FaultManager_ClearSystem(
+            FAULT_VPACK_DEVICE_FAULT);
     }
 }
 

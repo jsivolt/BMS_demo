@@ -21,7 +21,7 @@
  *
  * Bms_Vpack_MainFunction() is called from the 100 ms task, so 1 tick = 100 ms.
  */
-#define BMS_VPACK_TIMEOUT_TICKS         (2U)    /* 2 x 100 ms = 200 ms */
+#define BMS_VPACK_TIMEOUT_TICKS         (10U)    /* 10 x 100 ms = 1000 ms */
 #define BMS_VPACK_ALIVE_MAX_VALUE       (15U)
 
 /*

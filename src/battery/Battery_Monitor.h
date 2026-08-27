@@ -41,6 +41,10 @@ typedef struct
     uint8 VpackAliveCounter;
     uint8 VpackStatus;
 
+    boolean VpackCurrentValid;
+    boolean VpackVoltageValid;
+    boolean VpackAliveValid;
+
     boolean VpackValid;
 
     /* Cell voltages from AFE / vAFE. Unit: V */

@@ -41,6 +41,10 @@ typedef enum
 
 #define FAULT_CELL_IMBALANCE           (1UL << 15)
 
+#define FAULT_VPACK_COMM_TIMEOUT       (1UL << 16)
+#define FAULT_VPACK_ALIVE_ERROR        (1UL << 17)
+#define FAULT_VPACK_DEVICE_FAULT       (1UL << 18)
+
 /*
  * Add future faults here.
  */
@@ -58,7 +62,10 @@ typedef enum
         FAULT_PRECHARGE_TIMEOUT    |   \
         FAULT_CONTACTOR_FEEDBACK   |   \
         FAULT_CONTACTOR_WELD       |   \
-        FAULT_OVER_CURRENT )
+        FAULT_OVER_CURRENT         |   \
+        FAULT_VPACK_COMM_TIMEOUT   |   \
+        FAULT_VPACK_ALIVE_ERROR    |   \
+        FAULT_VPACK_DEVICE_FAULT )
 
 
 void FaultManager_Init(void);
