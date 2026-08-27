@@ -128,7 +128,8 @@ volatile uint8 g_BmsCanRxData[8] =
 static Flexcan_Ip_MsgBuffType g_BmsCanRxDebugMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage[BMS_CAN1_CFG_RX_MB_COUNT];
-static Flexcan_Ip_MsgBuffType g_BmsCan2RxMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCan2RxCurrentMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCan2RxVoltageMessage;
 
 /* CAN1 RX mailbox index/ID lookup tables, indexed by mailbox slot 0..3. */
 static const uint8 g_BmsCan1RxMbIndex[BMS_CAN1_CFG_RX_MB_COUNT] =
@@ -430,13 +431,25 @@ Std_ReturnType Bms_Can_Init(void)
     }
 
     /*
-     * Configure CAN2 RX MB for the initial 0x410 bring-up frame.
+     * Configure CAN2 RX MBs for the ADBMS2950 current and voltage frames.
      */
     g_BmsCan2InitStatus = FlexCAN_Ip_ConfigRxMb(
         BMS_CAN2_CFG_INSTANCE,
-        BMS_CAN2_CFG_RX_MB_INDEX,
+        BMS_CAN2_CFG_RX_CURRENT_MB_INDEX,
         &g_BmsCanRxInfo,
-        BMS_CAN2_CFG_RX_TEST_ID
+        BMS_CAN2_CFG_RX_CURRENT_ID
+    );
+
+    if (g_BmsCan2InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    g_BmsCan2InitStatus = FlexCAN_Ip_ConfigRxMb(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_VOLTAGE_MB_INDEX,
+        &g_BmsCanRxInfo,
+        BMS_CAN2_CFG_RX_VOLTAGE_ID
     );
 
     if (g_BmsCan2InitStatus != FLEXCAN_STATUS_SUCCESS)
@@ -457,12 +470,24 @@ Std_ReturnType Bms_Can_Init(void)
     }
 
     /*
-     * Arm CAN2 RX.
+     * Arm CAN2 RX MBs.
      */
     g_BmsCan2RxStatus = FlexCAN_Ip_Receive(
         BMS_CAN2_CFG_INSTANCE,
-        BMS_CAN2_CFG_RX_MB_INDEX,
-        &g_BmsCan2RxMessage,
+        BMS_CAN2_CFG_RX_CURRENT_MB_INDEX,
+        &g_BmsCan2RxCurrentMessage,
+        TRUE
+    );
+
+    if (g_BmsCan2RxStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    g_BmsCan2RxStatus = FlexCAN_Ip_Receive(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_VOLTAGE_MB_INDEX,
+        &g_BmsCan2RxVoltageMessage,
         TRUE
     );
 
@@ -1085,24 +1110,24 @@ void Bms_Can_MainFunction(void)
     }
 
     /*
-     * Process CAN2 ADBMS2950 simulator RX.
+     * Process CAN2 ADBMS2950 simulator RX - current frame.
      */
     FlexCAN_Ip_MainFunctionRead(
         BMS_CAN2_CFG_INSTANCE,
-        BMS_CAN2_CFG_RX_MB_INDEX
+        BMS_CAN2_CFG_RX_CURRENT_MB_INDEX
     );
 
     g_BmsCan2RxStatus = FlexCAN_Ip_GetTransferStatus(
         BMS_CAN2_CFG_INSTANCE,
-        BMS_CAN2_CFG_RX_MB_INDEX
+        BMS_CAN2_CFG_RX_CURRENT_MB_INDEX
     );
 
     if (g_BmsCan2RxStatus == FLEXCAN_STATUS_SUCCESS)
     {
         uint8 j;
 
-        g_BmsCan2RxId  = g_BmsCan2RxMessage.msgId;
-        g_BmsCan2RxDlc = g_BmsCan2RxMessage.dataLen;
+        g_BmsCan2RxId  = g_BmsCan2RxCurrentMessage.msgId;
+        g_BmsCan2RxDlc = g_BmsCan2RxCurrentMessage.dataLen;
 
         if (g_BmsCan2RxDlc > 8U)
         {
@@ -1112,24 +1137,74 @@ void Bms_Can_MainFunction(void)
         for (j = 0U; j < g_BmsCan2RxDlc; j++)
         {
             g_BmsCan2RxData[j] =
-                g_BmsCan2RxMessage.data[j];
+                g_BmsCan2RxCurrentMessage.data[j];
         }
 
         g_BmsCan2RxCount++;
 
         Bms_Vpack_ProcessFrame(
-            g_BmsCan2RxMessage.msgId,
-            g_BmsCan2RxMessage.dataLen,
-            g_BmsCan2RxMessage.data
+            g_BmsCan2RxCurrentMessage.msgId,
+            g_BmsCan2RxCurrentMessage.dataLen,
+            g_BmsCan2RxCurrentMessage.data
         );
 
         /*
-         * Re-arm CAN2 RX MB.
+         * Re-arm CAN2 current RX MB.
          */
         g_BmsCan2RxStatus = FlexCAN_Ip_Receive(
             BMS_CAN2_CFG_INSTANCE,
-            BMS_CAN2_CFG_RX_MB_INDEX,
-            &g_BmsCan2RxMessage,
+            BMS_CAN2_CFG_RX_CURRENT_MB_INDEX,
+            &g_BmsCan2RxCurrentMessage,
+            TRUE
+        );
+    }
+
+    /*
+     * Process CAN2 ADBMS2950 simulator RX - voltage frame.
+     */
+    FlexCAN_Ip_MainFunctionRead(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_VOLTAGE_MB_INDEX
+    );
+
+    g_BmsCan2RxStatus = FlexCAN_Ip_GetTransferStatus(
+        BMS_CAN2_CFG_INSTANCE,
+        BMS_CAN2_CFG_RX_VOLTAGE_MB_INDEX
+    );
+
+    if (g_BmsCan2RxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        uint8 j;
+
+        g_BmsCan2RxId  = g_BmsCan2RxVoltageMessage.msgId;
+        g_BmsCan2RxDlc = g_BmsCan2RxVoltageMessage.dataLen;
+
+        if (g_BmsCan2RxDlc > 8U)
+        {
+            g_BmsCan2RxDlc = 8U;
+        }
+
+        for (j = 0U; j < g_BmsCan2RxDlc; j++)
+        {
+            g_BmsCan2RxData[j] =
+                g_BmsCan2RxVoltageMessage.data[j];
+        }
+
+        g_BmsCan2RxCount++;
+
+        Bms_Vpack_ProcessFrame(
+            g_BmsCan2RxVoltageMessage.msgId,
+            g_BmsCan2RxVoltageMessage.dataLen,
+            g_BmsCan2RxVoltageMessage.data
+        );
+
+        /*
+         * Re-arm CAN2 voltage RX MB.
+         */
+        g_BmsCan2RxStatus = FlexCAN_Ip_Receive(
+            BMS_CAN2_CFG_INSTANCE,
+            BMS_CAN2_CFG_RX_VOLTAGE_MB_INDEX,
+            &g_BmsCan2RxVoltageMessage,
             TRUE
         );
     }

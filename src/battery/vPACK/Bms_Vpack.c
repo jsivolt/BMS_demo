@@ -7,6 +7,8 @@ volatile Bms_Vpack_DataType g_BmsVpackData =
     0,
     0U,
     0U,
+    0U,
+    0U,
     FALSE
 };
 
@@ -45,10 +47,26 @@ static sint16 Bms_Vpack_ReadS16LE(const uint8 *data)
 }
 
 
+/*
+ * Decode little-endian unsigned 32-bit value.
+ */
+static uint32 Bms_Vpack_ReadU32LE(const uint8 *data)
+{
+    return
+        ((uint32)data[0]) |
+        ((uint32)data[1] << 8U) |
+        ((uint32)data[2] << 16U) |
+        ((uint32)data[3] << 24U);
+}
+
+
 void Bms_Vpack_Init(void)
 {
     g_BmsVpackData.PackCurrent_mA = 0;
     g_BmsVpackData.ShuntVoltage_uV = 0;
+
+    g_BmsVpackData.PackVoltage_mV = 0U;
+    g_BmsVpackData.BusVoltage_mV  = 0U;
 
     g_BmsVpackData.AliveCounter = 0U;
     g_BmsVpackData.Status = 0U;
@@ -104,6 +122,31 @@ void Bms_Vpack_ProcessFrame(
          */
         g_BmsVpackData.Status =
             data[7];
+
+        g_BmsVpackData.Valid = TRUE;
+
+        g_BmsVpackFrameCount++;
+    }
+    else if (canId == BMS_VPACK_CAN_ID_VOLTAGE)
+    {
+        if (dlc < 8U)
+        {
+            return;
+        }
+
+        /*
+         * Byte 0-3:
+         * Pack voltage, unsigned, unit = 1 mV.
+         */
+        g_BmsVpackData.PackVoltage_mV =
+            Bms_Vpack_ReadU32LE(&data[0]);
+
+        /*
+         * Byte 4-7:
+         * Bus voltage, unsigned, unit = 1 mV.
+         */
+        g_BmsVpackData.BusVoltage_mV =
+            Bms_Vpack_ReadU32LE(&data[4]);
 
         g_BmsVpackData.Valid = TRUE;
 

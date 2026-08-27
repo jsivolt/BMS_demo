@@ -61,11 +61,17 @@ extern "C" {
 /** @brief FlexCAN hardware instance 2 (CAN2), used for ADBMS2950 simulation. */
 #define BMS_CAN2_CFG_INSTANCE             (2U)
 
-/** @brief CAN2 RX message buffer. */
-#define BMS_CAN2_CFG_RX_MB_INDEX          (1U)
+/** @brief CAN2 RX message buffer for the ADBMS2950 current frame. */
+#define BMS_CAN2_CFG_RX_CURRENT_MB_INDEX     (1U)
 
-/** @brief CAN2 test RX CAN identifier. */
-#define BMS_CAN2_CFG_RX_TEST_ID           (0x410U)
+/** @brief CAN2 RX message buffer for the ADBMS2950 voltage frame. */
+#define BMS_CAN2_CFG_RX_VOLTAGE_MB_INDEX     (2U)
+
+/** @brief CAN2 RX CAN identifier for the ADBMS2950 current frame. */
+#define BMS_CAN2_CFG_RX_CURRENT_ID           (0x410U)
+
+/** @brief CAN2 RX CAN identifier for the ADBMS2950 voltage frame. */
+#define BMS_CAN2_CFG_RX_VOLTAGE_ID           (0x411U)
 
 /** @brief Message buffer index reserved for debug reception. */
 #define BMS_CAN_CFG_RX_DEBUG_MB_INDEX     (1U)

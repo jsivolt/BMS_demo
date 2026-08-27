@@ -3,6 +3,7 @@
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
 #include "vAFE/Bms_Vafe.h"
+#include "vPACK/Bms_Vpack.h"
 #include "Fault_Manager.h"
 
 /* Simulation-stage cell voltage fault thresholds, tune per cell chemistry later */
@@ -33,6 +34,7 @@ static BatteryMonitor_DataType g_BatteryData;
  * ============================================================================================== */
 
 static void BatteryMonitor_UpdateCellVoltages(void);
+static void BatteryMonitor_UpdatePackMonitor(void);
 static void BatteryMonitor_UpdateCellVoltageFaults(void);
 static void BatteryMonitor_UpdateCellImbalanceFault(void);
 static void BatteryMonitor_UpdateTemperatureSummary(void);
@@ -50,6 +52,17 @@ void BatteryMonitor_Init(void)
     g_BatteryData.PackV1 = 0.0f;
     g_BatteryData.PackV2 = 0.0f;
     g_BatteryData.PackV3 = 0.0f;
+
+    g_BatteryData.PackCurrent_mA = 0;
+    g_BatteryData.ShuntVoltage_uV = 0;
+
+    g_BatteryData.VpackPackVoltage_mV = 0U;
+    g_BatteryData.VpackBusVoltage_mV = 0U;
+
+    g_BatteryData.VpackAliveCounter = 0U;
+    g_BatteryData.VpackStatus = 0U;
+
+    g_BatteryData.VpackValid = FALSE;
 
     for (i = 0U; i < 16U; i++)
     {
@@ -118,6 +131,15 @@ void BatteryMonitor_MainFunction(void)
 
     /*
      * ==========================================================================
+     * Pack monitor data from virtual ADBMS2950
+     * ==========================================================================
+     */
+
+    BatteryMonitor_UpdatePackMonitor();
+
+
+    /*
+     * ==========================================================================
      * Cell voltages from vAFE
      * ==========================================================================
      */
@@ -182,6 +204,41 @@ void BatteryMonitor_MainFunction(void)
     * Update temperature-related pack/system faults.
     */
     BatteryMonitor_UpdateTemperatureFaults();
+}
+
+
+/* ================================================================================================
+ * Pack monitor update (virtual ADBMS2950)
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdatePackMonitor(void)
+{
+    if (g_BmsVpackData.Valid == TRUE)
+    {
+        g_BatteryData.PackCurrent_mA =
+            g_BmsVpackData.PackCurrent_mA;
+
+        g_BatteryData.ShuntVoltage_uV =
+            g_BmsVpackData.ShuntVoltage_uV;
+
+        g_BatteryData.VpackPackVoltage_mV =
+            g_BmsVpackData.PackVoltage_mV;
+
+        g_BatteryData.VpackBusVoltage_mV =
+            g_BmsVpackData.BusVoltage_mV;
+
+        g_BatteryData.VpackAliveCounter =
+            g_BmsVpackData.AliveCounter;
+
+        g_BatteryData.VpackStatus =
+            g_BmsVpackData.Status;
+
+        g_BatteryData.VpackValid = TRUE;
+    }
+    else
+    {
+        g_BatteryData.VpackValid = FALSE;
+    }
 }
 
 

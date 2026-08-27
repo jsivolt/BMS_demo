@@ -22,6 +22,27 @@ typedef struct
     float PackV2;
     float PackV3;
 
+    /*
+     * Pack monitor data from virtual ADBMS2950.
+     */
+
+    /* Unit: mA */
+    sint32 PackCurrent_mA;
+
+    /* Unit: uV */
+    sint16 ShuntVoltage_uV;
+
+    /* Unit: mV */
+    uint32 VpackPackVoltage_mV;
+
+    /* Unit: mV */
+    uint32 VpackBusVoltage_mV;
+
+    uint8 VpackAliveCounter;
+    uint8 VpackStatus;
+
+    boolean VpackValid;
+
     /* Cell voltages from AFE / vAFE. Unit: V */
     float CellVoltage[16];
 

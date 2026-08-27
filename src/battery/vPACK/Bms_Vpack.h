@@ -7,6 +7,7 @@
  * Virtual ADBMS2950 CAN frame IDs
  */
 #define BMS_VPACK_CAN_ID_CURRENT        (0x410U)
+#define BMS_VPACK_CAN_ID_VOLTAGE        (0x411U)
 
 /*
  * Status bits
@@ -22,6 +23,9 @@ typedef struct
 {
     sint32 PackCurrent_mA;
     sint16 ShuntVoltage_uV;
+
+    uint32 PackVoltage_mV;
+    uint32 BusVoltage_mV;
 
     uint8 AliveCounter;
     uint8 Status;
