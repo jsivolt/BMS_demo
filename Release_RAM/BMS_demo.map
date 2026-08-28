@@ -6770,996 +6770,995 @@ END GROUP
                 0x20400770                Bms_StateMachine_Init
                 0x2040077c                Bms_StateMachine_GetState
                 0x20400788                Bms_StateMachine_MainFunction
- .text          0x20400844      0x40c ./src/battery/Battery_Monitor.o
+ .text          0x20400844      0x410 ./src/battery/Battery_Monitor.o
                 0x20400844                BatteryMonitor_Init
                 0x20400898                BatteryMonitor_MainFunction
-                0x20400c48                BatteryMonitor_GetData
- .text          0x20400c50       0xa2 ./src/battery/Bms_Afe.o
-                0x20400c82                Bms_Afe_WriteRegister
-                0x20400ca4                Bms_Afe_ReadRegister
-                0x20400cac                Bms_Afe_Init
-                0x20400cb4                Bms_Afe_ReadCellVoltages
- *fill*         0x20400cf2        0x2 
- .text          0x20400cf4      0x158 ./src/battery/Bms_Ntc.o
-                0x20400db4                Bms_Ntc_Init
-                0x20400dcc                Bms_Ntc_RawToTemperature
-                0x20400dd4                Bms_Ntc_MainFunction
-                0x20400e24                Bms_Ntc_GetTemperature_dC
-                0x20400e38                Bms_Ntc_IsValid
- .text          0x20400e4c      0x120 ./src/battery/vAFE/Bms_Vafe.o
-                0x20400e7c                Bms_Vafe_Init
-                0x20400eb0                Bms_Vafe_ProcessFrame
- .text          0x20400f6c       0xfc ./src/battery/vPACK/Bms_Vpack.o
-                0x20400f6c                Bms_Vpack_Init
-                0x20400f98                Bms_Vpack_ProcessFrame
-                0x2040101c                Bms_Vpack_MainFunction
- .text          0x20401068      0x988 ./src/communication/Bms_Can.o
-                0x204010ac                Bms_Can_Init
-                0x2040127c                Bms_Can_SendStatus
-                0x2040132c                Bms_Can_SendPackStatus
-                0x204013dc                Bms_Can_SendContactorStatus
-                0x2040154c                Bms_Can_SendFaultStatus1
-                0x204015b8                Bms_Can_SendFaultStatus2
-                0x20401624                Bms_Can_SendCellSummary
-                0x204016ac                Bms_Can_MainFunction
-                0x204019ac                Bms_Can1_SendTest
- .text          0x204019f0       0xb8 ./src/communication/Bms_Spi.o
-                0x204019f0                Bms_Spi_Init
-                0x20401a20                Bms_Spi_WriteRead
-                0x20401a58                Bms_Spi_Write
-                0x20401a76                Bms_Spi_Read
- .text          0x20401aa8      0x1c4 ./src/control/Bms_Contactor.o
-                0x20401ad0                Bms_Contactor_Init
-                0x20401b04                Bms_Contactor_RequestClose
-                0x20401b18                Bms_Contactor_RequestOpen
-                0x20401b2c                Bms_Contactor_MainFunction
-                0x20401c10                Bms_Contactor_GetState
-                0x20401c20                Bms_Contactor_GetOutputs
-                0x20401c4c                Bms_Contactor_SetPackVoltage
-                0x20401c60                Bms_Contactor_SetBusVoltage
- .text          0x20401c6c       0x34 ./src/drivers/Bms_Gpio.o
-                0x20401c6c                Bms_Gpio_Init
-                0x20401c7c                Bms_Gpio_WritePin
-                0x20401c8c                Bms_Gpio_ReadPin
- .text          0x20401ca0       0x5c ./src/drivers/Bms_Led.o
-                0x20401cd0                Bms_Led_On
-                0x20401cd4                Bms_Led_Off
-                0x20401cd8                Bms_Led_AllOff
-                0x20401cf6                Bms_Led_Init
- .text          0x20401cfc       0x84 ./src/main.o
-                0x20401d7c                Bms_Pit10msCallback
- .text          0x20401d80      0x17c ./src/safety/Fault_Manager.o
-                0x20401d80                FaultManager_Init
-                0x20401d94                FaultManager_SetPack
-                0x20401dac                FaultManager_ClearPack
-                0x20401dc4                FaultManager_ClearPackAll
-                0x20401dd8                FaultManager_GetPackFaults
-                0x20401dec                FaultManager_IsPackFaultActive
-                0x20401e08                FaultManager_PackHasCriticalFault
-                0x20401e2c                FaultManager_SetSystem
-                0x20401e3c                FaultManager_ClearSystem
-                0x20401e4c                FaultManager_ClearSystemAll
-                0x20401e58                FaultManager_IsSystemFaultActive
-                0x20401e6c                FaultManager_GetSystemFaults
-                0x20401e78                FaultManager_SystemHasCriticalFault
-                0x20401e90                FaultManager_Set
-                0x20401e94                FaultManager_Clear
-                0x20401e98                FaultManager_ClearAll
-                0x20401e9c                FaultManager_GetActiveFaults
-                0x20401ea8                FaultManager_IsActive
-                0x20401ebc                FaultManager_HasAnyFault
-                0x20401edc                FaultManager_HasCriticalFault
- .text          0x20401efc        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
- .text          0x20401efc        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
- .text          0x20401efc        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-wf_log.o)
- .text          0x20401efc        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-ef_log.o)
- .text          0x20401efc        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-sf_nan.o)
- .text          0x20401efc        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-s_lib_ver.o)
- .text          0x20401efc       0xa0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
-                0x20401efc                __aeabi_ldivmod
- .text          0x20401f9c       0x30 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
-                0x20401f9c                __aeabi_uldivmod
- .text          0x20401fcc      0x2d8 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
-                0x20401fcc                __udivmoddi4
- .text          0x204022a4        0x4 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
-                0x204022a4                __aeabi_idiv0
-                0x204022a4                __aeabi_ldiv0
- .text          0x204022a8        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-errno.o)
- .text          0x204022a8        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-impure.o)
+                0x20400c4a                BatteryMonitor_GetData
+ .text          0x20400c54       0xa2 ./src/battery/Bms_Afe.o
+                0x20400c86                Bms_Afe_WriteRegister
+                0x20400ca8                Bms_Afe_ReadRegister
+                0x20400cb0                Bms_Afe_Init
+                0x20400cb8                Bms_Afe_ReadCellVoltages
+ *fill*         0x20400cf6        0x2 
+ .text          0x20400cf8      0x158 ./src/battery/Bms_Ntc.o
+                0x20400db8                Bms_Ntc_Init
+                0x20400dd0                Bms_Ntc_RawToTemperature
+                0x20400dd8                Bms_Ntc_MainFunction
+                0x20400e28                Bms_Ntc_GetTemperature_dC
+                0x20400e3c                Bms_Ntc_IsValid
+ .text          0x20400e50      0x120 ./src/battery/vAFE/Bms_Vafe.o
+                0x20400e80                Bms_Vafe_Init
+                0x20400eb4                Bms_Vafe_ProcessFrame
+ .text          0x20400f70       0xfc ./src/battery/vPACK/Bms_Vpack.o
+                0x20400f70                Bms_Vpack_Init
+                0x20400f9c                Bms_Vpack_ProcessFrame
+                0x20401020                Bms_Vpack_MainFunction
+ .text          0x2040106c      0x988 ./src/communication/Bms_Can.o
+                0x204010b0                Bms_Can_Init
+                0x20401280                Bms_Can_SendStatus
+                0x20401330                Bms_Can_SendPackStatus
+                0x204013e0                Bms_Can_SendContactorStatus
+                0x20401550                Bms_Can_SendFaultStatus1
+                0x204015bc                Bms_Can_SendFaultStatus2
+                0x20401628                Bms_Can_SendCellSummary
+                0x204016b0                Bms_Can_MainFunction
+                0x204019b0                Bms_Can1_SendTest
+ .text          0x204019f4       0xb8 ./src/communication/Bms_Spi.o
+                0x204019f4                Bms_Spi_Init
+                0x20401a24                Bms_Spi_WriteRead
+                0x20401a5c                Bms_Spi_Write
+                0x20401a7a                Bms_Spi_Read
+ .text          0x20401aac      0x1c4 ./src/control/Bms_Contactor.o
+                0x20401ad4                Bms_Contactor_Init
+                0x20401b08                Bms_Contactor_RequestClose
+                0x20401b1c                Bms_Contactor_RequestOpen
+                0x20401b30                Bms_Contactor_MainFunction
+                0x20401c14                Bms_Contactor_GetState
+                0x20401c24                Bms_Contactor_GetOutputs
+                0x20401c50                Bms_Contactor_SetPackVoltage
+                0x20401c64                Bms_Contactor_SetBusVoltage
+ .text          0x20401c70       0x34 ./src/drivers/Bms_Gpio.o
+                0x20401c70                Bms_Gpio_Init
+                0x20401c80                Bms_Gpio_WritePin
+                0x20401c90                Bms_Gpio_ReadPin
+ .text          0x20401ca4       0x5c ./src/drivers/Bms_Led.o
+                0x20401cd4                Bms_Led_On
+                0x20401cd8                Bms_Led_Off
+                0x20401cdc                Bms_Led_AllOff
+                0x20401cfa                Bms_Led_Init
+ .text          0x20401d00       0x84 ./src/main.o
+                0x20401d80                Bms_Pit10msCallback
+ .text          0x20401d84      0x17c ./src/safety/Fault_Manager.o
+                0x20401d84                FaultManager_Init
+                0x20401d98                FaultManager_SetPack
+                0x20401db0                FaultManager_ClearPack
+                0x20401dc8                FaultManager_ClearPackAll
+                0x20401ddc                FaultManager_GetPackFaults
+                0x20401df0                FaultManager_IsPackFaultActive
+                0x20401e0c                FaultManager_PackHasCriticalFault
+                0x20401e30                FaultManager_SetSystem
+                0x20401e40                FaultManager_ClearSystem
+                0x20401e50                FaultManager_ClearSystemAll
+                0x20401e5c                FaultManager_IsSystemFaultActive
+                0x20401e70                FaultManager_GetSystemFaults
+                0x20401e7c                FaultManager_SystemHasCriticalFault
+                0x20401e94                FaultManager_Set
+                0x20401e98                FaultManager_Clear
+                0x20401e9c                FaultManager_ClearAll
+                0x20401ea0                FaultManager_GetActiveFaults
+                0x20401eac                FaultManager_IsActive
+                0x20401ec0                FaultManager_HasAnyFault
+                0x20401ee0                FaultManager_HasCriticalFault
+ .text          0x20401f00        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+ .text          0x20401f00        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+ .text          0x20401f00        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-wf_log.o)
+ .text          0x20401f00        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-ef_log.o)
+ .text          0x20401f00        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-sf_nan.o)
+ .text          0x20401f00        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-s_lib_ver.o)
+ .text          0x20401f00       0xa0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+                0x20401f00                __aeabi_ldivmod
+ .text          0x20401fa0       0x30 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+                0x20401fa0                __aeabi_uldivmod
+ .text          0x20401fd0      0x2d8 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+                0x20401fd0                __udivmoddi4
+ .text          0x204022a8        0x4 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+                0x204022a8                __aeabi_idiv0
+                0x204022a8                __aeabi_ldiv0
+ .text          0x204022ac        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-errno.o)
+ .text          0x204022ac        0x0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-impure.o)
  *(.text*)
- .text.memmove  0x204022a8       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
-                0x204022a8                memmove
- .text.memset   0x204022dc       0x10 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
-                0x204022dc                memset
- .text.logf     0x204022ec       0x6c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-wf_log.o)
-                0x204022ec                logf
+ .text.memmove  0x204022ac       0x34 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memmove.o)
+                0x204022ac                memmove
+ .text.memset   0x204022e0       0x10 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-memset.o)
+                0x204022e0                memset
+ .text.logf     0x204022f0       0x6c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-wf_log.o)
+                0x204022f0                logf
  .text.__ieee754_logf
-                0x20402358      0x1e0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-ef_log.o)
-                0x20402358                __ieee754_logf
- .text.nanf     0x20402538        0xc c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-sf_nan.o)
-                0x20402538                nanf
- .text.__errno  0x20402544        0xc c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-errno.o)
-                0x20402544                __errno
-                0x20402550                . = ALIGN (0x4)
+                0x2040235c      0x1e0 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-ef_log.o)
+                0x2040235c                __ieee754_logf
+ .text.nanf     0x2040253c        0xc c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-sf_nan.o)
+                0x2040253c                nanf
+ .text.__errno  0x20402548        0xc c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-errno.o)
+                0x20402548                __errno
+                0x20402554                . = ALIGN (0x4)
  *(.mcal_text)
- .mcal_text     0x20402550       0x14 ./Project_Settings/Startup_Code/exceptions.o
-                0x20402550                NMI_Handler
-                0x20402552                HardFault_Handler
-                0x20402554                MemManage_Handler
-                0x20402556                BusFault_Handler
-                0x20402558                UsageFault_Handler
-                0x2040255a                SVC_Handler
-                0x2040255c                DebugMon_Handler
-                0x2040255e                PendSV_Handler
-                0x20402560                SysTick_Handler
-                0x20402562                undefined_handler
- .mcal_text     0x20402564       0x52 ./Project_Settings/Startup_Code/nvic.o
-                0x20402564                NVIC_SetPriorityGrouping
-                0x20402578                NVIC_EnableIRQ
-                0x20402590                NVIC_DisableIRQ
-                0x204025a8                NVIC_SetPriority
- *fill*         0x204025b6        0x2 
- .mcal_text     0x204025b8       0xe8 ./Project_Settings/Startup_Code/startup.o
-                0x204025b8                init_data_bss
-                0x20402644                init_data_bss_core2
- .mcal_text     0x204026a0      0x338 ./Project_Settings/Startup_Code/system.o
-                0x204026a0                startup_go_to_user_mode
-                0x204026a2                default_interrupt_routine
-                0x204026a4                Sys_GetCoreID
-                0x204026b4                SystemInit
-                0x204029bc                Enable_FPU
- .mcal_text     0x204029d8     0x154c ./RTD/src/Adc_Sar_Ip.o
-                0x20402c14                Adc_Sar_Ip_IRQHandler
-                0x20402eca                Adc_Sar_Ip_ChainConfig
-                0x20402ed6                Adc_Sar_Ip_EnableChannel
-                0x20402f28                Adc_Sar_Ip_DisableChannel
-                0x20402f80                Adc_Sar_Ip_SetResolution
-                0x20402fb4                Adc_Sar_Ip_StartConversion
-                0x20402fe8                Adc_Sar_Ip_GetStatusFlags
-                0x2040304c                Adc_Sar_Ip_ClearStatusFlags
-                0x20403070                Adc_Sar_Ip_GetConvDataToArray
-                0x20403082                Adc_Sar_Ip_GetConvResultsToArray
-                0x20403092                Adc_Sar_Ip_GetConvData
-                0x204030cc                Adc_Sar_Ip_GetConvResult
-                0x20403134                Adc_Sar_Ip_Powerup
-                0x20403198                Adc_Sar_Ip_Powerdown
-                0x20403200                Adc_Sar_Ip_DoCalibration
-                0x2040330c                Adc_Sar_Ip_EnableNotifications
-                0x20403348                Adc_Sar_Ip_DisableNotifications
-                0x20403380                Adc_Sar_Ip_EnableChannelNotifications
-                0x204033dc                Adc_Sar_Ip_DisableChannelNotifications
-                0x20403440                Adc_Sar_Ip_SetSampleTimes
-                0x20403468                Adc_Sar_Ip_SetAveraging
-                0x204034a8                Adc_Sar_Ip_SetClockMode
-                0x20403524                Adc_Sar_Ip_AbortConversion
-                0x20403544                Adc_Sar_Ip_AbortChain
-                0x204035b8                Adc_Sar_Ip_SetPresamplingSource
-                0x20403608                Adc_Sar_Ip_EnableChannelPresampling
-                0x2040364c                Adc_Sar_Ip_DisableChannelPresampling
-                0x20403694                Adc_Sar_Ip_EnablePresampleConversion
-                0x204036c8                Adc_Sar_Ip_DisablePresampleConversion
-                0x204036fc                Adc_Sar_Ip_EnableDma
-                0x2040371c                Adc_Sar_Ip_DisableDma
-                0x2040373c                Adc_Sar_Ip_EnableChannelDma
-                0x20403770                Adc_Sar_Ip_DisableChannelDma
-                0x204037a8                Adc_Sar_Ip_DisableChannelDmaAll
-                0x204037fc                Adc_Sar_Ip_SetDmaClearSource
-                0x2040382c                Adc_Sar_Ip_SetWdgThreshold
-                0x204038d8                Adc_Sar_Ip_Init
-                0x20403cdc                Adc_Sar_Ip_Deinit
-                0x20403e00                Adc_Sar_Ip_SetConversionMode
-                0x20403e3c                Adc_Sar_Ip_SetCtuMode
-                0x20403eb0                Adc_Sar_Ip_SetExternalTrigger
-                0x20403ef4                Adc_Sar_Ip_SetUserGainAndOffset
-                0x20403f10                Adc_Sar_Ip_GetDataAddress
- .mcal_text     0x20403f24       0x12 ./RTD/src/Adc_Sar_Ip_Irq.o
-                0x20403f24                Adc_Sar_0_Isr
-                0x20403f2a                Adc_Sar_1_Isr
-                0x20403f30                Adc_Sar_2_Isr
- *fill*         0x20403f36        0x2 
- .mcal_text     0x20403f38      0x884 ./RTD/src/Clock_Ip.o
-                0x20403f3a                Clock_Ip_InitClock
-                0x204044e0                Clock_Ip_GetPllStatus
-                0x20404584                Clock_Ip_DistributePll
-                0x20404670                Clock_Ip_Init
-                0x20404694                Clock_Ip_DisableClockMonitor
-                0x204046b8                Clock_Ip_InstallNotificationsCallback
-                0x204046c4                Clock_Ip_DisableModuleClock
-                0x204046ec                Clock_Ip_EnableModuleClock
-                0x20404714                Clock_Ip_DisableFircInStandby
-                0x2040472c                Clock_Ip_EnableFircInStandby
-                0x20404744                Clock_Ip_DisableSircInStandby
-                0x2040475c                Clock_Ip_EnableSircInStandby
-                0x20404774                Clock_Ip_ReportClockErrors
-                0x20404780                Clock_Ip_StartTimeout
-                0x204047a0                Clock_Ip_TimeoutExpired
- .mcal_text     0x204047bc      0x1e4 ./RTD/src/Clock_Ip_Divider.o
- .mcal_text     0x204049a0       0xb0 ./RTD/src/Clock_Ip_DividerTrigger.o
- .mcal_text     0x20404a50      0x234 ./RTD/src/Clock_Ip_ExtOsc.o
- .mcal_text     0x20404c84        0x6 ./RTD/src/Clock_Ip_FracDiv.o
- .mcal_text     0x20404c8a        0x2 ./RTD/src/Clock_Ip_Frequency.o
-                0x20404c8a                Clock_Ip_SetExternalSignalFrequency
- .mcal_text     0x20404c8c      0x154 ./RTD/src/Clock_Ip_Gate.o
- .mcal_text     0x20404de0      0x104 ./RTD/src/Clock_Ip_IntOsc.o
- .mcal_text     0x20404ee4        0x4 ./RTD/src/Clock_Ip_Irq.o
-                0x20404ee4                Mcu_Cmu_ClockFail_IRQHandler
- .mcal_text     0x20404ee8      0x288 ./RTD/src/Clock_Ip_Monitor.o
-                0x20405128                Clock_Ip_CMU_ClockFailInt
- .mcal_text     0x20405170      0x184 ./RTD/src/Clock_Ip_Pll.o
- .mcal_text     0x204052f4      0x1f0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
- .mcal_text     0x204054e4      0x3dc ./RTD/src/Clock_Ip_Selector.o
-                0x20405894                Clock_Ip_SetRtcRtccClksel_TrustedCall
- .mcal_text     0x204058c0      0x344 ./RTD/src/Clock_Ip_Specific.o
-                0x204058c0                Clock_Ip_SetFlashWaitStates
-                0x204058c4                Clock_Ip_McMeEnterKey
-                0x204058d8                Clock_Ip_PowerClockIpModules
-                0x20405b58                DisableFircInStandbyMode
-                0x20405b68                EnableFircInStandbyMode
-                0x20405b84                DisableSircInStandbyMode
-                0x20405b94                EnableSircInStandbyMode
-                0x20405bb0                Clock_Ip_Command
-                0x20405c00                Clock_Ip_SetRamWaitStates
- .mcal_text     0x20405c04      0x504 ./RTD/src/Det.o
-                0x20405c04                Det_Start
-                0x20405c06                Det_InitDataNode
-                0x20405c8c                Det_LinkNodeToHead
-                0x20405cbc                Det_DelAllNodesSameId
-                0x20405dba                Det_FreeNodesInLinkedList
-                0x20405df0                Det_Init
-                0x20405fe8                Det_ReportError
-                0x20406048                Det_ReportRuntimeError
-                0x204060a8                Det_ReportTransientFault
- .mcal_text     0x20406108      0x1e0 ./RTD/src/Det_stub.o
-                0x20406108                Det_TestLastReportError
-                0x20406158                Det_TestLastReportRuntimeError
-                0x204061a8                Det_TestLastReportTransientFault
-                0x204061f8                Det_TestNoError
-                0x20406248                Det_TestNoRuntimeError
-                0x20406298                Det_TestNoTransientFault
- .mcal_text     0x204062e8     0x210c ./RTD/src/FlexCAN_Ip.o
-                0x20406a58                FlexCAN_Ip_Init_Privileged
-                0x20406c30                FlexCAN_Ip_Send
-                0x20406ca8                FlexCAN_Ip_ConfigRxMb
-                0x20406d3c                FlexCAN_Ip_Receive
-                0x20406d8c                FlexCAN_Ip_ReceiveBlocking
-                0x20406e7c                FlexCAN_Ip_RxFifo
-                0x20406eb8                FlexCAN_Ip_RxFifoBlocking
-                0x20407070                FlexCAN_Ip_ConfigRxFifo_Privileged
-                0x204070ec                FlexCAN_Ip_ConfigEnhancedRxFifo_Privileged
-                0x20407160                FlexCAN_Ip_ConfigRemoteResponseMb
-                0x20407228                FlexCAN_Ip_GetTransferStatus
-                0x20407274                FlexCAN_IRQHandler
-                0x20407410                FlexCAN_Ip_ClearErrorStatus
-                0x20407430                FlexCAN_Ip_GetErrorStatus
-                0x20407450                FlexCAN_Ip_GetControllerTxErrorCounter
-                0x20407470                FlexCAN_Ip_GetControllerRxErrorCounter
-                0x20407494                FlexCAN_Busoff_Error_IRQHandler
-                0x2040754c                FlexCAN_Ip_SendBlocking
-                0x20407688                FlexCAN_Ip_SetRxMbGlobalMask_Privileged
-                0x204076e0                FlexCAN_Ip_EnterFreezeMode_Privileged
-                0x204076f0                FlexCAN_Ip_ExitFreezeMode_Privileged
-                0x20407700                FlexCAN_Ip_SetRxIndividualMask_Privileged
-                0x2040777c                FlexCAN_Ip_SetRxFifoGlobalMask_Privileged
-                0x204077d4                FlexCAN_Ip_Deinit_Privileged
-                0x204078dc                FlexCAN_Ip_MainFunctionRead
-                0x20407974                FlexCAN_Ip_MainFunctionBusOff_Privileged
-                0x204079a8                FlexCAN_Ip_MainFunctionWrite
-                0x204079ec                FlexCAN_Ip_GetStopMode
-                0x20407a04                FlexCAN_Ip_GetStartMode
-                0x20407a1c                FlexCAN_Ip_SetStartMode_Privileged
-                0x20407a50                FlexCAN_Ip_SetStopMode_Privileged
-                0x20407a80                FlexCAN_Ip_SetRxMaskType_Privileged
-                0x20407aec                FlexCAN_Ip_SetBitrate_Privileged
-                0x20407b90                FlexCAN_Ip_GetBitrate
-                0x20407c44                FlexCAN_Ip_ClearTDCFail
-                0x20407c8c                FlexCAN_Ip_GetTDCFail
-                0x20407cc0                FlexCAN_Ip_GetTDCValue
-                0x20407cf4                FlexCAN_Ip_SetBitrateCbt_Privileged
-                0x20407dc0                FlexCAN_Ip_GetBitrateFD
-                0x20407e58                FlexCAN_Ip_SetTDCOffset_Privileged
-                0x20407f04                FlexCAN_Ip_SetTxArbitrationStartDelay_Privileged
-                0x20407f70                FlexCAN_Ip_GetBuffStatusFlag
-                0x20407fa4                FlexCAN_Ip_ClearBuffStatusFlag
-                0x20407fd4                FlexCAN_Ip_EnableInterrupts_Privileged
-                0x20408028                FlexCAN_Ip_DisableInterrupts_Privileged
-                0x20408074                FlexCAN_Ip_SetErrorInt_Privileged
-                0x2040810c                FlexCAN_Ip_AbortTransfer
-                0x20408244                FlexCAN_Ip_SetRxMb14Mask_Privileged
-                0x2040829c                FlexCAN_Ip_SetRxMb15Mask_Privileged
-                0x204082f4                FlexCAN_Ip_SetListenOnlyMode_Privileged
-                0x20408364                FlexCAN_Ip_GetListenOnlyMode
-                0x20408378                FlexCAN_Ip_ManualBusOffRecovery
- .mcal_text     0x204083f4      0xf24 ./RTD/src/FlexCAN_Ip_HwAccess.o
-                0x20408426                FlexCAN_ComputePayloadSize
-                0x20408440                FlexCAN_GetMsgBuffRegion
-                0x20408490                FlexCAN_GetMaxMbNum
-                0x204084dc                FlexCAN_EnterFreezeMode
-                0x2040853c                FlexCAN_Enable
-                0x20408588                FlexCAN_ExitFreezeMode
-                0x204085dc                FlexCAN_Disable
-                0x2040862e                FlexCAN_SetErrIntCmd
-                0x20408696                FlexCAN_Init
-                0x20408780                FlexCAN_EnableRxFifo
-                0x204087ce                FlexCAN_SetPayloadSize
-                0x2040883c                FlexCAN_GetMbPayloadSize
-                0x20408870                FlexCAN_LockRxMsgBuff
-                0x2040887a                FlexCAN_SetMsgBuffIntCmd
-                0x20408950                FLEXCAN_ClearMsgBuffIntCmd
-                0x204089d8                FlexCAN_DisableInterrupts
-                0x204089f2                FlexCAN_EnableInterrupts
-                0x20408a1c                FlexCAN_SetRxMsgBuff
-                0x20408aa8                FlexCAN_GetMsgBuffTimestamp
-                0x20408ab4                FlexCAN_GetMsgBuff
-                0x20408b4c                FlexCAN_SetTxMsgBuff
-                0x20408c64                FlexCAN_SetMaxMsgBuffNum
-                0x20408cfe                FlexCAN_SetOperationMode
-                0x20408d34                FlexCAN_SetRxFifoFilter
-                0x20408ea0                FlexCAN_ReadRxFifo
-                0x20408f04                FlexCAN_ReadEnhancedRxFifo
-                0x20408fa8                FlexCAN_IsMbOutOfRange
-                0x20408fc8                FlexCAN_IsEnhancedRxFifoAvailable
-                0x20408fd8                FlexCAN_IsEnhancedRxFifoEnabled
-                0x20408fea                FlexCAN_EnableEnhancedRxFifo
-                0x2040908e                FlexCAN_SetEnhancedRxFifoFilter
-                0x2040921c                FlexCAN_ConfigCtrlOptions
-                0x204092a8                FlexCAN_ResetImaskBuff
-                0x204092c0                FlexCAN_GetStopMode
-                0x204092c8                FlexCAN_GetStartMode
-                0x204092d6                FlexCAN_DisableMemErrorDetection
- .mcal_text     0x20409318       0x9c ./RTD/src/FlexCAN_Ip_Irq.o
-                0x20409318                CAN0_ORED_IRQHandler
-                0x2040931e                CAN0_ORED_0_31_MB_IRQHandler
-                0x2040932a                CAN0_ORED_32_63_MB_IRQHandler
-                0x20409336                CAN0_ORED_64_95_MB_IRQHandler
-                0x20409342                CAN1_ORED_IRQHandler
-                0x20409348                CAN1_ORED_0_31_MB_IRQHandler
-                0x20409354                CAN1_ORED_32_63_MB_IRQHandler
-                0x20409360                CAN2_ORED_IRQHandler
-                0x20409366                CAN2_ORED_0_31_MB_IRQHandler
-                0x20409372                CAN2_ORED_32_63_MB_IRQHandler
-                0x2040937e                CAN3_ORED_IRQHandler
-                0x20409384                CAN3_ORED_0_31_MB_IRQHandler
-                0x20409390                CAN4_ORED_IRQHandler
-                0x20409396                CAN4_ORED_0_31_MB_IRQHandler
-                0x204093a2                CAN5_ORED_IRQHandler
-                0x204093a8                CAN5_ORED_0_31_MB_IRQHandler
- .mcal_text     0x204093b4      0x276 ./RTD/src/IntCtrl_Ip.o
-                0x204093b4                IntCtrl_Ip_InstallHandlerPrivileged
-                0x204093ee                IntCtrl_Ip_EnableIrqPrivileged
-                0x2040942e                IntCtrl_Ip_DisableIrqPrivileged
-                0x2040946e                IntCtrl_Ip_SetPriorityPrivileged
-                0x204094a2                IntCtrl_Ip_GetPriorityPrivileged
-                0x204094c6                IntCtrl_Ip_ClearPendingPrivileged
-                0x204094f6                IntCtrl_Ip_SetPendingPrivileged
-                0x20409526                IntCtrl_Ip_GetPendingPrivileged
-                0x20409556                IntCtrl_Ip_GetActivePrivileged
-                0x20409586                IntCtrl_Ip_Init
-                0x204095f2                IntCtrl_Ip_InstallHandler
-                0x204095f6                IntCtrl_Ip_EnableIrq
-                0x204095fa                IntCtrl_Ip_DisableIrq
-                0x204095fe                IntCtrl_Ip_SetPriority
-                0x20409602                IntCtrl_Ip_GetPriority
-                0x20409606                IntCtrl_Ip_ClearPending
-                0x2040960a                IntCtrl_Ip_SetPending
-                0x2040960e                IntCtrl_Ip_GetPending
-                0x2040961c                IntCtrl_Ip_GetActive
- *fill*         0x2040962a        0x2 
- .mcal_text     0x2040962c      0x804 ./RTD/src/Lpspi_Ip.o
-                0x20409944                Lpspi_Ip_DeInit
-                0x20409978                Lpspi_Ip_SyncTransmit
-                0x20409bd0                Lpspi_Ip_AsyncTransmit
-                0x20409c54                Lpspi_Ip_ManageBuffers
-                0x20409c84                Lpspi_Ip_UpdateTransferParam
-                0x20409cb8                Lpspi_Ip_UpdateFrameSize
-                0x20409cd4                Lpspi_Ip_UpdateLsb
-                0x20409cf0                Lpspi_Ip_UpdateByteSwap
-                0x20409d0c                Lpspi_Ip_UpdateDefaultTransmitData
-                0x20409d28                Lpspi_Ip_UpdateTransferMode
-                0x20409d40                Lpspi_Ip_Init
-                0x20409d90                Lpspi_Ip_Cancel
-                0x20409ddc                Lpspi_Ip_IrqHandler
-                0x20409e20                Lpspi_Ip_GetStatus
- .mcal_text     0x20409e30        0x6 ./RTD/src/Lpspi_Ip_Irq.o
-                0x20409e30                Lpspi_Ip_LPSPI_1_IRQHandler
- .mcal_text     0x20409e36       0x44 ./RTD/src/OsIf_Timer.o
-                0x20409e36                OsIf_Init
-                0x20409e40                OsIf_GetCounter
-                0x20409e4c                OsIf_GetElapsed
-                0x20409e5e                OsIf_SetTimerFrequency
-                0x20409e68                OsIf_MicrosToTicks
- *fill*         0x20409e7a        0x2 
- .mcal_text     0x20409e7c       0xdc ./RTD/src/OsIf_Timer_System.o
-                0x20409e7c                OsIf_Timer_System_Init
-                0x20409eac                OsIf_Timer_System_GetCounter
-                0x20409ecc                OsIf_Timer_System_GetElapsed
-                0x20409eec                OsIf_Timer_System_SetTimerFrequency
-                0x20409f14                OsIf_Timer_System_MicrosToTicks
- .mcal_text     0x20409f58       0x4c ./RTD/src/OsIf_Timer_System_Internal_Systick.o
-                0x20409f58                OsIf_Timer_System_Internal_Init
-                0x20409f6e                OsIf_Timer_System_Internal_GetCounter
-                0x20409f7a                OsIf_Timer_System_Internal_GetElapsed
- .mcal_text     0x20409fa4      0x3a0 ./RTD/src/Pit_Ip.o
-                0x20409ff8                Pit_Ip_GetLoadValue
-                0x2040a00c                Pit_Ip_GetInterruptStatusFlag
-                0x2040a030                Pit_Ip_Init
-                0x2040a05c                Pit_Ip_InitChannel
-                0x2040a0bc                Pit_Ip_Deinit
-                0x2040a140                Pit_Ip_StartChannel
-                0x2040a174                Pit_Ip_StopChannel
-                0x2040a18a                Pit_Ip_GetCurrentTimer
-                0x2040a1a0                Pit_Ip_EnableChannelInterrupt
-                0x2040a1d0                Pit_Ip_DisableChannelInterrupt
-                0x2040a200                Pit_Ip_SetLifetimeTimer
-                0x2040a29c                Pit_Ip_GetLifetimeTimer
-                0x2040a2c8                PIT_0_ISR
- .mcal_text     0x2040a344     0x2648 ./RTD/src/SchM_Adc.o
-                0x2040a344                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_00
-                0x2040a378                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_00
-                0x2040a3a8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_01
-                0x2040a3dc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_01
-                0x2040a40c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_02
-                0x2040a440                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_02
-                0x2040a470                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_03
-                0x2040a4a4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_03
-                0x2040a4d4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_04
-                0x2040a508                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_04
-                0x2040a538                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_05
-                0x2040a56c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_05
-                0x2040a59c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_10
-                0x2040a5d0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_10
-                0x2040a600                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_100
-                0x2040a634                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_100
-                0x2040a664                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_101
-                0x2040a698                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_101
-                0x2040a6c8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_102
-                0x2040a6fc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_102
-                0x2040a72c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_103
-                0x2040a760                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_103
-                0x2040a790                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_11
-                0x2040a7c4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_11
-                0x2040a7f4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_12
-                0x2040a828                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_12
-                0x2040a858                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_13
-                0x2040a88c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_13
-                0x2040a8bc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_14
-                0x2040a8f0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_14
-                0x2040a920                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_15
-                0x2040a954                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_15
-                0x2040a984                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_16
-                0x2040a9b8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_16
-                0x2040a9e8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_17
-                0x2040aa1c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_17
-                0x2040aa4c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_18
-                0x2040aa80                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_18
-                0x2040aab0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_19
-                0x2040aae4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_19
-                0x2040ab14                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_20
-                0x2040ab48                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_20
-                0x2040ab78                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_21
-                0x2040abac                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_21
-                0x2040abdc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_22
-                0x2040ac10                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_22
-                0x2040ac40                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_23
-                0x2040ac74                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_23
-                0x2040aca4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_24
-                0x2040acd8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_24
-                0x2040ad08                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_25
-                0x2040ad3c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_25
-                0x2040ad6c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_26
-                0x2040ada0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_26
-                0x2040add0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_27
-                0x2040ae04                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_27
-                0x2040ae34                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_28
-                0x2040ae68                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_28
-                0x2040ae98                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_29
-                0x2040aecc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_29
-                0x2040aefc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_30
-                0x2040af30                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_30
-                0x2040af60                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_31
-                0x2040af94                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_31
-                0x2040afc4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_32
-                0x2040aff8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_32
-                0x2040b028                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_33
-                0x2040b05c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_33
-                0x2040b08c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_34
-                0x2040b0c0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_34
-                0x2040b0f0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_35
-                0x2040b124                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_35
-                0x2040b154                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_36
-                0x2040b188                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_36
-                0x2040b1b8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_37
-                0x2040b1ec                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_37
-                0x2040b21c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_38
-                0x2040b250                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_38
-                0x2040b280                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_39
-                0x2040b2b4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_39
-                0x2040b2e4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_40
-                0x2040b318                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_40
-                0x2040b348                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_41
-                0x2040b37c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_41
-                0x2040b3ac                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_42
-                0x2040b3e0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_42
-                0x2040b410                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_43
-                0x2040b444                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_43
-                0x2040b474                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_44
-                0x2040b4a8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_44
-                0x2040b4d8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_45
-                0x2040b50c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_45
-                0x2040b53c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_46
-                0x2040b570                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_46
-                0x2040b5a0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_47
-                0x2040b5d4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_47
-                0x2040b604                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_48
-                0x2040b638                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_48
-                0x2040b668                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_49
-                0x2040b69c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_49
-                0x2040b6cc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_50
-                0x2040b700                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_50
-                0x2040b730                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_51
-                0x2040b764                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_51
-                0x2040b794                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_54
-                0x2040b7c8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_54
-                0x2040b7f8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_55
-                0x2040b82c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_55
-                0x2040b85c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_56
-                0x2040b890                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_56
-                0x2040b8c0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_57
-                0x2040b8f4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_57
-                0x2040b924                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_58
-                0x2040b958                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_58
-                0x2040b988                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_59
-                0x2040b9bc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_59
-                0x2040b9ec                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_60
-                0x2040ba20                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_60
-                0x2040ba50                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_61
-                0x2040ba84                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_61
-                0x2040bab4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_62
-                0x2040bae8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_62
-                0x2040bb18                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_63
-                0x2040bb4c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_63
-                0x2040bb7c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_64
-                0x2040bbb0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_64
-                0x2040bbe0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_65
-                0x2040bc14                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_65
-                0x2040bc44                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_66
-                0x2040bc78                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_66
-                0x2040bca8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_67
-                0x2040bcdc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_67
-                0x2040bd0c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_68
-                0x2040bd40                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_68
-                0x2040bd70                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_69
-                0x2040bda4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_69
-                0x2040bdd4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_70
-                0x2040be08                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_70
-                0x2040be38                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_71
-                0x2040be6c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_71
-                0x2040be9c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_72
-                0x2040bed0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_72
-                0x2040bf00                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_73
-                0x2040bf34                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_73
-                0x2040bf64                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_74
-                0x2040bf98                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_74
-                0x2040bfc8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_75
-                0x2040bffc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_75
-                0x2040c02c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_76
-                0x2040c060                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_76
-                0x2040c090                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_77
-                0x2040c0c4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_77
-                0x2040c0f4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_78
-                0x2040c128                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_78
-                0x2040c158                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_79
-                0x2040c18c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_79
-                0x2040c1bc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_80
-                0x2040c1f0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_80
-                0x2040c220                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_81
-                0x2040c254                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_81
-                0x2040c284                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_82
-                0x2040c2b8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_82
-                0x2040c2e8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_83
-                0x2040c31c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_83
-                0x2040c34c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_84
-                0x2040c380                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_84
-                0x2040c3b0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_85
-                0x2040c3e4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_85
-                0x2040c414                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_86
-                0x2040c448                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_86
-                0x2040c478                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_87
-                0x2040c4ac                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_87
-                0x2040c4dc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_88
-                0x2040c510                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_88
-                0x2040c540                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_89
-                0x2040c574                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_89
-                0x2040c5a4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_90
-                0x2040c5d8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_90
-                0x2040c608                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_91
-                0x2040c63c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_91
-                0x2040c66c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_92
-                0x2040c6a0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_92
-                0x2040c6d0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_93
-                0x2040c704                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_93
-                0x2040c734                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_94
-                0x2040c768                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_94
-                0x2040c798                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_95
-                0x2040c7cc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_95
-                0x2040c7fc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_96
-                0x2040c830                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_96
-                0x2040c860                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_97
-                0x2040c894                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_97
-                0x2040c8c4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_98
-                0x2040c8f8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_98
-                0x2040c928                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_99
-                0x2040c95c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_99
- .mcal_text     0x2040c98c       0xc8 ./RTD/src/SchM_BaseNXP.o
-                0x2040c98c                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
-                0x2040c9c0                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
-                0x2040c9f0                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
-                0x2040ca24                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
- .mcal_text     0x2040ca54      0x960 ./RTD/src/SchM_Can_43_FLEXCAN.o
-                0x2040ca54                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_00
-                0x2040ca88                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_00
-                0x2040cab8                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_01
-                0x2040caec                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_01
-                0x2040cb1c                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_02
-                0x2040cb50                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_02
-                0x2040cb80                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_03
-                0x2040cbb4                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_03
-                0x2040cbe4                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_04
-                0x2040cc18                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_04
-                0x2040cc48                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_05
-                0x2040cc7c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_05
-                0x2040ccac                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_06
-                0x2040cce0                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_06
-                0x2040cd10                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_07
-                0x2040cd44                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_07
-                0x2040cd74                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_08
-                0x2040cda8                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_08
-                0x2040cdd8                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_09
-                0x2040ce0c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_09
-                0x2040ce3c                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_10
-                0x2040ce70                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_10
-                0x2040cea0                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_11
-                0x2040ced4                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_11
-                0x2040cf04                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_12
-                0x2040cf38                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_12
-                0x2040cf68                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_13
-                0x2040cf9c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_13
-                0x2040cfcc                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_14
-                0x2040d000                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_14
-                0x2040d030                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_15
-                0x2040d064                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_15
-                0x2040d094                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_16
-                0x2040d0c8                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_16
-                0x2040d0f8                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_17
-                0x2040d12c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_17
-                0x2040d15c                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_18
-                0x2040d190                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_18
-                0x2040d1c0                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_19
-                0x2040d1f4                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_19
-                0x2040d224                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_20
-                0x2040d258                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_20
-                0x2040d288                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_21
-                0x2040d2bc                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_21
-                0x2040d2ec                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_22
-                0x2040d320                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_22
-                0x2040d350                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_23
-                0x2040d384                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_23
- .mcal_text     0x2040d3b4       0xc8 ./RTD/src/SchM_Dio.o
-                0x2040d3b4                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_00
-                0x2040d3e8                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_00
-                0x2040d418                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_01
-                0x2040d44c                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_01
- .mcal_text     0x2040d47c     0x1a2c ./RTD/src/SchM_Gpt.o
-                0x2040d47c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_00
-                0x2040d4b0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_00
-                0x2040d4e0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_01
-                0x2040d514                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_01
-                0x2040d544                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_02
-                0x2040d578                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_02
-                0x2040d5a8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_03
-                0x2040d5dc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_03
-                0x2040d60c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_04
-                0x2040d640                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_04
-                0x2040d670                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_05
-                0x2040d6a4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_05
-                0x2040d6d4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_06
-                0x2040d708                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_06
-                0x2040d738                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_07
-                0x2040d76c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_07
-                0x2040d79c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_08
-                0x2040d7d0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_08
-                0x2040d800                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_09
-                0x2040d834                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_09
-                0x2040d864                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_10
-                0x2040d898                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_10
-                0x2040d8c8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_11
-                0x2040d8fc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_11
-                0x2040d92c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_15
-                0x2040d960                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_15
-                0x2040d990                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_16
-                0x2040d9c4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_16
-                0x2040d9f4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_17
-                0x2040da28                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_17
-                0x2040da58                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_18
-                0x2040da8c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_18
-                0x2040dabc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_19
-                0x2040daf0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_19
-                0x2040db20                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_21
-                0x2040db54                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_21
-                0x2040db84                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_22
-                0x2040dbb8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_22
-                0x2040dbe8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_23
-                0x2040dc1c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_23
-                0x2040dc4c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_24
-                0x2040dc80                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_24
-                0x2040dcb0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_25
-                0x2040dce4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_25
-                0x2040dd14                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_26
-                0x2040dd48                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_26
-                0x2040dd78                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_29
-                0x2040ddac                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_29
-                0x2040dddc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_30
-                0x2040de10                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_30
-                0x2040de40                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_31
-                0x2040de74                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_31
-                0x2040dea4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_35
-                0x2040ded8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_35
-                0x2040df08                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_36
-                0x2040df3c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_36
-                0x2040df6c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_38
-                0x2040dfa0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_38
-                0x2040dfd0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_39
-                0x2040e004                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_39
-                0x2040e034                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_40
-                0x2040e068                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_40
-                0x2040e098                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_41
-                0x2040e0cc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_41
-                0x2040e0fc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_42
-                0x2040e130                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_42
-                0x2040e160                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_43
-                0x2040e194                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_43
-                0x2040e1c4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_44
-                0x2040e1f8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_44
-                0x2040e228                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_45
-                0x2040e25c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_45
-                0x2040e28c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_46
-                0x2040e2c0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_46
-                0x2040e2f0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_50
-                0x2040e324                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_50
-                0x2040e354                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_51
-                0x2040e388                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_51
-                0x2040e3b8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_52
-                0x2040e3ec                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_52
-                0x2040e41c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_53
-                0x2040e450                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_53
-                0x2040e480                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_54
-                0x2040e4b4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_54
-                0x2040e4e4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_55
-                0x2040e518                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_55
-                0x2040e548                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_56
-                0x2040e57c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_56
-                0x2040e5ac                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_60
-                0x2040e5e0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_60
-                0x2040e610                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_61
-                0x2040e644                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_61
-                0x2040e674                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_64
-                0x2040e6a8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_64
-                0x2040e6d8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_65
-                0x2040e70c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_65
-                0x2040e73c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_66
-                0x2040e770                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_66
-                0x2040e7a0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_67
-                0x2040e7d4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_67
-                0x2040e804                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_68
-                0x2040e838                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_68
-                0x2040e868                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_69
-                0x2040e89c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_69
-                0x2040e8cc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_70
-                0x2040e900                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_70
-                0x2040e930                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_71
-                0x2040e964                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_71
-                0x2040e994                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_72
-                0x2040e9c8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_72
-                0x2040e9f8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_73
-                0x2040ea2c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_73
-                0x2040ea5c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_80
-                0x2040ea90                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_80
-                0x2040eac0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_81
-                0x2040eaf4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_81
-                0x2040eb24                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_82
-                0x2040eb58                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_82
-                0x2040eb88                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_83
-                0x2040ebbc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_83
-                0x2040ebec                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_84
-                0x2040ec20                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_84
-                0x2040ec50                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_85
-                0x2040ec84                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_85
-                0x2040ecb4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_86
-                0x2040ece8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_86
-                0x2040ed18                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_87
-                0x2040ed4c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_87
-                0x2040ed7c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_89
-                0x2040edb0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_89
-                0x2040ede0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_90
-                0x2040ee14                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_90
-                0x2040ee44                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_91
-                0x2040ee78                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_91
- .mcal_text     0x2040eea8      0x12c ./RTD/src/SchM_Mcu.o
-                0x2040eea8                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_00
-                0x2040eedc                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_00
-                0x2040ef0c                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_01
-                0x2040ef40                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_01
-                0x2040ef70                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_02
-                0x2040efa4                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_02
- .mcal_text     0x2040efd4      0xaf0 ./RTD/src/SchM_Port.o
-                0x2040efd4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_00
-                0x2040f008                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_00
-                0x2040f038                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_01
-                0x2040f06c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_01
-                0x2040f09c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_02
-                0x2040f0d0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_02
-                0x2040f100                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_03
-                0x2040f134                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_03
-                0x2040f164                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_04
-                0x2040f198                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_04
-                0x2040f1c8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_05
-                0x2040f1fc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_05
-                0x2040f22c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_06
-                0x2040f260                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_06
-                0x2040f290                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_07
-                0x2040f2c4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_07
-                0x2040f2f4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_08
-                0x2040f328                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_08
-                0x2040f358                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_09
-                0x2040f38c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_09
-                0x2040f3bc                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_10
-                0x2040f3f0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_10
-                0x2040f420                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_11
-                0x2040f454                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_11
-                0x2040f484                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_12
-                0x2040f4b8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_12
-                0x2040f4e8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_13
-                0x2040f51c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_13
-                0x2040f54c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_14
-                0x2040f580                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_14
-                0x2040f5b0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_15
-                0x2040f5e4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_15
-                0x2040f614                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_16
-                0x2040f648                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_16
-                0x2040f678                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_17
-                0x2040f6ac                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_17
-                0x2040f6dc                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_18
-                0x2040f710                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_18
-                0x2040f740                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_19
-                0x2040f774                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_19
-                0x2040f7a4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_20
-                0x2040f7d8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_20
-                0x2040f808                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_21
-                0x2040f83c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_21
-                0x2040f86c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_22
-                0x2040f8a0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_22
-                0x2040f8d0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_23
-                0x2040f904                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_23
-                0x2040f934                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_24
-                0x2040f968                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_24
-                0x2040f998                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_25
-                0x2040f9cc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_25
-                0x2040f9fc                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_26
-                0x2040fa30                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_26
-                0x2040fa60                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_27
-                0x2040fa94                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_27
- .mcal_text     0x2040fac4      0xa28 ./RTD/src/SchM_Spi.o
-                0x2040fac4                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_00
-                0x2040faf8                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_00
-                0x2040fb28                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_01
-                0x2040fb5c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_01
-                0x2040fb8c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_02
-                0x2040fbc0                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_02
-                0x2040fbf0                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_03
-                0x2040fc24                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_03
-                0x2040fc54                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_04
-                0x2040fc88                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_04
-                0x2040fcb8                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_05
-                0x2040fcec                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_05
-                0x2040fd1c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_06
-                0x2040fd50                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_06
-                0x2040fd80                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_07
-                0x2040fdb4                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_07
-                0x2040fde4                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_08
-                0x2040fe18                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_08
-                0x2040fe48                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_09
-                0x2040fe7c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_09
-                0x2040feac                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_10
-                0x2040fee0                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_10
-                0x2040ff10                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_11
-                0x2040ff44                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_11
-                0x2040ff74                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_12
-                0x2040ffa8                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_12
-                0x2040ffd8                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_13
-                0x2041000c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_13
-                0x2041003c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_14
-                0x20410070                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_14
-                0x204100a0                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_15
-                0x204100d4                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_15
-                0x20410104                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_16
-                0x20410138                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_16
-                0x20410168                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_17
-                0x2041019c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_17
-                0x204101cc                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_18
-                0x20410200                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_18
-                0x20410230                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_19
-                0x20410264                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_19
-                0x20410294                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_20
-                0x204102c8                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_20
-                0x204102f8                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_21
-                0x2041032c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_21
-                0x2041035c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_22
-                0x20410390                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_22
-                0x204103c0                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_23
-                0x204103f4                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_23
-                0x20410424                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_24
-                0x20410458                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_24
-                0x20410488                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_25
-                0x204104bc                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_25
- .mcal_text     0x204104ec      0x1fc ./RTD/src/Siul2_Dio_Ip.o
-                0x20410520                Siul2_Dio_Ip_WritePin
-                0x2041058c                Siul2_Dio_Ip_SetGPDO
-                0x204105a8                Siul2_Dio_Ip_ClearGPDO
-                0x204105c4                Siul2_Dio_Ip_WritePins
-                0x204105dc                Siul2_Dio_Ip_GetPinsOutput
-                0x204105f4                Siul2_Dio_Ip_SetPins
-                0x20410612                Siul2_Dio_Ip_ClearPins
-                0x20410632                Siul2_Dio_Ip_TogglePins
-                0x20410650                Siul2_Dio_Ip_ReadPins
-                0x2041066a                Siul2_Dio_Ip_ReadPin
-                0x2041069c                Siul2_Dio_Ip_MaskedWritePins
- .mcal_text     0x204106e8      0x458 ./RTD/src/Siul2_Port_Ip.o
-                0x2041083c                Siul2_Port_Ip_Init
-                0x2041086c                Siul2_Port_Ip_SetPullSel
-                0x204108c8                Siul2_Port_Ip_SetOutputBuffer
-                0x2041092e                Siul2_Port_Ip_SetInputBuffer
-                0x2041099e                Siul2_Port_Ip_SetPinDirection
-                0x20410a16                Siul2_Port_Ip_RevertPinConfiguration
-                0x20410a78                Siul2_Port_Ip_GetPinConfiguration
- .mcal_text     0x20410b40      0x11c ./RTD/src/Tspc_Port_Ip.o
-                0x20410b40                Tspc_Port_Ip_EnableObeGroup
-                0x20410b70                Tspc_Port_Ip_DisableObeGroup
-                0x20410ba0                Tspc_Port_Ip_MaskObeGroup
-                0x20410bbe                Tspc_Port_Ip_ConfigureObeGroup
-                0x20410c5c                . = ALIGN (0x4)
+ .mcal_text     0x20402554       0x14 ./Project_Settings/Startup_Code/exceptions.o
+                0x20402554                NMI_Handler
+                0x20402556                HardFault_Handler
+                0x20402558                MemManage_Handler
+                0x2040255a                BusFault_Handler
+                0x2040255c                UsageFault_Handler
+                0x2040255e                SVC_Handler
+                0x20402560                DebugMon_Handler
+                0x20402562                PendSV_Handler
+                0x20402564                SysTick_Handler
+                0x20402566                undefined_handler
+ .mcal_text     0x20402568       0x52 ./Project_Settings/Startup_Code/nvic.o
+                0x20402568                NVIC_SetPriorityGrouping
+                0x2040257c                NVIC_EnableIRQ
+                0x20402594                NVIC_DisableIRQ
+                0x204025ac                NVIC_SetPriority
+ *fill*         0x204025ba        0x2 
+ .mcal_text     0x204025bc       0xe8 ./Project_Settings/Startup_Code/startup.o
+                0x204025bc                init_data_bss
+                0x20402648                init_data_bss_core2
+ .mcal_text     0x204026a4      0x338 ./Project_Settings/Startup_Code/system.o
+                0x204026a4                startup_go_to_user_mode
+                0x204026a6                default_interrupt_routine
+                0x204026a8                Sys_GetCoreID
+                0x204026b8                SystemInit
+                0x204029c0                Enable_FPU
+ .mcal_text     0x204029dc     0x154c ./RTD/src/Adc_Sar_Ip.o
+                0x20402c18                Adc_Sar_Ip_IRQHandler
+                0x20402ece                Adc_Sar_Ip_ChainConfig
+                0x20402eda                Adc_Sar_Ip_EnableChannel
+                0x20402f2c                Adc_Sar_Ip_DisableChannel
+                0x20402f84                Adc_Sar_Ip_SetResolution
+                0x20402fb8                Adc_Sar_Ip_StartConversion
+                0x20402fec                Adc_Sar_Ip_GetStatusFlags
+                0x20403050                Adc_Sar_Ip_ClearStatusFlags
+                0x20403074                Adc_Sar_Ip_GetConvDataToArray
+                0x20403086                Adc_Sar_Ip_GetConvResultsToArray
+                0x20403096                Adc_Sar_Ip_GetConvData
+                0x204030d0                Adc_Sar_Ip_GetConvResult
+                0x20403138                Adc_Sar_Ip_Powerup
+                0x2040319c                Adc_Sar_Ip_Powerdown
+                0x20403204                Adc_Sar_Ip_DoCalibration
+                0x20403310                Adc_Sar_Ip_EnableNotifications
+                0x2040334c                Adc_Sar_Ip_DisableNotifications
+                0x20403384                Adc_Sar_Ip_EnableChannelNotifications
+                0x204033e0                Adc_Sar_Ip_DisableChannelNotifications
+                0x20403444                Adc_Sar_Ip_SetSampleTimes
+                0x2040346c                Adc_Sar_Ip_SetAveraging
+                0x204034ac                Adc_Sar_Ip_SetClockMode
+                0x20403528                Adc_Sar_Ip_AbortConversion
+                0x20403548                Adc_Sar_Ip_AbortChain
+                0x204035bc                Adc_Sar_Ip_SetPresamplingSource
+                0x2040360c                Adc_Sar_Ip_EnableChannelPresampling
+                0x20403650                Adc_Sar_Ip_DisableChannelPresampling
+                0x20403698                Adc_Sar_Ip_EnablePresampleConversion
+                0x204036cc                Adc_Sar_Ip_DisablePresampleConversion
+                0x20403700                Adc_Sar_Ip_EnableDma
+                0x20403720                Adc_Sar_Ip_DisableDma
+                0x20403740                Adc_Sar_Ip_EnableChannelDma
+                0x20403774                Adc_Sar_Ip_DisableChannelDma
+                0x204037ac                Adc_Sar_Ip_DisableChannelDmaAll
+                0x20403800                Adc_Sar_Ip_SetDmaClearSource
+                0x20403830                Adc_Sar_Ip_SetWdgThreshold
+                0x204038dc                Adc_Sar_Ip_Init
+                0x20403ce0                Adc_Sar_Ip_Deinit
+                0x20403e04                Adc_Sar_Ip_SetConversionMode
+                0x20403e40                Adc_Sar_Ip_SetCtuMode
+                0x20403eb4                Adc_Sar_Ip_SetExternalTrigger
+                0x20403ef8                Adc_Sar_Ip_SetUserGainAndOffset
+                0x20403f14                Adc_Sar_Ip_GetDataAddress
+ .mcal_text     0x20403f28       0x12 ./RTD/src/Adc_Sar_Ip_Irq.o
+                0x20403f28                Adc_Sar_0_Isr
+                0x20403f2e                Adc_Sar_1_Isr
+                0x20403f34                Adc_Sar_2_Isr
+ *fill*         0x20403f3a        0x2 
+ .mcal_text     0x20403f3c      0x884 ./RTD/src/Clock_Ip.o
+                0x20403f3e                Clock_Ip_InitClock
+                0x204044e4                Clock_Ip_GetPllStatus
+                0x20404588                Clock_Ip_DistributePll
+                0x20404674                Clock_Ip_Init
+                0x20404698                Clock_Ip_DisableClockMonitor
+                0x204046bc                Clock_Ip_InstallNotificationsCallback
+                0x204046c8                Clock_Ip_DisableModuleClock
+                0x204046f0                Clock_Ip_EnableModuleClock
+                0x20404718                Clock_Ip_DisableFircInStandby
+                0x20404730                Clock_Ip_EnableFircInStandby
+                0x20404748                Clock_Ip_DisableSircInStandby
+                0x20404760                Clock_Ip_EnableSircInStandby
+                0x20404778                Clock_Ip_ReportClockErrors
+                0x20404784                Clock_Ip_StartTimeout
+                0x204047a4                Clock_Ip_TimeoutExpired
+ .mcal_text     0x204047c0      0x1e4 ./RTD/src/Clock_Ip_Divider.o
+ .mcal_text     0x204049a4       0xb0 ./RTD/src/Clock_Ip_DividerTrigger.o
+ .mcal_text     0x20404a54      0x234 ./RTD/src/Clock_Ip_ExtOsc.o
+ .mcal_text     0x20404c88        0x6 ./RTD/src/Clock_Ip_FracDiv.o
+ .mcal_text     0x20404c8e        0x2 ./RTD/src/Clock_Ip_Frequency.o
+                0x20404c8e                Clock_Ip_SetExternalSignalFrequency
+ .mcal_text     0x20404c90      0x154 ./RTD/src/Clock_Ip_Gate.o
+ .mcal_text     0x20404de4      0x104 ./RTD/src/Clock_Ip_IntOsc.o
+ .mcal_text     0x20404ee8        0x4 ./RTD/src/Clock_Ip_Irq.o
+                0x20404ee8                Mcu_Cmu_ClockFail_IRQHandler
+ .mcal_text     0x20404eec      0x288 ./RTD/src/Clock_Ip_Monitor.o
+                0x2040512c                Clock_Ip_CMU_ClockFailInt
+ .mcal_text     0x20405174      0x184 ./RTD/src/Clock_Ip_Pll.o
+ .mcal_text     0x204052f8      0x1f0 ./RTD/src/Clock_Ip_ProgFreqSwitch.o
+ .mcal_text     0x204054e8      0x3dc ./RTD/src/Clock_Ip_Selector.o
+                0x20405898                Clock_Ip_SetRtcRtccClksel_TrustedCall
+ .mcal_text     0x204058c4      0x344 ./RTD/src/Clock_Ip_Specific.o
+                0x204058c4                Clock_Ip_SetFlashWaitStates
+                0x204058c8                Clock_Ip_McMeEnterKey
+                0x204058dc                Clock_Ip_PowerClockIpModules
+                0x20405b5c                DisableFircInStandbyMode
+                0x20405b6c                EnableFircInStandbyMode
+                0x20405b88                DisableSircInStandbyMode
+                0x20405b98                EnableSircInStandbyMode
+                0x20405bb4                Clock_Ip_Command
+                0x20405c04                Clock_Ip_SetRamWaitStates
+ .mcal_text     0x20405c08      0x504 ./RTD/src/Det.o
+                0x20405c08                Det_Start
+                0x20405c0a                Det_InitDataNode
+                0x20405c90                Det_LinkNodeToHead
+                0x20405cc0                Det_DelAllNodesSameId
+                0x20405dbe                Det_FreeNodesInLinkedList
+                0x20405df4                Det_Init
+                0x20405fec                Det_ReportError
+                0x2040604c                Det_ReportRuntimeError
+                0x204060ac                Det_ReportTransientFault
+ .mcal_text     0x2040610c      0x1e0 ./RTD/src/Det_stub.o
+                0x2040610c                Det_TestLastReportError
+                0x2040615c                Det_TestLastReportRuntimeError
+                0x204061ac                Det_TestLastReportTransientFault
+                0x204061fc                Det_TestNoError
+                0x2040624c                Det_TestNoRuntimeError
+                0x2040629c                Det_TestNoTransientFault
+ .mcal_text     0x204062ec     0x210c ./RTD/src/FlexCAN_Ip.o
+                0x20406a5c                FlexCAN_Ip_Init_Privileged
+                0x20406c34                FlexCAN_Ip_Send
+                0x20406cac                FlexCAN_Ip_ConfigRxMb
+                0x20406d40                FlexCAN_Ip_Receive
+                0x20406d90                FlexCAN_Ip_ReceiveBlocking
+                0x20406e80                FlexCAN_Ip_RxFifo
+                0x20406ebc                FlexCAN_Ip_RxFifoBlocking
+                0x20407074                FlexCAN_Ip_ConfigRxFifo_Privileged
+                0x204070f0                FlexCAN_Ip_ConfigEnhancedRxFifo_Privileged
+                0x20407164                FlexCAN_Ip_ConfigRemoteResponseMb
+                0x2040722c                FlexCAN_Ip_GetTransferStatus
+                0x20407278                FlexCAN_IRQHandler
+                0x20407414                FlexCAN_Ip_ClearErrorStatus
+                0x20407434                FlexCAN_Ip_GetErrorStatus
+                0x20407454                FlexCAN_Ip_GetControllerTxErrorCounter
+                0x20407474                FlexCAN_Ip_GetControllerRxErrorCounter
+                0x20407498                FlexCAN_Busoff_Error_IRQHandler
+                0x20407550                FlexCAN_Ip_SendBlocking
+                0x2040768c                FlexCAN_Ip_SetRxMbGlobalMask_Privileged
+                0x204076e4                FlexCAN_Ip_EnterFreezeMode_Privileged
+                0x204076f4                FlexCAN_Ip_ExitFreezeMode_Privileged
+                0x20407704                FlexCAN_Ip_SetRxIndividualMask_Privileged
+                0x20407780                FlexCAN_Ip_SetRxFifoGlobalMask_Privileged
+                0x204077d8                FlexCAN_Ip_Deinit_Privileged
+                0x204078e0                FlexCAN_Ip_MainFunctionRead
+                0x20407978                FlexCAN_Ip_MainFunctionBusOff_Privileged
+                0x204079ac                FlexCAN_Ip_MainFunctionWrite
+                0x204079f0                FlexCAN_Ip_GetStopMode
+                0x20407a08                FlexCAN_Ip_GetStartMode
+                0x20407a20                FlexCAN_Ip_SetStartMode_Privileged
+                0x20407a54                FlexCAN_Ip_SetStopMode_Privileged
+                0x20407a84                FlexCAN_Ip_SetRxMaskType_Privileged
+                0x20407af0                FlexCAN_Ip_SetBitrate_Privileged
+                0x20407b94                FlexCAN_Ip_GetBitrate
+                0x20407c48                FlexCAN_Ip_ClearTDCFail
+                0x20407c90                FlexCAN_Ip_GetTDCFail
+                0x20407cc4                FlexCAN_Ip_GetTDCValue
+                0x20407cf8                FlexCAN_Ip_SetBitrateCbt_Privileged
+                0x20407dc4                FlexCAN_Ip_GetBitrateFD
+                0x20407e5c                FlexCAN_Ip_SetTDCOffset_Privileged
+                0x20407f08                FlexCAN_Ip_SetTxArbitrationStartDelay_Privileged
+                0x20407f74                FlexCAN_Ip_GetBuffStatusFlag
+                0x20407fa8                FlexCAN_Ip_ClearBuffStatusFlag
+                0x20407fd8                FlexCAN_Ip_EnableInterrupts_Privileged
+                0x2040802c                FlexCAN_Ip_DisableInterrupts_Privileged
+                0x20408078                FlexCAN_Ip_SetErrorInt_Privileged
+                0x20408110                FlexCAN_Ip_AbortTransfer
+                0x20408248                FlexCAN_Ip_SetRxMb14Mask_Privileged
+                0x204082a0                FlexCAN_Ip_SetRxMb15Mask_Privileged
+                0x204082f8                FlexCAN_Ip_SetListenOnlyMode_Privileged
+                0x20408368                FlexCAN_Ip_GetListenOnlyMode
+                0x2040837c                FlexCAN_Ip_ManualBusOffRecovery
+ .mcal_text     0x204083f8      0xf24 ./RTD/src/FlexCAN_Ip_HwAccess.o
+                0x2040842a                FlexCAN_ComputePayloadSize
+                0x20408444                FlexCAN_GetMsgBuffRegion
+                0x20408494                FlexCAN_GetMaxMbNum
+                0x204084e0                FlexCAN_EnterFreezeMode
+                0x20408540                FlexCAN_Enable
+                0x2040858c                FlexCAN_ExitFreezeMode
+                0x204085e0                FlexCAN_Disable
+                0x20408632                FlexCAN_SetErrIntCmd
+                0x2040869a                FlexCAN_Init
+                0x20408784                FlexCAN_EnableRxFifo
+                0x204087d2                FlexCAN_SetPayloadSize
+                0x20408840                FlexCAN_GetMbPayloadSize
+                0x20408874                FlexCAN_LockRxMsgBuff
+                0x2040887e                FlexCAN_SetMsgBuffIntCmd
+                0x20408954                FLEXCAN_ClearMsgBuffIntCmd
+                0x204089dc                FlexCAN_DisableInterrupts
+                0x204089f6                FlexCAN_EnableInterrupts
+                0x20408a20                FlexCAN_SetRxMsgBuff
+                0x20408aac                FlexCAN_GetMsgBuffTimestamp
+                0x20408ab8                FlexCAN_GetMsgBuff
+                0x20408b50                FlexCAN_SetTxMsgBuff
+                0x20408c68                FlexCAN_SetMaxMsgBuffNum
+                0x20408d02                FlexCAN_SetOperationMode
+                0x20408d38                FlexCAN_SetRxFifoFilter
+                0x20408ea4                FlexCAN_ReadRxFifo
+                0x20408f08                FlexCAN_ReadEnhancedRxFifo
+                0x20408fac                FlexCAN_IsMbOutOfRange
+                0x20408fcc                FlexCAN_IsEnhancedRxFifoAvailable
+                0x20408fdc                FlexCAN_IsEnhancedRxFifoEnabled
+                0x20408fee                FlexCAN_EnableEnhancedRxFifo
+                0x20409092                FlexCAN_SetEnhancedRxFifoFilter
+                0x20409220                FlexCAN_ConfigCtrlOptions
+                0x204092ac                FlexCAN_ResetImaskBuff
+                0x204092c4                FlexCAN_GetStopMode
+                0x204092cc                FlexCAN_GetStartMode
+                0x204092da                FlexCAN_DisableMemErrorDetection
+ .mcal_text     0x2040931c       0x9c ./RTD/src/FlexCAN_Ip_Irq.o
+                0x2040931c                CAN0_ORED_IRQHandler
+                0x20409322                CAN0_ORED_0_31_MB_IRQHandler
+                0x2040932e                CAN0_ORED_32_63_MB_IRQHandler
+                0x2040933a                CAN0_ORED_64_95_MB_IRQHandler
+                0x20409346                CAN1_ORED_IRQHandler
+                0x2040934c                CAN1_ORED_0_31_MB_IRQHandler
+                0x20409358                CAN1_ORED_32_63_MB_IRQHandler
+                0x20409364                CAN2_ORED_IRQHandler
+                0x2040936a                CAN2_ORED_0_31_MB_IRQHandler
+                0x20409376                CAN2_ORED_32_63_MB_IRQHandler
+                0x20409382                CAN3_ORED_IRQHandler
+                0x20409388                CAN3_ORED_0_31_MB_IRQHandler
+                0x20409394                CAN4_ORED_IRQHandler
+                0x2040939a                CAN4_ORED_0_31_MB_IRQHandler
+                0x204093a6                CAN5_ORED_IRQHandler
+                0x204093ac                CAN5_ORED_0_31_MB_IRQHandler
+ .mcal_text     0x204093b8      0x276 ./RTD/src/IntCtrl_Ip.o
+                0x204093b8                IntCtrl_Ip_InstallHandlerPrivileged
+                0x204093f2                IntCtrl_Ip_EnableIrqPrivileged
+                0x20409432                IntCtrl_Ip_DisableIrqPrivileged
+                0x20409472                IntCtrl_Ip_SetPriorityPrivileged
+                0x204094a6                IntCtrl_Ip_GetPriorityPrivileged
+                0x204094ca                IntCtrl_Ip_ClearPendingPrivileged
+                0x204094fa                IntCtrl_Ip_SetPendingPrivileged
+                0x2040952a                IntCtrl_Ip_GetPendingPrivileged
+                0x2040955a                IntCtrl_Ip_GetActivePrivileged
+                0x2040958a                IntCtrl_Ip_Init
+                0x204095f6                IntCtrl_Ip_InstallHandler
+                0x204095fa                IntCtrl_Ip_EnableIrq
+                0x204095fe                IntCtrl_Ip_DisableIrq
+                0x20409602                IntCtrl_Ip_SetPriority
+                0x20409606                IntCtrl_Ip_GetPriority
+                0x2040960a                IntCtrl_Ip_ClearPending
+                0x2040960e                IntCtrl_Ip_SetPending
+                0x20409612                IntCtrl_Ip_GetPending
+                0x20409620                IntCtrl_Ip_GetActive
+ *fill*         0x2040962e        0x2 
+ .mcal_text     0x20409630      0x804 ./RTD/src/Lpspi_Ip.o
+                0x20409948                Lpspi_Ip_DeInit
+                0x2040997c                Lpspi_Ip_SyncTransmit
+                0x20409bd4                Lpspi_Ip_AsyncTransmit
+                0x20409c58                Lpspi_Ip_ManageBuffers
+                0x20409c88                Lpspi_Ip_UpdateTransferParam
+                0x20409cbc                Lpspi_Ip_UpdateFrameSize
+                0x20409cd8                Lpspi_Ip_UpdateLsb
+                0x20409cf4                Lpspi_Ip_UpdateByteSwap
+                0x20409d10                Lpspi_Ip_UpdateDefaultTransmitData
+                0x20409d2c                Lpspi_Ip_UpdateTransferMode
+                0x20409d44                Lpspi_Ip_Init
+                0x20409d94                Lpspi_Ip_Cancel
+                0x20409de0                Lpspi_Ip_IrqHandler
+                0x20409e24                Lpspi_Ip_GetStatus
+ .mcal_text     0x20409e34        0x6 ./RTD/src/Lpspi_Ip_Irq.o
+                0x20409e34                Lpspi_Ip_LPSPI_1_IRQHandler
+ .mcal_text     0x20409e3a       0x44 ./RTD/src/OsIf_Timer.o
+                0x20409e3a                OsIf_Init
+                0x20409e44                OsIf_GetCounter
+                0x20409e50                OsIf_GetElapsed
+                0x20409e62                OsIf_SetTimerFrequency
+                0x20409e6c                OsIf_MicrosToTicks
+ *fill*         0x20409e7e        0x2 
+ .mcal_text     0x20409e80       0xdc ./RTD/src/OsIf_Timer_System.o
+                0x20409e80                OsIf_Timer_System_Init
+                0x20409eb0                OsIf_Timer_System_GetCounter
+                0x20409ed0                OsIf_Timer_System_GetElapsed
+                0x20409ef0                OsIf_Timer_System_SetTimerFrequency
+                0x20409f18                OsIf_Timer_System_MicrosToTicks
+ .mcal_text     0x20409f5c       0x4c ./RTD/src/OsIf_Timer_System_Internal_Systick.o
+                0x20409f5c                OsIf_Timer_System_Internal_Init
+                0x20409f72                OsIf_Timer_System_Internal_GetCounter
+                0x20409f7e                OsIf_Timer_System_Internal_GetElapsed
+ .mcal_text     0x20409fa8      0x3a0 ./RTD/src/Pit_Ip.o
+                0x20409ffc                Pit_Ip_GetLoadValue
+                0x2040a010                Pit_Ip_GetInterruptStatusFlag
+                0x2040a034                Pit_Ip_Init
+                0x2040a060                Pit_Ip_InitChannel
+                0x2040a0c0                Pit_Ip_Deinit
+                0x2040a144                Pit_Ip_StartChannel
+                0x2040a178                Pit_Ip_StopChannel
+                0x2040a18e                Pit_Ip_GetCurrentTimer
+                0x2040a1a4                Pit_Ip_EnableChannelInterrupt
+                0x2040a1d4                Pit_Ip_DisableChannelInterrupt
+                0x2040a204                Pit_Ip_SetLifetimeTimer
+                0x2040a2a0                Pit_Ip_GetLifetimeTimer
+                0x2040a2cc                PIT_0_ISR
+ .mcal_text     0x2040a348     0x2648 ./RTD/src/SchM_Adc.o
+                0x2040a348                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_00
+                0x2040a37c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_00
+                0x2040a3ac                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_01
+                0x2040a3e0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_01
+                0x2040a410                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_02
+                0x2040a444                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_02
+                0x2040a474                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_03
+                0x2040a4a8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_03
+                0x2040a4d8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_04
+                0x2040a50c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_04
+                0x2040a53c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_05
+                0x2040a570                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_05
+                0x2040a5a0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_10
+                0x2040a5d4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_10
+                0x2040a604                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_100
+                0x2040a638                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_100
+                0x2040a668                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_101
+                0x2040a69c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_101
+                0x2040a6cc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_102
+                0x2040a700                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_102
+                0x2040a730                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_103
+                0x2040a764                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_103
+                0x2040a794                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_11
+                0x2040a7c8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_11
+                0x2040a7f8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_12
+                0x2040a82c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_12
+                0x2040a85c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_13
+                0x2040a890                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_13
+                0x2040a8c0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_14
+                0x2040a8f4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_14
+                0x2040a924                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_15
+                0x2040a958                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_15
+                0x2040a988                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_16
+                0x2040a9bc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_16
+                0x2040a9ec                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_17
+                0x2040aa20                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_17
+                0x2040aa50                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_18
+                0x2040aa84                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_18
+                0x2040aab4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_19
+                0x2040aae8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_19
+                0x2040ab18                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_20
+                0x2040ab4c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_20
+                0x2040ab7c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_21
+                0x2040abb0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_21
+                0x2040abe0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_22
+                0x2040ac14                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_22
+                0x2040ac44                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_23
+                0x2040ac78                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_23
+                0x2040aca8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_24
+                0x2040acdc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_24
+                0x2040ad0c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_25
+                0x2040ad40                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_25
+                0x2040ad70                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_26
+                0x2040ada4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_26
+                0x2040add4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_27
+                0x2040ae08                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_27
+                0x2040ae38                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_28
+                0x2040ae6c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_28
+                0x2040ae9c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_29
+                0x2040aed0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_29
+                0x2040af00                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_30
+                0x2040af34                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_30
+                0x2040af64                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_31
+                0x2040af98                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_31
+                0x2040afc8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_32
+                0x2040affc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_32
+                0x2040b02c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_33
+                0x2040b060                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_33
+                0x2040b090                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_34
+                0x2040b0c4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_34
+                0x2040b0f4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_35
+                0x2040b128                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_35
+                0x2040b158                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_36
+                0x2040b18c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_36
+                0x2040b1bc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_37
+                0x2040b1f0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_37
+                0x2040b220                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_38
+                0x2040b254                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_38
+                0x2040b284                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_39
+                0x2040b2b8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_39
+                0x2040b2e8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_40
+                0x2040b31c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_40
+                0x2040b34c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_41
+                0x2040b380                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_41
+                0x2040b3b0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_42
+                0x2040b3e4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_42
+                0x2040b414                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_43
+                0x2040b448                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_43
+                0x2040b478                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_44
+                0x2040b4ac                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_44
+                0x2040b4dc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_45
+                0x2040b510                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_45
+                0x2040b540                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_46
+                0x2040b574                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_46
+                0x2040b5a4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_47
+                0x2040b5d8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_47
+                0x2040b608                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_48
+                0x2040b63c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_48
+                0x2040b66c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_49
+                0x2040b6a0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_49
+                0x2040b6d0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_50
+                0x2040b704                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_50
+                0x2040b734                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_51
+                0x2040b768                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_51
+                0x2040b798                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_54
+                0x2040b7cc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_54
+                0x2040b7fc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_55
+                0x2040b830                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_55
+                0x2040b860                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_56
+                0x2040b894                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_56
+                0x2040b8c4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_57
+                0x2040b8f8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_57
+                0x2040b928                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_58
+                0x2040b95c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_58
+                0x2040b98c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_59
+                0x2040b9c0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_59
+                0x2040b9f0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_60
+                0x2040ba24                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_60
+                0x2040ba54                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_61
+                0x2040ba88                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_61
+                0x2040bab8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_62
+                0x2040baec                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_62
+                0x2040bb1c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_63
+                0x2040bb50                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_63
+                0x2040bb80                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_64
+                0x2040bbb4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_64
+                0x2040bbe4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_65
+                0x2040bc18                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_65
+                0x2040bc48                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_66
+                0x2040bc7c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_66
+                0x2040bcac                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_67
+                0x2040bce0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_67
+                0x2040bd10                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_68
+                0x2040bd44                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_68
+                0x2040bd74                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_69
+                0x2040bda8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_69
+                0x2040bdd8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_70
+                0x2040be0c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_70
+                0x2040be3c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_71
+                0x2040be70                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_71
+                0x2040bea0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_72
+                0x2040bed4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_72
+                0x2040bf04                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_73
+                0x2040bf38                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_73
+                0x2040bf68                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_74
+                0x2040bf9c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_74
+                0x2040bfcc                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_75
+                0x2040c000                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_75
+                0x2040c030                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_76
+                0x2040c064                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_76
+                0x2040c094                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_77
+                0x2040c0c8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_77
+                0x2040c0f8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_78
+                0x2040c12c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_78
+                0x2040c15c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_79
+                0x2040c190                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_79
+                0x2040c1c0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_80
+                0x2040c1f4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_80
+                0x2040c224                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_81
+                0x2040c258                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_81
+                0x2040c288                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_82
+                0x2040c2bc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_82
+                0x2040c2ec                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_83
+                0x2040c320                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_83
+                0x2040c350                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_84
+                0x2040c384                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_84
+                0x2040c3b4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_85
+                0x2040c3e8                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_85
+                0x2040c418                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_86
+                0x2040c44c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_86
+                0x2040c47c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_87
+                0x2040c4b0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_87
+                0x2040c4e0                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_88
+                0x2040c514                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_88
+                0x2040c544                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_89
+                0x2040c578                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_89
+                0x2040c5a8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_90
+                0x2040c5dc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_90
+                0x2040c60c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_91
+                0x2040c640                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_91
+                0x2040c670                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_92
+                0x2040c6a4                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_92
+                0x2040c6d4                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_93
+                0x2040c708                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_93
+                0x2040c738                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_94
+                0x2040c76c                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_94
+                0x2040c79c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_95
+                0x2040c7d0                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_95
+                0x2040c800                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_96
+                0x2040c834                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_96
+                0x2040c864                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_97
+                0x2040c898                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_97
+                0x2040c8c8                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_98
+                0x2040c8fc                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_98
+                0x2040c92c                SchM_Enter_Adc_ADC_EXCLUSIVE_AREA_99
+                0x2040c960                SchM_Exit_Adc_ADC_EXCLUSIVE_AREA_99
+ .mcal_text     0x2040c990       0xc8 ./RTD/src/SchM_BaseNXP.o
+                0x2040c990                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
+                0x2040c9c4                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_00
+                0x2040c9f4                SchM_Enter_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
+                0x2040ca28                SchM_Exit_BaseNXP_BASENXP_EXCLUSIVE_AREA_01
+ .mcal_text     0x2040ca58      0x960 ./RTD/src/SchM_Can_43_FLEXCAN.o
+                0x2040ca58                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_00
+                0x2040ca8c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_00
+                0x2040cabc                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_01
+                0x2040caf0                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_01
+                0x2040cb20                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_02
+                0x2040cb54                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_02
+                0x2040cb84                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_03
+                0x2040cbb8                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_03
+                0x2040cbe8                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_04
+                0x2040cc1c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_04
+                0x2040cc4c                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_05
+                0x2040cc80                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_05
+                0x2040ccb0                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_06
+                0x2040cce4                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_06
+                0x2040cd14                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_07
+                0x2040cd48                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_07
+                0x2040cd78                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_08
+                0x2040cdac                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_08
+                0x2040cddc                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_09
+                0x2040ce10                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_09
+                0x2040ce40                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_10
+                0x2040ce74                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_10
+                0x2040cea4                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_11
+                0x2040ced8                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_11
+                0x2040cf08                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_12
+                0x2040cf3c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_12
+                0x2040cf6c                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_13
+                0x2040cfa0                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_13
+                0x2040cfd0                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_14
+                0x2040d004                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_14
+                0x2040d034                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_15
+                0x2040d068                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_15
+                0x2040d098                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_16
+                0x2040d0cc                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_16
+                0x2040d0fc                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_17
+                0x2040d130                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_17
+                0x2040d160                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_18
+                0x2040d194                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_18
+                0x2040d1c4                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_19
+                0x2040d1f8                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_19
+                0x2040d228                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_20
+                0x2040d25c                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_20
+                0x2040d28c                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_21
+                0x2040d2c0                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_21
+                0x2040d2f0                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_22
+                0x2040d324                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_22
+                0x2040d354                SchM_Enter_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_23
+                0x2040d388                SchM_Exit_Can_43_FLEXCAN_CAN_EXCLUSIVE_AREA_23
+ .mcal_text     0x2040d3b8       0xc8 ./RTD/src/SchM_Dio.o
+                0x2040d3b8                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_00
+                0x2040d3ec                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_00
+                0x2040d41c                SchM_Enter_Dio_DIO_EXCLUSIVE_AREA_01
+                0x2040d450                SchM_Exit_Dio_DIO_EXCLUSIVE_AREA_01
+ .mcal_text     0x2040d480     0x1a2c ./RTD/src/SchM_Gpt.o
+                0x2040d480                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_00
+                0x2040d4b4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_00
+                0x2040d4e4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_01
+                0x2040d518                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_01
+                0x2040d548                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_02
+                0x2040d57c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_02
+                0x2040d5ac                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_03
+                0x2040d5e0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_03
+                0x2040d610                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_04
+                0x2040d644                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_04
+                0x2040d674                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_05
+                0x2040d6a8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_05
+                0x2040d6d8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_06
+                0x2040d70c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_06
+                0x2040d73c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_07
+                0x2040d770                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_07
+                0x2040d7a0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_08
+                0x2040d7d4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_08
+                0x2040d804                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_09
+                0x2040d838                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_09
+                0x2040d868                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_10
+                0x2040d89c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_10
+                0x2040d8cc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_11
+                0x2040d900                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_11
+                0x2040d930                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_15
+                0x2040d964                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_15
+                0x2040d994                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_16
+                0x2040d9c8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_16
+                0x2040d9f8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_17
+                0x2040da2c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_17
+                0x2040da5c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_18
+                0x2040da90                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_18
+                0x2040dac0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_19
+                0x2040daf4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_19
+                0x2040db24                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_21
+                0x2040db58                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_21
+                0x2040db88                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_22
+                0x2040dbbc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_22
+                0x2040dbec                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_23
+                0x2040dc20                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_23
+                0x2040dc50                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_24
+                0x2040dc84                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_24
+                0x2040dcb4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_25
+                0x2040dce8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_25
+                0x2040dd18                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_26
+                0x2040dd4c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_26
+                0x2040dd7c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_29
+                0x2040ddb0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_29
+                0x2040dde0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_30
+                0x2040de14                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_30
+                0x2040de44                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_31
+                0x2040de78                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_31
+                0x2040dea8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_35
+                0x2040dedc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_35
+                0x2040df0c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_36
+                0x2040df40                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_36
+                0x2040df70                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_38
+                0x2040dfa4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_38
+                0x2040dfd4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_39
+                0x2040e008                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_39
+                0x2040e038                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_40
+                0x2040e06c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_40
+                0x2040e09c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_41
+                0x2040e0d0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_41
+                0x2040e100                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_42
+                0x2040e134                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_42
+                0x2040e164                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_43
+                0x2040e198                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_43
+                0x2040e1c8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_44
+                0x2040e1fc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_44
+                0x2040e22c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_45
+                0x2040e260                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_45
+                0x2040e290                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_46
+                0x2040e2c4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_46
+                0x2040e2f4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_50
+                0x2040e328                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_50
+                0x2040e358                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_51
+                0x2040e38c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_51
+                0x2040e3bc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_52
+                0x2040e3f0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_52
+                0x2040e420                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_53
+                0x2040e454                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_53
+                0x2040e484                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_54
+                0x2040e4b8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_54
+                0x2040e4e8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_55
+                0x2040e51c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_55
+                0x2040e54c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_56
+                0x2040e580                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_56
+                0x2040e5b0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_60
+                0x2040e5e4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_60
+                0x2040e614                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_61
+                0x2040e648                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_61
+                0x2040e678                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_64
+                0x2040e6ac                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_64
+                0x2040e6dc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_65
+                0x2040e710                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_65
+                0x2040e740                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_66
+                0x2040e774                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_66
+                0x2040e7a4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_67
+                0x2040e7d8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_67
+                0x2040e808                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_68
+                0x2040e83c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_68
+                0x2040e86c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_69
+                0x2040e8a0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_69
+                0x2040e8d0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_70
+                0x2040e904                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_70
+                0x2040e934                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_71
+                0x2040e968                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_71
+                0x2040e998                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_72
+                0x2040e9cc                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_72
+                0x2040e9fc                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_73
+                0x2040ea30                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_73
+                0x2040ea60                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_80
+                0x2040ea94                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_80
+                0x2040eac4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_81
+                0x2040eaf8                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_81
+                0x2040eb28                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_82
+                0x2040eb5c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_82
+                0x2040eb8c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_83
+                0x2040ebc0                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_83
+                0x2040ebf0                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_84
+                0x2040ec24                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_84
+                0x2040ec54                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_85
+                0x2040ec88                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_85
+                0x2040ecb8                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_86
+                0x2040ecec                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_86
+                0x2040ed1c                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_87
+                0x2040ed50                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_87
+                0x2040ed80                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_89
+                0x2040edb4                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_89
+                0x2040ede4                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_90
+                0x2040ee18                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_90
+                0x2040ee48                SchM_Enter_Gpt_GPT_EXCLUSIVE_AREA_91
+                0x2040ee7c                SchM_Exit_Gpt_GPT_EXCLUSIVE_AREA_91
+ .mcal_text     0x2040eeac      0x12c ./RTD/src/SchM_Mcu.o
+                0x2040eeac                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_00
+                0x2040eee0                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_00
+                0x2040ef10                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_01
+                0x2040ef44                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_01
+                0x2040ef74                SchM_Enter_Mcu_MCU_EXCLUSIVE_AREA_02
+                0x2040efa8                SchM_Exit_Mcu_MCU_EXCLUSIVE_AREA_02
+ .mcal_text     0x2040efd8      0xaf0 ./RTD/src/SchM_Port.o
+                0x2040efd8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_00
+                0x2040f00c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_00
+                0x2040f03c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_01
+                0x2040f070                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_01
+                0x2040f0a0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_02
+                0x2040f0d4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_02
+                0x2040f104                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_03
+                0x2040f138                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_03
+                0x2040f168                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_04
+                0x2040f19c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_04
+                0x2040f1cc                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_05
+                0x2040f200                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_05
+                0x2040f230                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_06
+                0x2040f264                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_06
+                0x2040f294                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_07
+                0x2040f2c8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_07
+                0x2040f2f8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_08
+                0x2040f32c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_08
+                0x2040f35c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_09
+                0x2040f390                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_09
+                0x2040f3c0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_10
+                0x2040f3f4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_10
+                0x2040f424                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_11
+                0x2040f458                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_11
+                0x2040f488                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_12
+                0x2040f4bc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_12
+                0x2040f4ec                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_13
+                0x2040f520                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_13
+                0x2040f550                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_14
+                0x2040f584                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_14
+                0x2040f5b4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_15
+                0x2040f5e8                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_15
+                0x2040f618                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_16
+                0x2040f64c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_16
+                0x2040f67c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_17
+                0x2040f6b0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_17
+                0x2040f6e0                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_18
+                0x2040f714                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_18
+                0x2040f744                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_19
+                0x2040f778                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_19
+                0x2040f7a8                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_20
+                0x2040f7dc                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_20
+                0x2040f80c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_21
+                0x2040f840                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_21
+                0x2040f870                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_22
+                0x2040f8a4                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_22
+                0x2040f8d4                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_23
+                0x2040f908                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_23
+                0x2040f938                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_24
+                0x2040f96c                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_24
+                0x2040f99c                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_25
+                0x2040f9d0                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_25
+                0x2040fa00                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_26
+                0x2040fa34                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_26
+                0x2040fa64                SchM_Enter_Port_PORT_EXCLUSIVE_AREA_27
+                0x2040fa98                SchM_Exit_Port_PORT_EXCLUSIVE_AREA_27
+ .mcal_text     0x2040fac8      0xa28 ./RTD/src/SchM_Spi.o
+                0x2040fac8                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_00
+                0x2040fafc                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_00
+                0x2040fb2c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_01
+                0x2040fb60                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_01
+                0x2040fb90                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_02
+                0x2040fbc4                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_02
+                0x2040fbf4                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_03
+                0x2040fc28                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_03
+                0x2040fc58                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_04
+                0x2040fc8c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_04
+                0x2040fcbc                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_05
+                0x2040fcf0                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_05
+                0x2040fd20                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_06
+                0x2040fd54                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_06
+                0x2040fd84                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_07
+                0x2040fdb8                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_07
+                0x2040fde8                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_08
+                0x2040fe1c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_08
+                0x2040fe4c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_09
+                0x2040fe80                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_09
+                0x2040feb0                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_10
+                0x2040fee4                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_10
+                0x2040ff14                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_11
+                0x2040ff48                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_11
+                0x2040ff78                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_12
+                0x2040ffac                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_12
+                0x2040ffdc                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_13
+                0x20410010                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_13
+                0x20410040                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_14
+                0x20410074                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_14
+                0x204100a4                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_15
+                0x204100d8                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_15
+                0x20410108                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_16
+                0x2041013c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_16
+                0x2041016c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_17
+                0x204101a0                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_17
+                0x204101d0                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_18
+                0x20410204                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_18
+                0x20410234                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_19
+                0x20410268                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_19
+                0x20410298                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_20
+                0x204102cc                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_20
+                0x204102fc                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_21
+                0x20410330                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_21
+                0x20410360                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_22
+                0x20410394                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_22
+                0x204103c4                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_23
+                0x204103f8                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_23
+                0x20410428                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_24
+                0x2041045c                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_24
+                0x2041048c                SchM_Enter_Spi_SPI_EXCLUSIVE_AREA_25
+                0x204104c0                SchM_Exit_Spi_SPI_EXCLUSIVE_AREA_25
+ .mcal_text     0x204104f0      0x1fc ./RTD/src/Siul2_Dio_Ip.o
+                0x20410524                Siul2_Dio_Ip_WritePin
+                0x20410590                Siul2_Dio_Ip_SetGPDO
+                0x204105ac                Siul2_Dio_Ip_ClearGPDO
+                0x204105c8                Siul2_Dio_Ip_WritePins
+                0x204105e0                Siul2_Dio_Ip_GetPinsOutput
+                0x204105f8                Siul2_Dio_Ip_SetPins
+                0x20410616                Siul2_Dio_Ip_ClearPins
+                0x20410636                Siul2_Dio_Ip_TogglePins
+                0x20410654                Siul2_Dio_Ip_ReadPins
+                0x2041066e                Siul2_Dio_Ip_ReadPin
+                0x204106a0                Siul2_Dio_Ip_MaskedWritePins
+ .mcal_text     0x204106ec      0x458 ./RTD/src/Siul2_Port_Ip.o
+                0x20410840                Siul2_Port_Ip_Init
+                0x20410870                Siul2_Port_Ip_SetPullSel
+                0x204108cc                Siul2_Port_Ip_SetOutputBuffer
+                0x20410932                Siul2_Port_Ip_SetInputBuffer
+                0x204109a2                Siul2_Port_Ip_SetPinDirection
+                0x20410a1a                Siul2_Port_Ip_RevertPinConfiguration
+                0x20410a7c                Siul2_Port_Ip_GetPinConfiguration
+ .mcal_text     0x20410b44      0x11c ./RTD/src/Tspc_Port_Ip.o
+                0x20410b44                Tspc_Port_Ip_EnableObeGroup
+                0x20410b74                Tspc_Port_Ip_DisableObeGroup
+                0x20410ba4                Tspc_Port_Ip_MaskObeGroup
+                0x20410bc2                Tspc_Port_Ip_ConfigureObeGroup
+                0x20410c60                . = ALIGN (0x4)
  *(.init)
-                0x20410c5c                . = ALIGN (0x4)
+                0x20410c60                . = ALIGN (0x4)
  *(.fini)
-                0x20410c5c                . = ALIGN (0x4)
+                0x20410c60                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x20410c5c       0x16 ./RTD/src/Adc_Sar_Ip.o
- .rodata        0x20410c72        0x3 ./RTD/src/Clock_Ip_IntOsc.o
- .rodata        0x20410c75       0x48 ./RTD/src/FlexCAN_Ip_HwAccess.o
- .rodata        0x20410cbd        0x6 ./RTD/src/Pit_Ip.o
- *fill*         0x20410cc3        0x1 
- .rodata        0x20410cc4        0x4 ./RTD/src/Siul2_Port_Ip.o
-                0x20410cc4                Port_au32Siul2BaseAddr
- .rodata        0x20410cc8       0x14 ./src/communication/Bms_Can.o
- .rodata        0x20410cdc       0x18 ./src/main.o
+ .rodata        0x20410c60       0x16 ./RTD/src/Adc_Sar_Ip.o
+ .rodata        0x20410c76        0x3 ./RTD/src/Clock_Ip_IntOsc.o
+ .rodata        0x20410c79       0x48 ./RTD/src/FlexCAN_Ip_HwAccess.o
+ .rodata        0x20410cc1        0x6 ./RTD/src/Pit_Ip.o
+ *fill*         0x20410cc7        0x1 
+ .rodata        0x20410cc8        0x4 ./RTD/src/Siul2_Port_Ip.o
+                0x20410cc8                Port_au32Siul2BaseAddr
+ .rodata        0x20410ccc       0x14 ./src/communication/Bms_Can.o
+ .rodata        0x20410ce0       0x18 ./src/main.o
  *(.rodata*)
  .rodata.str1.1
-                0x20410cf4        0x9 ./src/communication/Bms_Can.o
+                0x20410cf8        0x9 ./src/communication/Bms_Can.o
  .rodata.logf.str1.1
-                0x20410cfd        0x9 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-wf_log.o)
+                0x20410d01        0x9 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a(lib_a-wf_log.o)
                                   0x1 (size before relaxing)
- *fill*         0x20410cfd        0x3 
+ *fill*         0x20410d01        0x3 
  .rodata._global_impure_ptr
-                0x20410d00        0x4 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-impure.o)
-                0x20410d00                _global_impure_ptr
-                0x20410d04                . = ALIGN (0x4)
+                0x20410d04        0x4 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(lib_a-impure.o)
+                0x20410d04                _global_impure_ptr
+                0x20410d08                . = ALIGN (0x4)
  *(.mcal_const_cfg)
  .mcal_const_cfg
-                0x20410d04      0xe40 ./board/Siul2_Port_Ip_Cfg.o
-                0x20410d04                g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
+                0x20410d08      0xe40 ./board/Siul2_Port_Ip_Cfg.o
+                0x20410d08                g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
  .mcal_const_cfg
-                0x20411b44      0x120 ./generate/src/Adc_Sar_Ip_PBcfg.o
-                0x20411b44                AdcHwUnit_0
-                0x20411bd4                AdcHwUnit_1
- *fill*         0x20411c64        0x4 
+                0x20411b48      0x120 ./generate/src/Adc_Sar_Ip_PBcfg.o
+                0x20411b48                AdcHwUnit_0
+                0x20411bd8                AdcHwUnit_1
  .mcal_const_cfg
                 0x20411c68      0x5fc ./generate/src/Clock_Ip_Cfg.o
                 0x20411c68                Clock_Ip_aClockConfig
@@ -9471,7 +9470,7 @@ LOAD linker stubs
  .debug_line    0x00032a04      0x59c c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
  .debug_line    0x00032fa0       0x68 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
 
-.debug_str      0x00000000   0x22f50e
+.debug_str      0x00000000   0x22f510
  .debug_str     0x00000000    0x14d88 ./Project_Settings/Startup_Code/exceptions.o
                               0x14fae (size before relaxing)
  .debug_str     0x00014d88     0xb895 ./Project_Settings/Startup_Code/nvic.o
@@ -9596,36 +9595,36 @@ LOAD linker stubs
                               0x14a74 (size before relaxing)
  .debug_str     0x0022a193      0x5bb ./src/app/Bms_StateMachine.o
                               0x40663 (size before relaxing)
- .debug_str     0x0022a74e      0x896 ./src/battery/Battery_Monitor.o
-                               0x6c56 (size before relaxing)
- .debug_str     0x0022afe4      0x1e0 ./src/battery/Bms_Afe.o
+ .debug_str     0x0022a74e      0x898 ./src/battery/Battery_Monitor.o
+                               0x6c58 (size before relaxing)
+ .debug_str     0x0022afe6      0x1e0 ./src/battery/Bms_Afe.o
                                0x6085 (size before relaxing)
- .debug_str     0x0022b1c4     0x2ccb ./src/battery/Bms_Ntc.o
+ .debug_str     0x0022b1c6     0x2ccb ./src/battery/Bms_Ntc.o
                                0x8d78 (size before relaxing)
- .debug_str     0x0022de8f       0xc3 ./src/battery/vAFE/Bms_Vafe.o
+ .debug_str     0x0022de91       0xc3 ./src/battery/vAFE/Bms_Vafe.o
                                0x6039 (size before relaxing)
- .debug_str     0x0022df52      0x12f ./src/battery/vPACK/Bms_Vpack.o
+ .debug_str     0x0022df54      0x12f ./src/battery/vPACK/Bms_Vpack.o
                                0x6196 (size before relaxing)
- .debug_str     0x0022e081      0xa6d ./src/communication/Bms_Can.o
+ .debug_str     0x0022e083      0xa6d ./src/communication/Bms_Can.o
                              0x2024cc (size before relaxing)
- .debug_str     0x0022eaee       0xa8 ./src/communication/Bms_Spi.o
+ .debug_str     0x0022eaf0       0xa8 ./src/communication/Bms_Spi.o
                               0x19bdf (size before relaxing)
- .debug_str     0x0022eb96      0x328 ./src/control/Bms_Contactor.o
+ .debug_str     0x0022eb98      0x328 ./src/control/Bms_Contactor.o
                                0x667d (size before relaxing)
- .debug_str     0x0022eebe      0x11d ./src/drivers/Bms_Gpio.o
+ .debug_str     0x0022eec0      0x11d ./src/drivers/Bms_Gpio.o
                               0x64f40 (size before relaxing)
- .debug_str     0x0022efdb       0xce ./src/drivers/Bms_Led.o
+ .debug_str     0x0022efdd       0xce ./src/drivers/Bms_Led.o
                               0x4016e (size before relaxing)
- .debug_str     0x0022f0a9      0x103 ./src/main.o
+ .debug_str     0x0022f0ab      0x103 ./src/main.o
                               0xa71f2 (size before relaxing)
- .debug_str     0x0022f1ac       0xe3 ./src/safety/Fault_Manager.o
+ .debug_str     0x0022f1ae       0xe3 ./src/safety/Fault_Manager.o
                                0x64bc (size before relaxing)
- .debug_str     0x0022f28f       0x96 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
+ .debug_str     0x0022f291       0x96 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_ldivmod.o)
                                  0xa2 (size before relaxing)
- .debug_str     0x0022f325       0xa2 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
- .debug_str     0x0022f325      0x1b1 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
+ .debug_str     0x0022f327       0xa2 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_aeabi_uldivmod.o)
+ .debug_str     0x0022f327      0x1b1 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
                                 0x2c3 (size before relaxing)
- .debug_str     0x0022f4d6       0x38 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
+ .debug_str     0x0022f4d8       0x38 c:/nxp/s32ds.3.6.10/s32ds/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin/../lib/gcc/arm-none-eabi/10.2.0/thumb/v7e-m+fp/hard\libgcc.a(_dvmd_tls.o)
                                  0xa6 (size before relaxing)
 
 .debug_frame    0x00000000     0x65a8

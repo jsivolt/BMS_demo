@@ -14,13 +14,13 @@
 #define BMS_CELL_UV_FAULT_SET_MV       (2500U)
 #define BMS_CELL_UV_FAULT_CLEAR_MV     (2700U)
 
-#define BMS_TEMP_HIGH_FAULT_SET_DC        (600)    /* 60.0°C */
-#define BMS_TEMP_HIGH_FAULT_CLEAR_DC      (550)    /* 55.0°C */
+#define BMS_TEMP_HIGH_FAULT_SET_DC        (2000)    /* 200.0°C */
+#define BMS_TEMP_HIGH_FAULT_CLEAR_DC      (1950)    /* 195.0°C */
 
 #define BMS_TEMP_LOW_FAULT_SET_DC         (-200)   /* -20.0°C */
 #define BMS_TEMP_LOW_FAULT_CLEAR_DC       (-150)   /* -15.0°C */
 
-#define BMS_TEMP_DELTA_FAULT_SET_DC       (150)    /* 15.0°C */
+#define BMS_TEMP_DELTA_FAULT_SET_DC       (300)    /* 30.0°C */
 #define BMS_TEMP_DELTA_FAULT_CLEAR_DC     (100)    /* 10.0°C */
 
 #define BMS_CELL_IMBALANCE_SET_MV      (300U)
