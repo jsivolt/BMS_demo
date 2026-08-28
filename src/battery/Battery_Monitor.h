@@ -26,8 +26,21 @@ typedef struct
      * Pack monitor data from virtual ADBMS2950.
      */
 
-    /* Unit: mA */
-    sint32 PackCurrent_mA;
+    /*
+     * Pack current.
+     *
+     * [0] = Pack 1
+     * [1] = Pack 2
+     * [2] = Pack 3
+     *
+     * Unit: mA
+     *
+     * Positive = discharge
+     * Negative = charge
+     */
+    sint32 PackCurrent_mA[BATTERY_MONITOR_PACK_COUNT];
+
+    boolean PackCurrentValid[BATTERY_MONITOR_PACK_COUNT];
 
     /* Unit: uV */
     sint16 ShuntVoltage_uV;

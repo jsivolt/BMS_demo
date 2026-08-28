@@ -123,6 +123,7 @@ volatile uint32 g_DebugDisableRequestAddr = 0U;
 
 static uint8 g_BmsCanPackStatusAliveCounter = 0U;
 static uint8 g_BmsCanContactorAliveCounter = 0U;
+static uint8 g_BmsCanPackCurrentAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -188,6 +189,37 @@ static void Bms_Can_PackUint32LE(
     data[1] = (uint8)((value >> 8U) & 0xFFUL);
     data[2] = (uint8)((value >> 16U) & 0xFFUL);
     data[3] = (uint8)((value >> 24U) & 0xFFUL);
+}
+
+
+/*
+ * Convert current from mA to signed 0.1 A/bit CAN raw value.
+ *
+ * 100 mA = 0.1 A = 1 raw count
+ *
+ * Positive = discharge
+ * Negative = charge
+ */
+static sint16 Bms_Can_CurrentToRaw(sint32 current_mA)
+{
+    sint32 raw;
+
+    raw = current_mA / 100;
+
+    if (raw > 32767)
+    {
+        raw = 32767;
+    }
+    else if (raw < -32768)
+    {
+        raw = -32768;
+    }
+    else
+    {
+        /* No saturation required. */
+    }
+
+    return (sint16)raw;
 }
 
 
@@ -1011,6 +1043,144 @@ void Bms_Can_SendCellSummary(void)
             txData,
             BMS_CAN_TX_TIMEOUT_MS
         );
+}
+
+
+/* ================================================================================================
+ * CAN TX pack current status frame
+ * CAN ID: 0x306
+ *
+ * Byte0-1 : Pack1 current, signed, little endian, 0.1 A/bit
+ * Byte2-3 : Pack2 current, signed, little endian, 0.1 A/bit
+ * Byte4-5 : Pack3 current, signed, little endian, 0.1 A/bit
+ *
+ * Byte6:
+ * bit0 = Pack1 current valid
+ * bit1 = Pack2 current valid
+ * bit2 = Pack3 current valid
+ *
+ * Byte7:
+ * bit0-3 = alive counter
+ * ============================================================================================== */
+
+void Bms_Can_SendPackCurrent(void)
+{
+    const BatteryMonitor_DataType *batteryData;
+
+    uint8 txData[8] = {0U};
+
+    sint16 pack1Raw;
+    sint16 pack2Raw;
+    sint16 pack3Raw;
+
+    uint16 pack1RawU;
+    uint16 pack2RawU;
+    uint16 pack3RawU;
+
+    batteryData = BatteryMonitor_GetData();
+
+    if (batteryData == NULL_PTR)
+    {
+        return;
+    }
+
+    /*
+     * Convert mA -> 0.1 A/bit.
+     */
+    pack1Raw =
+        Bms_Can_CurrentToRaw(
+            batteryData->PackCurrent_mA[0]
+        );
+
+    pack2Raw =
+        Bms_Can_CurrentToRaw(
+            batteryData->PackCurrent_mA[1]
+        );
+
+    pack3Raw =
+        Bms_Can_CurrentToRaw(
+            batteryData->PackCurrent_mA[2]
+        );
+
+    /*
+     * Preserve signed two's-complement bit pattern
+     * while packing into CAN bytes.
+     */
+    pack1RawU = (uint16)pack1Raw;
+    pack2RawU = (uint16)pack2Raw;
+    pack3RawU = (uint16)pack3Raw;
+
+    /*
+     * Byte0-1: Pack1 current
+     */
+    txData[0] = (uint8)(pack1RawU & 0xFFU);
+    txData[1] = (uint8)((pack1RawU >> 8U) & 0xFFU);
+
+    /*
+     * Byte2-3: Pack2 current
+     */
+    txData[2] = (uint8)(pack2RawU & 0xFFU);
+    txData[3] = (uint8)((pack2RawU >> 8U) & 0xFFU);
+
+    /*
+     * Byte4-5: Pack3 current
+     */
+    txData[4] = (uint8)(pack3RawU & 0xFFU);
+    txData[5] = (uint8)((pack3RawU >> 8U) & 0xFFU);
+
+    /*
+     * Byte6: current validity flags.
+     */
+    txData[6] = 0U;
+
+    if (batteryData->PackCurrentValid[0] == TRUE)
+    {
+        txData[6] |= 0x01U;
+    }
+
+    if (batteryData->PackCurrentValid[1] == TRUE)
+    {
+        txData[6] |= 0x02U;
+    }
+
+    if (batteryData->PackCurrentValid[2] == TRUE)
+    {
+        txData[6] |= 0x04U;
+    }
+
+    /*
+     * Byte7:
+     * bit0-3 = alive counter
+     */
+    txData[7] =
+        (uint8)(g_BmsCanPackCurrentAliveCounter & 0x0FU);
+
+    /*
+     * Handle previous polling TX completion.
+     */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_PACK_CURRENT_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanPackCurrentAliveCounter =
+            (uint8)(
+                (g_BmsCanPackCurrentAliveCounter + 1U) &
+                0x0FU
+            );
+    }
 }
 
 

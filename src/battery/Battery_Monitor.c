@@ -55,7 +55,6 @@ void BatteryMonitor_Init(void)
     g_BatteryData.PackV2 = 0.0f;
     g_BatteryData.PackV3 = 0.0f;
 
-    g_BatteryData.PackCurrent_mA = 0;
     g_BatteryData.ShuntVoltage_uV = 0;
 
     g_BatteryData.VpackPackVoltage_mV = 0U;
@@ -82,6 +81,12 @@ void BatteryMonitor_Init(void)
     g_BatteryData.MaxCellIndex = 0U;
 
     g_BatteryData.CellVoltageValid = FALSE;
+
+    for (i = 0U; i < BATTERY_MONITOR_PACK_COUNT; i++)
+    {
+        g_BatteryData.PackCurrent_mA[i] = 0;
+        g_BatteryData.PackCurrentValid[i] = FALSE;
+    }
 
     for (i = 0U; i < BATTERY_MONITOR_PACK_COUNT; i++)
     {
@@ -244,7 +249,7 @@ void BatteryMonitor_MainFunction(void)
 static void BatteryMonitor_UpdatePackMonitor(void)
 {
     /*
-     * Always copy communication health flags.
+     * Communication health from virtual ADBMS2950.
      */
     g_BatteryData.VpackCurrentValid =
         g_BmsVpackData.CurrentValid;
@@ -259,12 +264,18 @@ static void BatteryMonitor_UpdatePackMonitor(void)
         g_BmsVpackData.Valid;
 
     /*
+     * Current channel currently represents Pack 1.
+     */
+    g_BatteryData.PackCurrentValid[0] =
+        g_BmsVpackData.CurrentValid;
+
+    /*
      * Only overwrite measurement data when the overall
      * vPACK dataset is valid.
      */
     if (g_BmsVpackData.Valid == TRUE)
     {
-        g_BatteryData.PackCurrent_mA =
+        g_BatteryData.PackCurrent_mA[0] =
             g_BmsVpackData.PackCurrent_mA;
 
         g_BatteryData.ShuntVoltage_uV =

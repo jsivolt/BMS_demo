@@ -236,6 +236,8 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can1_SendTest();
 
     Bms_Can_SendCellSummary();
+
+    Bms_Can_SendPackCurrent();
 }
 
 static void Bms_MainFunction_1000ms(void)

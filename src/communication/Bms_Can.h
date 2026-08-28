@@ -14,6 +14,7 @@ void Bms_Can_SendFaultStatus2(void);
 void Bms_Can1_SendTest(void);
 
 void Bms_Can_SendCellSummary(void);
+void Bms_Can_SendPackCurrent(void);
 
 /*
  * Poll CAN RX mailbox.
