@@ -45,6 +45,7 @@ typedef enum
 #define FAULT_VPACK_ALIVE_ERROR        (1UL << 17)
 #define FAULT_VPACK_DEVICE_FAULT       (1UL << 18)
 
+#define FAULT_PACK1_VOLTAGE_TIMEOUT    (1UL << 19)
 /*
  * Add future faults here.
  */
@@ -65,7 +66,8 @@ typedef enum
         FAULT_OVER_CURRENT         |   \
         FAULT_VPACK_COMM_TIMEOUT   |   \
         FAULT_VPACK_ALIVE_ERROR    |   \
-        FAULT_VPACK_DEVICE_FAULT )
+        FAULT_VPACK_DEVICE_FAULT   |   \
+        FAULT_PACK1_VOLTAGE_TIMEOUT)
 
 
 void FaultManager_Init(void);

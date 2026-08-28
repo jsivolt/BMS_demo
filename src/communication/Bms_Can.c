@@ -22,6 +22,8 @@
 
 #define PACK1_VOLTAGE_SCALE         0.1F
 
+#define PACK1_VOLTAGE_TIMEOUT_MS    (500U)
+#define BMS_CAN_MAIN_PERIOD_MS      (100U)
 
 /* ================================================================================================
  * CAN TX configuration
@@ -100,6 +102,7 @@ volatile uint8  g_BmsCan2RxDlc = 0U;
 volatile float32 g_CanPack1Voltage_V = 0.0F;
 volatile boolean g_CanPack1VoltageValid = FALSE;
 volatile uint32 g_CanPack1VoltageRxCount = 0U;
+volatile uint32 g_CanPack1VoltageAgeMs = 0U;
 
 volatile uint8 g_BmsCan2RxData[8] =
 {
@@ -200,6 +203,9 @@ static void Bms_Can_ProcessPack1Voltage(const uint8 *data)
 
     g_CanPack1VoltageValid = TRUE;
     g_CanPack1VoltageRxCount++;
+
+    /* Reset timeout age whenever a valid 0x411 frame is received. */
+    g_CanPack1VoltageAgeMs = 0U;
 }
 
 
@@ -1016,6 +1022,23 @@ void Bms_Can_MainFunction(void)
 {
     uint8 i;
 
+    /*
+     * Pack1 voltage CAN timeout supervision.
+     * Called every 100 ms.
+     */
+    if (g_CanPack1VoltageValid == TRUE)
+    {
+        if ((g_CanPack1VoltageAgeMs + BMS_CAN_MAIN_PERIOD_MS) >=
+            PACK1_VOLTAGE_TIMEOUT_MS)
+        {
+            g_CanPack1VoltageAgeMs = PACK1_VOLTAGE_TIMEOUT_MS;
+            g_CanPack1VoltageValid = FALSE;
+        }
+        else
+        {
+            g_CanPack1VoltageAgeMs += BMS_CAN_MAIN_PERIOD_MS;
+        }
+    }
 
     /* Process 0x200 debug mailbox. */
     FlexCAN_Ip_MainFunctionRead(

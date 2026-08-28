@@ -25,5 +25,6 @@ void Bms_Can_MainFunction(void);
 extern volatile float32 g_CanPack1Voltage_V;
 extern volatile boolean g_CanPack1VoltageValid;
 extern volatile uint32 g_CanPack1VoltageRxCount;
+extern volatile uint32 g_CanPack1VoltageAgeMs;
 
 #endif

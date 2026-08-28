@@ -140,6 +140,22 @@ void BatteryMonitor_MainFunction(void)
         g_BatteryData.Status = BAT_MON_STATUS_INVALID;
     }
 
+    if (g_CanPack1VoltageRxCount > 0U)
+    {
+        if (g_CanPack1VoltageValid == FALSE)
+        {
+            FaultManager_SetPack(
+                FAULT_PACK_1,
+                FAULT_PACK1_VOLTAGE_TIMEOUT);
+        }
+        else
+        {
+            FaultManager_ClearPack(
+                FAULT_PACK_1,
+                FAULT_PACK1_VOLTAGE_TIMEOUT);
+        }
+    }
+
 
     /*
      * ==========================================================================
