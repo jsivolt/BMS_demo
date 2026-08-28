@@ -20,6 +20,8 @@
 #define BMS_CAN_LED_PORT         PTA_H_HALF
 #define BMS_CAN_LED_PIN          (14U)
 
+#define PACK1_VOLTAGE_SCALE         0.1F
+
 
 /* ================================================================================================
  * CAN TX configuration
@@ -94,6 +96,10 @@ volatile Flexcan_Ip_StatusType g_BmsCan2RxStatus;
 volatile uint32 g_BmsCan2RxCount = 0U;
 volatile uint32 g_BmsCan2RxId = 0U;
 volatile uint8  g_BmsCan2RxDlc = 0U;
+
+volatile float32 g_CanPack1Voltage_V = 0.0F;
+volatile boolean g_CanPack1VoltageValid = FALSE;
+volatile uint32 g_CanPack1VoltageRxCount = 0U;
 
 volatile uint8 g_BmsCan2RxData[8] =
 {
@@ -179,6 +185,21 @@ static void Bms_Can_PackUint32LE(
     data[1] = (uint8)((value >> 8U) & 0xFFUL);
     data[2] = (uint8)((value >> 16U) & 0xFFUL);
     data[3] = (uint8)((value >> 24U) & 0xFFUL);
+}
+
+
+static void Bms_Can_ProcessPack1Voltage(const uint8 *data)
+{
+    uint16 rawVoltage;
+
+    rawVoltage = ((uint16)data[0]) |
+                 ((uint16)data[1] << 8U);
+
+    g_CanPack1Voltage_V =
+        ((float32)rawVoltage * PACK1_VOLTAGE_SCALE);
+
+    g_CanPack1VoltageValid = TRUE;
+    g_CanPack1VoltageRxCount++;
 }
 
 
@@ -1197,6 +1218,14 @@ void Bms_Can_MainFunction(void)
             g_BmsCan2RxVoltageMessage.dataLen,
             g_BmsCan2RxVoltageMessage.data
         );
+
+        if (g_BmsCan2RxVoltageMessage.msgId ==
+            BMS_CAN2_CFG_RX_VOLTAGE_ID)
+        {
+            Bms_Can_ProcessPack1Voltage(
+                g_BmsCan2RxVoltageMessage.data
+            );
+        }
 
         /*
          * Re-arm CAN2 voltage RX MB.

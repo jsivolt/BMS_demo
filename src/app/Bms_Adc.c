@@ -176,11 +176,11 @@ void Bms_Adc_MainFunction(void)
         );
 
 
+        /* PackV1 is simulated via CAN2, so its ADC validity does not gate g_BmsAdcPackValid */
         if ((potResult.ValidFlag == TRUE) &&
             (ntc1Result.ValidFlag == TRUE) &&
             (ntc2Result.ValidFlag == TRUE) &&
             (ntc3Result.ValidFlag == TRUE) &&
-            (packV1Result.ValidFlag == TRUE) &&
             (packV2Result.ValidFlag == TRUE) &&
             (packV3Result.ValidFlag == TRUE))
         {
@@ -190,7 +190,6 @@ void Bms_Adc_MainFunction(void)
             g_BmsAdcNtc2Raw = ntc2Result.ConvData;
             g_BmsAdcNtc3Raw = ntc3Result.ConvData;
 
-            g_BmsAdcPackV1Raw = packV1Result.ConvData;
             g_BmsAdcPackV2Raw = packV2Result.ConvData;
             g_BmsAdcPackV3Raw = packV3Result.ConvData;
 
@@ -199,6 +198,11 @@ void Bms_Adc_MainFunction(void)
         else
         {
             g_BmsAdcPackValid = FALSE;
+        }
+
+        if (packV1Result.ValidFlag == TRUE)
+        {
+            g_BmsAdcPackV1Raw = packV1Result.ConvData;
         }
     }
 

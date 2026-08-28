@@ -2,6 +2,7 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "../communication/Bms_Can.h"
 #include "vAFE/Bms_Vafe.h"
 #include "vPACK/Bms_Vpack.h"
 #include "Fault_Manager.h"
@@ -112,11 +113,18 @@ void BatteryMonitor_MainFunction(void)
      * ==========================================================================
      */
 
-    if (Bms_Adc_IsPackValid() == TRUE)
+    if ((Bms_Adc_IsPackValid() == TRUE) &&
+        (g_CanPack1VoltageValid == TRUE))
     {
+        /*
+         * Pack 1 voltage from CAN2 simulation.
+         */
         g_BatteryData.PackV1 =
-            (float)Bms_Adc_GetPackV1VoltageMv() / 1000.0f;
+            g_CanPack1Voltage_V;
 
+        /*
+         * Pack 2 / Pack 3 remain ADC inputs.
+         */
         g_BatteryData.PackV2 =
             (float)Bms_Adc_GetPackV2VoltageMv() / 1000.0f;
 

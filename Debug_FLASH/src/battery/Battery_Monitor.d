@@ -6,8 +6,8 @@ src/battery/Battery_Monitor.o: ../src/battery/Battery_Monitor.c \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Compiler_Cfg.h \
  C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/CompilerDefinition.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h \
- ../src/battery/Bms_Ntc.h ../src/battery/vAFE/Bms_Vafe.h \
- ../src/battery/vPACK/Bms_Vpack.h \
+ ../src/battery/Bms_Ntc.h ../src/battery/../communication/Bms_Can.h \
+ ../src/battery/vAFE/Bms_Vafe.h ../src/battery/vPACK/Bms_Vpack.h \
  C\:/S32K344/workspace/BMS_demo/src/safety/Fault_Manager.h
 ../src/battery/Battery_Monitor.h:
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/Std_Types.h:
@@ -17,6 +17,7 @@ C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1
 C\:/NXP/S32DS.3.6.10/S32DS/software/PlatformSDK_S32K3/RTD/BaseNXP_TS_T40D34M70I1R0/include/CompilerDefinition.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h:
 ../src/battery/Bms_Ntc.h:
+../src/battery/../communication/Bms_Can.h:
 ../src/battery/vAFE/Bms_Vafe.h:
 ../src/battery/vPACK/Bms_Vpack.h:
 C\:/S32K344/workspace/BMS_demo/src/safety/Fault_Manager.h:
