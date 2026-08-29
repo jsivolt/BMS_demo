@@ -9,7 +9,7 @@ NS_ :
 
 BS_:
 
-BU_: S32K344 vAFE_Sim vPACK_Sim PCAN
+BU_: S32K344 S32K344_BMS vAFE_Sim vPACK_Sim PCAN
 
 BO_ 512 BMS_Debug_Command: 8 PCAN
  SG_ DebugCommand : 0|8@1+ (1,0) [0|255] "" S32K344
@@ -76,6 +76,11 @@ BO_ 774 BMS_Pack_Current: 8 S32K344
  SG_ Pack2CurrentValid : 49|1@1+ (1,0) [0|1] "" PCAN
  SG_ Pack3CurrentValid : 50|1@1+ (1,0) [0|1] "" PCAN
  SG_ PackCurrentAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
+
+BO_ 775 Pack_Power_Status: 8 S32K344_BMS
+ SG_ Pack1Power : 0|32@1- (1,0) [-2147483648|2147483647] "W" PCAN
+ SG_ Pack1PowerValid : 32|1@1+ (1,0) [0|1] "" PCAN
+ SG_ PowerAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
 
 BO_ 1024 CAN1_Test: 8 S32K344
  SG_ TestByte0 : 0|8@1+ (1,0) [0|255] "" PCAN

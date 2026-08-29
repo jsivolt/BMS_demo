@@ -51,6 +51,7 @@ static BatteryMonitor_DataType g_BatteryData;
 static void BatteryMonitor_UpdateCellVoltages(void);
 static void BatteryMonitor_UpdatePackMonitor(void);
 static void BatteryMonitor_UpdateVpackFaults(void);
+static void BatteryMonitor_UpdatePackPower(void);
 static void BatteryMonitor_UpdatePackCurrentFaults(void);
 static void BatteryMonitor_UpdateCellVoltageFaults(void);
 static void BatteryMonitor_UpdateCellImbalanceFault(void);
@@ -101,10 +102,10 @@ void BatteryMonitor_Init(void)
     {
         g_BatteryData.PackCurrent_mA[i] = 0;
         g_BatteryData.PackCurrentValid[i] = FALSE;
-    }
 
-    for (i = 0U; i < BATTERY_MONITOR_PACK_COUNT; i++)
-    {
+        g_BatteryData.PackPower_W[i] = 0.0f;
+        g_BatteryData.PackPowerValid[i] = FALSE;
+
         g_BatteryData.PackTemperature_dC[i] = 0;
         g_BatteryData.PackTemperatureValid[i] = FALSE;
     }
@@ -186,6 +187,8 @@ void BatteryMonitor_MainFunction(void)
     BatteryMonitor_UpdatePackMonitor();
 
     BatteryMonitor_UpdateVpackFaults();
+
+    BatteryMonitor_UpdatePackPower();
 
     BatteryMonitor_UpdatePackCurrentFaults();
 
@@ -310,6 +313,39 @@ static void BatteryMonitor_UpdatePackMonitor(void)
         g_BatteryData.VpackStatus =
             g_BmsVpackData.Status;
     }
+}
+
+
+/* ================================================================================================
+ * Pack power calculation
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdatePackPower(void)
+{
+    /*
+     * Pack 1 power is valid only when both
+     * voltage and current are valid.
+     */
+    if ((g_CanPack1VoltageValid == TRUE) &&
+        (g_BatteryData.PackCurrentValid[0] == TRUE))
+    {
+        g_BatteryData.PackPower_W[0] =
+            g_BatteryData.PackV1 *
+            ((float)g_BatteryData.PackCurrent_mA[0] / 1000.0f);
+
+        g_BatteryData.PackPowerValid[0] = TRUE;
+    }
+    else
+    {
+        g_BatteryData.PackPower_W[0] = 0.0f;
+        g_BatteryData.PackPowerValid[0] = FALSE;
+    }
+
+    /*
+     * Pack 2 / Pack 3 current inputs are not implemented yet.
+     */
+    g_BatteryData.PackPowerValid[1] = FALSE;
+    g_BatteryData.PackPowerValid[2] = FALSE;
 }
 
 

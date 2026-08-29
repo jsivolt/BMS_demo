@@ -124,6 +124,7 @@ volatile uint32 g_DebugDisableRequestAddr = 0U;
 static uint8 g_BmsCanPackStatusAliveCounter = 0U;
 static uint8 g_BmsCanContactorAliveCounter = 0U;
 static uint8 g_BmsCanPackCurrentAliveCounter = 0U;
+static uint8 g_BmsCanPackPowerAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -220,6 +221,23 @@ static sint16 Bms_Can_CurrentToRaw(sint32 current_mA)
     }
 
     return (sint16)raw;
+}
+
+
+/* Converts power (W) to a saturated signed 32-bit, 1 W/bit raw value for CAN payloads. */
+static sint32 Bms_Can_PowerToRaw(float power_W)
+{
+    if (power_W > 2147483647.0f)
+    {
+        return (sint32)2147483647;
+    }
+
+    if (power_W < -2147483648.0f)
+    {
+        return (sint32)(-2147483647 - 1);
+    }
+
+    return (sint32)power_W;
 }
 
 
@@ -1178,6 +1196,85 @@ void Bms_Can_SendPackCurrent(void)
         g_BmsCanPackCurrentAliveCounter =
             (uint8)(
                 (g_BmsCanPackCurrentAliveCounter + 1U) &
+                0x0FU
+            );
+    }
+}
+
+
+void Bms_Can_SendPackPower(void)
+{
+    const BatteryMonitor_DataType *batteryData;
+
+    uint8 txData[8] = {0U};
+
+    sint32 powerRaw;
+    uint32 powerRawU;
+
+    batteryData = BatteryMonitor_GetData();
+
+    if (batteryData == NULL_PTR)
+    {
+        return;
+    }
+
+    powerRaw =
+        Bms_Can_PowerToRaw(
+            batteryData->PackPower_W[0]
+        );
+
+    powerRawU = (uint32)powerRaw;
+
+    /*
+     * Byte0-3: Pack1 power, signed 32-bit,
+     * little endian, 1 W/bit.
+     */
+    txData[0] = (uint8)(powerRawU & 0xFFU);
+    txData[1] = (uint8)((powerRawU >> 8U) & 0xFFU);
+    txData[2] = (uint8)((powerRawU >> 16U) & 0xFFU);
+    txData[3] = (uint8)((powerRawU >> 24U) & 0xFFU);
+
+    /*
+     * Byte4 bit0: Pack1 power valid.
+     */
+    if (batteryData->PackPowerValid[0] == TRUE)
+    {
+        txData[4] |= 0x01U;
+    }
+
+    /*
+     * Byte5-6 reserved.
+     */
+
+    /*
+     * Byte7 bit0-3: alive counter.
+     */
+    txData[7] =
+        (uint8)(g_BmsCanPackPowerAliveCounter & 0x0FU);
+
+    /*
+     * Handle previous polling TX completion.
+     */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_PACK_POWER_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanPackPowerAliveCounter =
+            (uint8)(
+                (g_BmsCanPackPowerAliveCounter + 1U) &
                 0x0FU
             );
     }

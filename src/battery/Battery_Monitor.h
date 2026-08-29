@@ -42,6 +42,22 @@ typedef struct
 
     boolean PackCurrentValid[BATTERY_MONITOR_PACK_COUNT];
 
+    /*
+     * Pack electrical power.
+     *
+     * [0] = Pack 1
+     * [1] = Pack 2
+     * [2] = Pack 3
+     *
+     * Unit: W
+     *
+     * Positive = discharge power
+     * Negative = charge power
+     */
+    float PackPower_W[BATTERY_MONITOR_PACK_COUNT];
+
+    boolean PackPowerValid[BATTERY_MONITOR_PACK_COUNT];
+
     /* Unit: uV */
     sint16 ShuntVoltage_uV;
 
