@@ -20,7 +20,7 @@
 #define BMS_TEMP_LOW_FAULT_SET_DC         (-200)   /* -20.0°C */
 #define BMS_TEMP_LOW_FAULT_CLEAR_DC       (-150)   /* -15.0°C */
 
-#define BMS_TEMP_DELTA_FAULT_SET_DC       (300)    /* 30.0°C */
+#define BMS_TEMP_DELTA_FAULT_SET_DC       (500)    /* 30.0°C */
 #define BMS_TEMP_DELTA_FAULT_CLEAR_DC     (100)    /* 10.0°C */
 
 #define BMS_CELL_IMBALANCE_SET_MV      (300U)

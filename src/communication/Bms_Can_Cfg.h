@@ -31,28 +31,20 @@ extern "C" {
 /** @brief CAN1 test CAN identifier used for transmission. */
 #define BMS_CAN1_CFG_TX_TEST_ID           (0x400U)
 
-/** @brief CAN1 message buffer index reserved for RX mailbox 0. */
+/** @brief CAN1 RX slot 0 - Cell Voltage frame 0. */
 #define BMS_CAN1_CFG_RX_MB0_INDEX         (1U)
-
-/** @brief CAN1 CAN identifier for RX mailbox 0. */
 #define BMS_CAN1_CFG_RX_MB0_ID            (0x401U)
 
-/** @brief CAN1 message buffer index reserved for RX mailbox 1. */
+/** @brief CAN1 RX slot 1 - Cell Voltage frame 1. */
 #define BMS_CAN1_CFG_RX_MB1_INDEX         (2U)
-
-/** @brief CAN1 CAN identifier for RX mailbox 1. */
 #define BMS_CAN1_CFG_RX_MB1_ID            (0x402U)
 
-/** @brief CAN1 message buffer index reserved for RX mailbox 2. */
+/** @brief CAN1 RX slot 2 - Cell Voltage frame 2. */
 #define BMS_CAN1_CFG_RX_MB2_INDEX         (3U)
-
-/** @brief CAN1 CAN identifier for RX mailbox 2. */
 #define BMS_CAN1_CFG_RX_MB2_ID            (0x403U)
 
-/** @brief CAN1 message buffer index reserved for RX mailbox 3. */
+/** @brief CAN1 RX slot 3 - Cell Voltage frame 3. */
 #define BMS_CAN1_CFG_RX_MB3_INDEX         (4U)
-
-/** @brief CAN1 CAN identifier for RX mailbox 3. */
 #define BMS_CAN1_CFG_RX_MB3_ID            (0x404U)
 
 /** @brief Number of CAN1 RX mailboxes. */
