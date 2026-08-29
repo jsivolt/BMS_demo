@@ -26,6 +26,20 @@
 #define BMS_CELL_IMBALANCE_SET_MV      (300U)
 #define BMS_CELL_IMBALANCE_CLEAR_MV    (200U)
 
+/*
+ * Pack 1 current fault thresholds.
+ *
+ * Positive current = discharge
+ * Negative current = charge
+ *
+ * Unit: mA
+ */
+#define BMS_PACK_DISCHARGE_OC_SET_MA       (100000)
+#define BMS_PACK_DISCHARGE_OC_CLEAR_MA      (90000)
+
+#define BMS_PACK_CHARGE_OC_SET_MA          (-80000)
+#define BMS_PACK_CHARGE_OC_CLEAR_MA        (-70000)
+
 static BatteryMonitor_DataType g_BatteryData;
 
 
@@ -37,6 +51,7 @@ static BatteryMonitor_DataType g_BatteryData;
 static void BatteryMonitor_UpdateCellVoltages(void);
 static void BatteryMonitor_UpdatePackMonitor(void);
 static void BatteryMonitor_UpdateVpackFaults(void);
+static void BatteryMonitor_UpdatePackCurrentFaults(void);
 static void BatteryMonitor_UpdateCellVoltageFaults(void);
 static void BatteryMonitor_UpdateCellImbalanceFault(void);
 static void BatteryMonitor_UpdateTemperatureSummary(void);
@@ -171,6 +186,8 @@ void BatteryMonitor_MainFunction(void)
     BatteryMonitor_UpdatePackMonitor();
 
     BatteryMonitor_UpdateVpackFaults();
+
+    BatteryMonitor_UpdatePackCurrentFaults();
 
 
     /*
@@ -344,6 +361,98 @@ static void BatteryMonitor_UpdateVpackFaults(void)
     {
         FaultManager_ClearSystem(
             FAULT_VPACK_DEVICE_FAULT);
+    }
+}
+
+
+/* ================================================================================================
+ * Pack 1 current fault evaluation
+ * ============================================================================================== */
+
+static void BatteryMonitor_UpdatePackCurrentFaults(void)
+{
+    sint32 current_mA;
+
+    /*
+     * Current threshold faults are only meaningful when
+     * the Pack 1 current measurement is valid.
+     */
+    if (g_BatteryData.PackCurrentValid[0] == FALSE)
+    {
+        FaultManager_ClearPack(
+            FAULT_PACK_1,
+            FAULT_PACK_DISCHARGE_OC);
+
+        FaultManager_ClearPack(
+            FAULT_PACK_1,
+            FAULT_PACK_CHARGE_OC);
+
+        return;
+    }
+
+    current_mA =
+        g_BatteryData.PackCurrent_mA[0];
+
+    /*
+     * ================================================================
+     * Discharge over-current
+     *
+     * SET   >= +100 A
+     * CLEAR <=  +90 A
+     * ================================================================
+     */
+    if (FaultManager_IsPackFaultActive(
+            FAULT_PACK_1,
+            FAULT_PACK_DISCHARGE_OC) == TRUE)
+    {
+        if (current_mA <=
+            BMS_PACK_DISCHARGE_OC_CLEAR_MA)
+        {
+            FaultManager_ClearPack(
+                FAULT_PACK_1,
+                FAULT_PACK_DISCHARGE_OC);
+        }
+    }
+    else
+    {
+        if (current_mA >=
+            BMS_PACK_DISCHARGE_OC_SET_MA)
+        {
+            FaultManager_SetPack(
+                FAULT_PACK_1,
+                FAULT_PACK_DISCHARGE_OC);
+        }
+    }
+
+    /*
+     * ================================================================
+     * Charge over-current
+     *
+     * SET   <= -80 A
+     * CLEAR >= -70 A
+     * ================================================================
+     */
+    if (FaultManager_IsPackFaultActive(
+            FAULT_PACK_1,
+            FAULT_PACK_CHARGE_OC) == TRUE)
+    {
+        if (current_mA >=
+            BMS_PACK_CHARGE_OC_CLEAR_MA)
+        {
+            FaultManager_ClearPack(
+                FAULT_PACK_1,
+                FAULT_PACK_CHARGE_OC);
+        }
+    }
+    else
+    {
+        if (current_mA <=
+            BMS_PACK_CHARGE_OC_SET_MA)
+        {
+            FaultManager_SetPack(
+                FAULT_PACK_1,
+                FAULT_PACK_CHARGE_OC);
+        }
     }
 }
 
