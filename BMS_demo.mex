@@ -463,6 +463,26 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.c40_ip" description="C40_Ip is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.c40_ip" description="An unsupported version of the C40_Ip in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.cache" description="cache is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.cache" description="An unsupported version of the cache in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
             <dependency resourceType="Tool" resourceId="Clocks" description="The Clocks tool is required by the Peripherals tool, but it is disabled." problem_level="2" source="Peripherals">
                <feature name="enabled" evaluation="equal">
                   <data>true</data>
@@ -473,6 +493,9 @@
             <file path="generate/include/Adc_Sar_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/Adc_Sar_Ip_CfgDefines.h" update_enabled="true"/>
             <file path="generate/include/Adc_Sar_Ip_PBcfg.h" update_enabled="true"/>
+            <file path="generate/include/C40_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/Cache_Ip_Cfg_Defines.h" update_enabled="true"/>
+            <file path="generate/include/Cache_Ip_Cfg_DeviceRegisters.h" update_enabled="true"/>
             <file path="generate/include/DeviceDefinition.h" update_enabled="true"/>
             <file path="generate/include/FlexCAN_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/FlexCAN_Ip_CfgDefines.h" update_enabled="true"/>
@@ -491,6 +514,7 @@
             <file path="generate/include/Soc_Ips.h" update_enabled="true"/>
             <file path="generate/include/modules.h" update_enabled="true"/>
             <file path="generate/src/Adc_Sar_Ip_PBcfg.c" update_enabled="true"/>
+            <file path="generate/src/C40_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/FlexCAN_Ip_Sa_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/IntCtrl_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/Lpspi_Ip_Sa_PBcfg.c" update_enabled="true"/>
@@ -1533,6 +1557,80 @@
                                  <array name="SpiMaxDmaFastTransfer"/>
                               </struct>
                            </array>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="C40_Ip" uuid="89cbdad9-a90c-41b2-89d2-17e31e04f375" type="C40_Ip" type_id="C40_Ip" mode="ip" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="C40_Ip">
+                        <setting name="Name" value="C40_Ip"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-PRE-COMPILE"/>
+                        </struct>
+                        <struct name="MemGeneral">
+                           <setting name="Name" value="MemGeneral"/>
+                           <setting name="C40IpDevErrorDetect" value="true"/>
+                           <setting name="MemHwCompareService" value="false"/>
+                           <setting name="MemEnableCheckCfgCrc" value="false"/>
+                           <setting name="MemHwUtestModeService" value="false"/>
+                           <setting name="MemHwGetBlockFromAddressService" value="false"/>
+                           <setting name="MemSectorSetLockApi" value="true"/>
+                           <setting name="MemEraseVerificationEnabled" value="true"/>
+                           <setting name="MemWriteVerificationEnabled" value="false"/>
+                           <array name="MemStartFlashAccessNotif"/>
+                           <array name="MemFinishedFlashAccessNotif"/>
+                           <setting name="MemTimeoutSupervisionEnabled" value="false"/>
+                           <setting name="MemTimeoutMethod" value="OSIF_COUNTER_DUMMY"/>
+                           <setting name="MemEraseTimeout" value="0"/>
+                           <setting name="MemWriteTimeout" value="0"/>
+                           <setting name="MemAbortTimeout" value="0"/>
+                           <setting name="MemUtestArrayIntegrityCheckTimeout" value="0"/>
+                           <setting name="MemUtestSuspendTimeout" value="0"/>
+                           <setting name="MemUtestResumeTimeout" value="0"/>
+                        </struct>
+                        <struct name="MemAutosarExt">
+                           <setting name="Name" value="MemAutosarExt"/>
+                           <setting name="MemEnableUserModeSupport" value="false"/>
+                           <setting name="MemSynchronizeCache" value="true"/>
+                           <setting name="MemEccDataErrorSuppression" value="true"/>
+                           <setting name="MemBlock4PipeSelect" value="MEM_COMMAND_PIPE_0"/>
+                           <setting name="MemEccEnableCheck" value="false"/>
+                           <setting name="MemUseExtendedDataFlash" value="false"/>
+                        </struct>
+                        <struct name="MemPublishedInformation" quick_selection="Default">
+                           <setting name="Name" value="MemPublishedInformation"/>
+                           <setting name="MemErasedValue" value="4294967295"/>
+                           <setting name="MemECCValue" value="1427461397"/>
+                        </struct>
+                        <struct name="CommonPublishedInformation" quick_selection="Default">
+                           <setting name="Name" value="CommonPublishedInformation"/>
+                           <setting name="ArReleaseMajorVersion" value="4"/>
+                           <setting name="ArReleaseMinorVersion" value="9"/>
+                           <setting name="ArReleaseRevisionVersion" value="0"/>
+                           <setting name="ModuleId" value="91"/>
+                           <setting name="SwMajorVersion" value="7"/>
+                           <setting name="SwMinorVersion" value="0"/>
+                           <setting name="SwPatchVersion" value="1"/>
+                           <setting name="VendorApiInfix" value="INFLS"/>
+                           <setting name="VendorId" value="43"/>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="Cache_Ip" uuid="c479de54-521d-463e-81d9-5e471675c4d4" type="Cache_Ip" type_id="Cache_Ip" mode="general" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="Cache_Ip">
+                        <setting name="Name" value="Cache_Ip"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-POST-BUILD"/>
+                        </struct>
+                        <struct name="MclGeneral">
+                           <setting name="Name" value="MclGeneral"/>
+                           <setting name="MclEnableUserModeSupport" value="false"/>
+                           <struct name="MclCache">
+                              <setting name="Name" value="MclCache"/>
+                              <setting name="MclEnableCache" value="true"/>
+                              <setting name="MclEnableCacheDevErrorDetect" value="false"/>
+                           </struct>
                         </struct>
                      </config_set>
                   </instance>

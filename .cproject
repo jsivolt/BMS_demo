@@ -736,9 +736,9 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="com.nxp.s32ds.cle.uct.internal.core.toolchainScriptProfile">
-		<COND_TOOLCHAIN_COMPONENTS_OPTION>COPY=platform.driver.siul2_dio;platform.driver.pit;platform.driver.clock;platform.driver.osif;platform.driver.IntCtrl_Ip;platform.driver.FlexCAN;platform.driver.siul2_port;platform.driver.adc_sar;platform.driver.lpspi</COND_TOOLCHAIN_COMPONENTS_OPTION>
+		<COND_TOOLCHAIN_COMPONENTS_OPTION>COPY=platform.driver.siul2_dio;platform.driver.pit;platform.driver.clock;platform.driver.osif;platform.driver.IntCtrl_Ip;platform.driver.FlexCAN;platform.driver.siul2_port;platform.driver.adc_sar;platform.driver.lpspi;platform.driver.cache;platform.driver.c40_ip</COND_TOOLCHAIN_COMPONENTS_OPTION>
 	</storageModule>
 	<storageModule moduleId="com.nxp.s32ds.cle.uct.core">
-		<sdkComponents>platform.driver.clock;platform.driver.rte_mcu;platform.driver.det;platform.driver.osif;platform.driver.rte_osif;platform.driver.siul2_port;platform.driver.rte_port;platform.driver.siul2_dio;platform.driver.rte_dio;platform.driver.pit;platform.driver.rte_gpt;platform.driver.IntCtrl_Ip;platform.driver.adc_sar;platform.driver.rte_adc;platform.driver.FlexCAN;platform.driver.rte_can;platform.driver.lpspi;platform.driver.rte_spi</sdkComponents>
+		<sdkComponents>platform.driver.clock;platform.driver.rte_mcu;platform.driver.det;platform.driver.osif;platform.driver.rte_osif;platform.driver.siul2_port;platform.driver.rte_port;platform.driver.siul2_dio;platform.driver.rte_dio;platform.driver.pit;platform.driver.rte_gpt;platform.driver.IntCtrl_Ip;platform.driver.adc_sar;platform.driver.rte_adc;platform.driver.FlexCAN;platform.driver.rte_can;platform.driver.lpspi;platform.driver.rte_spi;platform.driver.c40_ip;platform.driver.cache;platform.driver.rte_mcl;platform.driver.rte_mem_43_infls</sdkComponents>
 	</storageModule>
 </cproject>

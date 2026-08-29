@@ -55,6 +55,7 @@
 #include "battery/vPACK/Bms_Vpack.h"
 #include "communication/Bms_Can.h"
 #include "communication/Bms_Spi.h"
+#include "storage/Bms_Nvm.h"
 
 #include "Bms_StateMachine.h"
 
@@ -101,6 +102,19 @@
 
 
 /* ================================================================================================
+ * Fault register addresses (Cortex-M7 SCB)
+ * ============================================================================================== */
+
+#define SCB_HFSR_ADDR   (0xE000ED2CUL)
+#define SCB_CFSR_ADDR   (0xE000ED28UL)
+#define SCB_MMFAR_ADDR  (0xE000ED34UL)
+#define SCB_BFAR_ADDR   (0xE000ED38UL)
+#define SCB_AFSR_ADDR   (0xE000ED3CUL)
+
+#define REG32(addr)     (*(volatile uint32 *)(addr))
+
+
+/* ================================================================================================
  * Global variables
  * ============================================================================================== */
 
@@ -112,6 +126,31 @@
 static uint32 g_LedCounter = 0U;
 
 static boolean g_LedOn = FALSE;
+
+/* Fault registers captured by HardFault_Handler for post-mortem debugging */
+volatile uint32 g_HardFault_HFSR  = 0U;
+volatile uint32 g_HardFault_CFSR  = 0U;
+volatile uint32 g_HardFault_BFAR  = 0U;
+volatile uint32 g_HardFault_MMFAR = 0U;
+volatile uint32 g_HardFault_AFSR  = 0U;
+
+/* ================================================================================================
+ * Fault handlers
+ * ============================================================================================== */
+
+void HardFault_Handler(void)
+{
+    g_HardFault_HFSR  = REG32(SCB_HFSR_ADDR);
+    g_HardFault_CFSR  = REG32(SCB_CFSR_ADDR);
+    g_HardFault_MMFAR = REG32(SCB_MMFAR_ADDR);
+    g_HardFault_BFAR  = REG32(SCB_BFAR_ADDR);
+    g_HardFault_AFSR  = REG32(SCB_AFSR_ADDR);
+
+    while (TRUE)
+    {
+        /* Inspect in debugger */
+    }
+}
 
 /* ================================================================================================
  * PIT callback
@@ -249,7 +288,7 @@ static void Bms_MainFunction_100ms(void)
 
 static void Bms_MainFunction_1000ms(void)
 {
-    /* TODO: reserved for future 1000 ms tasks (e.g. diagnostics). */
+    Bms_Soc_1sFunction();
 }
 
 
@@ -265,7 +304,6 @@ static const Bms_Scheduler_TaskEntryType Bms_Scheduler_TaskTable[] =
     { Bms_MainFunction_100ms,  10U },   /* 100 ms  */
     { Bms_MainFunction_1000ms, 100U }   /* 1000 ms */
 };
-
 
 /* ================================================================================================
  * main
@@ -438,6 +476,9 @@ int main(void)
     Bms_Vpack_Init();
 
     BatteryMonitor_Init();
+
+    /* Initialize SOC persistent storage and scan Data Flash. */
+    Bms_Nvm_Init();
 
     Bms_Soc_Init();
 

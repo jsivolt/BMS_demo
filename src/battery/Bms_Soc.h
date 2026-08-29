@@ -31,6 +31,12 @@ extern "C"{
 #define BMS_SOC_MIN_PCT_X10             (0U)
 #define BMS_SOC_MAX_PCT_X10             (1000U)
 
+/** @brief Minimum interval between persisted SOC saves. */
+#define BMS_SOC_SAVE_PERIOD_MS       (60000UL)
+
+/** @brief Minimum SOC change (0.1 % units) required to trigger an early save. */
+#define BMS_SOC_SAVE_DELTA_X10       (1U)
+
 /*==================================================================================================
 *                                       TYPE DEFINITIONS
 ==================================================================================================*/
@@ -74,6 +80,11 @@ const Bms_Soc_DataType *Bms_Soc_GetData(void);
  * @param[in] NewSoc_pct_x10 New SOC, unit 0.1 %, clamped to [BMS_SOC_MIN_PCT_X10, BMS_SOC_MAX_PCT_X10].
  */
 void Bms_Soc_SetSoc_pct_x10(uint16 NewSoc_pct_x10);
+
+/**
+ * @brief Periodic (1 s) SOC persistence: saves to NVM when due and changed enough.
+ */
+void Bms_Soc_1sFunction(void);
 
 #ifdef __cplusplus
 }

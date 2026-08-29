@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../generate/src/Adc_Sar_Ip_PBcfg.c \
+../generate/src/C40_Ip_Cfg.c \
 ../generate/src/Clock_Ip_Cfg.c \
 ../generate/src/FlexCAN_Ip_Sa_PBcfg.c \
 ../generate/src/Igf_Port_Ip_Cfg.c \
@@ -15,6 +16,7 @@ C_SRCS += \
 
 OBJS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.o \
+./generate/src/C40_Ip_Cfg.o \
 ./generate/src/Clock_Ip_Cfg.o \
 ./generate/src/FlexCAN_Ip_Sa_PBcfg.o \
 ./generate/src/Igf_Port_Ip_Cfg.o \
@@ -25,6 +27,7 @@ OBJS += \
 
 C_DEPS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.d \
+./generate/src/C40_Ip_Cfg.d \
 ./generate/src/Clock_Ip_Cfg.d \
 ./generate/src/FlexCAN_Ip_Sa_PBcfg.d \
 ./generate/src/Igf_Port_Ip_Cfg.d \

@@ -2,21 +2,23 @@
  *  @file       Bms_Soc.c
  *  @brief      Pack 1 State-of-Charge estimation using Coulomb counting.
  *
- *  SOC(t) = SOC(t-1) - I(t) * dt / Capacity
- *
- *  Pack 1 current sign convention (see Battery_Monitor.h):
- *    Positive = discharge -> remaining capacity decreases
- *    Negative = charge     -> remaining capacity increases
+ *  Pack 1 current sign convention:
+ *    Positive = charge    -> remaining capacity increases
+ *    Negative = discharge -> remaining capacity decreases
  */
+
 
 #include "Bms_Soc.h"
 #include "Battery_Monitor.h"
+#include "../storage/Bms_Nvm.h"
 
 /*==================================================================================================
 *                                       LOCAL VARIABLES
 ==================================================================================================*/
 
 static Bms_Soc_DataType g_BmsSocData;
+static uint16 g_LastSavedSoc_pct_x10;
+static uint32 g_SocSaveTimer_ms;
 
 /*==================================================================================================
 *                                       GLOBAL FUNCTIONS
@@ -24,12 +26,63 @@ static Bms_Soc_DataType g_BmsSocData;
 
 void Bms_Soc_Init(void)
 {
-    g_BmsSocData.RemainingCapacity_mAh =
-        ((float)BMS_SOC_PACK1_CAPACITY_MAH * (float)BMS_SOC_INITIAL_PCT_X10) / 1000.0f;
+    uint16 restoredSoc;
 
-    g_BmsSocData.Soc_pct_x10 = (uint16)BMS_SOC_INITIAL_PCT_X10;
+    if (Bms_Nvm_LoadSoc(&restoredSoc) == TRUE)
+    {
+        Bms_Soc_SetSoc_pct_x10(restoredSoc);
+    }
+    else
+    {
+        Bms_Soc_SetSoc_pct_x10(
+            (uint16)BMS_SOC_INITIAL_PCT_X10);
+    }
+
+    g_LastSavedSoc_pct_x10 =
+        g_BmsSocData.Soc_pct_x10;
+
+    g_SocSaveTimer_ms = 0U;
 
     g_BmsSocData.Valid = FALSE;
+}
+
+void Bms_Soc_1sFunction(void)
+{
+    uint16 currentSoc;
+    uint16 difference;
+
+    if (g_BmsSocData.Valid == FALSE)
+    {
+        return;
+    }
+
+    g_SocSaveTimer_ms += 1000U;
+
+    if (g_SocSaveTimer_ms < BMS_SOC_SAVE_PERIOD_MS)
+    {
+        return;
+    }
+
+    g_SocSaveTimer_ms = 0U;
+
+    currentSoc = g_BmsSocData.Soc_pct_x10;
+
+    if (currentSoc >= g_LastSavedSoc_pct_x10)
+    {
+        difference = currentSoc - g_LastSavedSoc_pct_x10;
+    }
+    else
+    {
+        difference = g_LastSavedSoc_pct_x10 - currentSoc;
+    }
+
+    if (difference >= BMS_SOC_SAVE_DELTA_X10)
+    {
+        if (Bms_Nvm_SaveSoc(currentSoc) == TRUE)
+        {
+            g_LastSavedSoc_pct_x10 = currentSoc;
+        }
+    }
 }
 
 void Bms_Soc_MainFunction(void)
