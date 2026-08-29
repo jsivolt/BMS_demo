@@ -82,6 +82,11 @@ BO_ 775 Pack_Power_Status: 8 S32K344_BMS
  SG_ Pack1PowerValid : 32|1@1+ (1,0) [0|1] "" PCAN
  SG_ PowerAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
 
+BO_ 776 SOC_Status: 8 S32K344_BMS
+ SG_ Pack1SOC : 0|16@1+ (0.1,0) [0|100] "%" PCAN
+ SG_ Pack1SOCValid : 16|1@1+ (1,0) [0|1] "" PCAN
+ SG_ SOCAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
+
 BO_ 1024 CAN1_Test: 8 S32K344
  SG_ TestByte0 : 0|8@1+ (1,0) [0|255] "" PCAN
  SG_ TestByte1 : 8|8@1+ (1,0) [0|255] "" PCAN
@@ -124,6 +129,9 @@ BO_ 1041 ADBMS2950_PackVoltage: 8 vPACK_Sim
 VAL_ 512 DebugCommand 0 "NOP" 1 "LED2_ON" 2 "LED2_OFF" 3 "CLEAR_RX_COUNT";
 VAL_ 513 ControlCommand 0 "NOP" 1 "BMS_ENABLE" 2 "BMS_DISABLE" 3 "CLEAR_FAULT";
 VAL_ 768 BmsState 0 "INIT" 1 "STANDBY" 2 "ACTIVE" 3 "FAULT";
+VAL_ 776 Pack1SOCValid
+    0 "Invalid"
+    1 "Valid";
 
 CM_ BO_ 1025 "CAN1 RX mailbox slot 0, hardware MB1. Cell 1-4, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1026 "CAN1 RX mailbox slot 1, hardware MB2. Cell 5-8, little-endian uint16, 1 mV/bit.";

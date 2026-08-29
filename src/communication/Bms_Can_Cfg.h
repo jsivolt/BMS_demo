@@ -98,6 +98,9 @@ extern "C" {
 /** @brief CAN identifier used to broadcast pack power status. */
 #define BMS_CAN_CFG_TX_PACK_POWER_ID      (0x307U)
 
+/** @brief CAN identifier used to broadcast SOC status. */
+#define BMS_CAN_CFG_TX_SOC_STATUS_ID    (0x308U)
+
 /** @brief CAN identifier used for incoming debug frames. */
 #define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)
 

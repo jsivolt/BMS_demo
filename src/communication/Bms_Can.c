@@ -14,6 +14,7 @@
 
 #include "../battery/vAFE/Bms_Vafe.h"
 #include "../battery/vPACK/Bms_Vpack.h"
+#include "../battery/Bms_Soc.h"
 
 
 #define BMS_CAN_TX_TIMEOUT_MS   (100U)
@@ -125,6 +126,7 @@ static uint8 g_BmsCanPackStatusAliveCounter = 0U;
 static uint8 g_BmsCanContactorAliveCounter = 0U;
 static uint8 g_BmsCanPackCurrentAliveCounter = 0U;
 static uint8 g_BmsCanPackPowerAliveCounter = 0U;
+static uint8 g_BmsCanSocAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -1277,6 +1279,73 @@ void Bms_Can_SendPackPower(void)
                 (g_BmsCanPackPowerAliveCounter + 1U) &
                 0x0FU
             );
+    }
+}
+
+
+void Bms_Can_SendSocStatus(void)
+{
+    const Bms_Soc_DataType *socData;
+    uint8 txData[8] = {0U};
+    uint16 socRaw;
+
+    socData = Bms_Soc_GetData();
+
+    if (socData == NULL_PTR)
+    {
+        return;
+    }
+
+    /*
+     * Soc_pct_x10:
+     * 500  = 50.0%
+     * 1000 = 100.0%
+     */
+    socRaw = socData->Soc_pct_x10;
+
+    txData[0] = (uint8)(socRaw & 0xFFU);
+    txData[1] = (uint8)((socRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte2 bit0 = Pack1 SOC valid
+     */
+    if (socData->Valid == TRUE)
+    {
+        txData[2] |= 0x01U;
+    }
+
+    /*
+     * Byte3-6 reserved
+     */
+
+    /*
+     * Byte7 bit0-3 = alive counter
+     */
+    txData[7] =
+        (uint8)(g_BmsCanSocAliveCounter & 0x0FU);
+
+    /*
+     * Handle previous polling TX completion.
+     */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_SOC_STATUS_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanSocAliveCounter =
+            (uint8)((g_BmsCanSocAliveCounter + 1U) & 0x0FU);
     }
 }
 

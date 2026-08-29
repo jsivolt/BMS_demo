@@ -50,6 +50,7 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "Bms_Soc.h"
 #include "battery/vAFE/Bms_Vafe.h"
 #include "battery/vPACK/Bms_Vpack.h"
 #include "communication/Bms_Can.h"
@@ -221,6 +222,8 @@ static void Bms_MainFunction_100ms(void)
 
     BatteryMonitor_MainFunction();
 
+    Bms_Soc_MainFunction();
+
     Bms_StateMachine_MainFunction();
 
     Bms_Can_SendStatus();
@@ -240,6 +243,8 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendPackCurrent();
 
     Bms_Can_SendPackPower();
+
+    Bms_Can_SendSocStatus();
 }
 
 static void Bms_MainFunction_1000ms(void)
@@ -433,6 +438,8 @@ int main(void)
     Bms_Vpack_Init();
 
     BatteryMonitor_Init();
+
+    Bms_Soc_Init();
 
 
     /* ============================================================================================

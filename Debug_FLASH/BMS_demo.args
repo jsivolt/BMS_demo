@@ -78,6 +78,7 @@
 "./src/battery/Battery_Monitor.o"
 "./src/battery/Bms_Afe.o"
 "./src/battery/Bms_Ntc.o"
+"./src/battery/Bms_Soc.o"
 "./src/battery/vAFE/Bms_Vafe.o"
 "./src/battery/vPACK/Bms_Vpack.o"
 "./src/communication/Bms_Can.o"

@@ -74,6 +74,7 @@ src/main.o: ../src/main.c ../RTD/include/Clock_Ip.h \
  C\:/S32K344/workspace/BMS_demo/src/battery/Battery_Monitor.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h \
  C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h \
+ C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Soc.h \
  ../src/battery/vAFE/Bms_Vafe.h ../src/battery/vPACK/Bms_Vpack.h \
  ../src/communication/Bms_Can.h ../src/communication/Bms_Spi.h \
  C\:/S32K344/workspace/BMS_demo/src/app/Bms_StateMachine.h \
@@ -156,6 +157,7 @@ C\:/S32K344/workspace/BMS_demo/src/app/Bms_App.h:
 C\:/S32K344/workspace/BMS_demo/src/battery/Battery_Monitor.h:
 C\:/S32K344/workspace/BMS_demo/src/app/Bms_Adc.h:
 C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Ntc.h:
+C\:/S32K344/workspace/BMS_demo/src/battery/Bms_Soc.h:
 ../src/battery/vAFE/Bms_Vafe.h:
 ../src/battery/vPACK/Bms_Vpack.h:
 ../src/communication/Bms_Can.h:

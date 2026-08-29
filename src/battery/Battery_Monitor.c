@@ -27,18 +27,17 @@
 #define BMS_CELL_IMBALANCE_CLEAR_MV    (200U)
 
 /*
- * Pack 1 current fault thresholds.
+ * Pack current sign convention:
  *
- * Positive current = discharge
- * Negative current = charge
- *
- * Unit: mA
+ * Positive current = Charge
+ * Negative current = Discharge
  */
-#define BMS_PACK_DISCHARGE_OC_SET_MA       (100000)
-#define BMS_PACK_DISCHARGE_OC_CLEAR_MA      (90000)
 
-#define BMS_PACK_CHARGE_OC_SET_MA          (-80000)
-#define BMS_PACK_CHARGE_OC_CLEAR_MA        (-70000)
+#define BMS_PACK_CHARGE_OC_SET_MA          (80000)
+#define BMS_PACK_CHARGE_OC_CLEAR_MA        (70000)
+
+#define BMS_PACK_DISCHARGE_OC_SET_MA      (-100000)
+#define BMS_PACK_DISCHARGE_OC_CLEAR_MA     (-90000)
 
 static BatteryMonitor_DataType g_BatteryData;
 
@@ -433,15 +432,15 @@ static void BatteryMonitor_UpdatePackCurrentFaults(void)
      * ================================================================
      * Discharge over-current
      *
-     * SET   >= +100 A
-     * CLEAR <=  +90 A
+     * SET   <= -100 A
+     * CLEAR >=  -90 A
      * ================================================================
      */
     if (FaultManager_IsPackFaultActive(
             FAULT_PACK_1,
             FAULT_PACK_DISCHARGE_OC) == TRUE)
     {
-        if (current_mA <=
+        if (current_mA >=
             BMS_PACK_DISCHARGE_OC_CLEAR_MA)
         {
             FaultManager_ClearPack(
@@ -451,7 +450,7 @@ static void BatteryMonitor_UpdatePackCurrentFaults(void)
     }
     else
     {
-        if (current_mA >=
+        if (current_mA <=
             BMS_PACK_DISCHARGE_OC_SET_MA)
         {
             FaultManager_SetPack(
@@ -464,15 +463,15 @@ static void BatteryMonitor_UpdatePackCurrentFaults(void)
      * ================================================================
      * Charge over-current
      *
-     * SET   <= -80 A
-     * CLEAR >= -70 A
+     * SET   >= +80 A
+     * CLEAR <= +70 A
      * ================================================================
      */
     if (FaultManager_IsPackFaultActive(
             FAULT_PACK_1,
             FAULT_PACK_CHARGE_OC) == TRUE)
     {
-        if (current_mA >=
+        if (current_mA <=
             BMS_PACK_CHARGE_OC_CLEAR_MA)
         {
             FaultManager_ClearPack(
@@ -482,7 +481,7 @@ static void BatteryMonitor_UpdatePackCurrentFaults(void)
     }
     else
     {
-        if (current_mA <=
+        if (current_mA >=
             BMS_PACK_CHARGE_OC_SET_MA)
         {
             FaultManager_SetPack(
