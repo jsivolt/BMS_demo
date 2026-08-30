@@ -2,6 +2,14 @@
 #include "Bms_Contactor_Cfg.h"
 #include "Fault_Manager.h"
 
+#include "Siul2_Dio_Ip.h"
+#include "Siul2_Dio_Ip_Cfg.h"
+
+/*
+ * 1 = precharge completes on a timer instead of a bus voltage judgement.
+ * Must be 0 before connecting real HV, which also requires a caller for
+ * Bms_Contactor_SetBusVoltage(); nothing feeds it today.
+ */
 #define BMS_CONTACTOR_SIMULATION_MODE    (1U)
 
 typedef struct
@@ -26,6 +34,18 @@ static Bms_ContactorContextType
  * Shared DC bus, common to all packs.
  */
 static volatile float g_BusVoltage;
+
+
+/* ---------------------------------------------------------- */
+
+/*
+ * Fault masks latched at the first entry into FAULT.
+ * The live masks self-clear once the first valid measurement arrives.
+ */
+volatile uint32 g_DebugFaultPack1First = 0U;
+volatile uint32 g_DebugFaultSystemFirst = 0U;
+volatile uint32 g_DebugFaultPack1Sticky = 0U;
+volatile uint32 g_DebugFaultSystemSticky = 0U;
 
 
 /* ---------------------------------------------------------- */
@@ -57,6 +77,61 @@ static void Bms_Contactor_ProcessPack(Bms_PackIdType packId);
 
 /* ---------------------------------------------------------- */
 
+static void Bms_Contactor_WritePin(
+        Siul2_Dio_Ip_GpioType * const base,
+        Siul2_Dio_Ip_PinsChannelType pin,
+        boolean active)
+{
+    Siul2_Dio_Ip_PinsLevelType level;
+
+    if (active == TRUE)
+    {
+        level = (Siul2_Dio_Ip_PinsLevelType)
+                BMS_CONTACTOR_OUTPUT_ACTIVE_LEVEL;
+    }
+    else
+    {
+        level = (Siul2_Dio_Ip_PinsLevelType)
+                (1U - BMS_CONTACTOR_OUTPUT_ACTIVE_LEVEL);
+    }
+
+    Siul2_Dio_Ip_WritePin(base, pin, level);
+}
+
+
+/* ---------------------------------------------------------- */
+
+static void Bms_Contactor_ApplyOutputs(Bms_PackIdType packId)
+{
+    const Bms_ContactorOutputType *out;
+
+    /* Only Pack1 has relay hardware wired. */
+    if (packId != BMS_PACK_1)
+    {
+        return;
+    }
+
+    out = &g_Contactor[packId].output;
+
+    Bms_Contactor_WritePin(
+            BMS_CONTACTOR_P1_NEG_PORT,
+            BMS_CONTACTOR_P1_NEG_PIN,
+            out->negative);
+
+    Bms_Contactor_WritePin(
+            BMS_CONTACTOR_P1_PRE_PORT,
+            BMS_CONTACTOR_P1_PRE_PIN,
+            out->precharge);
+
+    Bms_Contactor_WritePin(
+            BMS_CONTACTOR_P1_POS_PORT,
+            BMS_CONTACTOR_P1_POS_PIN,
+            out->positive);
+}
+
+
+/* ---------------------------------------------------------- */
+
 void Bms_Contactor_Init(void)
 {
     uint32 i;
@@ -73,6 +148,8 @@ void Bms_Contactor_Init(void)
         g_Contactor[i].stateTimerMs = 0U;
 
         Bms_Contactor_AllOff((Bms_PackIdType)i);
+
+        Bms_Contactor_ApplyOutputs((Bms_PackIdType)i);
     }
 
     g_BusVoltage = 0.0F;
@@ -109,6 +186,10 @@ void Bms_Contactor_MainFunction(void)
     {
         Bms_Contactor_ProcessPack(
                 (Bms_PackIdType)pack);
+
+        /* ProcessPack has early returns, so drive the pins from here. */
+        Bms_Contactor_ApplyOutputs(
+                (Bms_PackIdType)pack);
     }
 }
 
@@ -141,6 +222,25 @@ static void Bms_Contactor_ProcessPack(Bms_PackIdType packId)
 
         ctx->closeRequest = FALSE;
         ctx->openRequest = FALSE;
+
+        if (packId == BMS_PACK_1)
+        {
+            FaultMaskType packMask;
+            FaultMaskType sysMask;
+
+            packMask = FaultManager_GetPackFaults(FAULT_PACK_1);
+            sysMask = FaultManager_GetSystemFaults();
+
+            if ((g_DebugFaultPack1First == 0U) &&
+                (g_DebugFaultSystemFirst == 0U))
+            {
+                g_DebugFaultPack1First = (uint32)packMask;
+                g_DebugFaultSystemFirst = (uint32)sysMask;
+            }
+
+            g_DebugFaultPack1Sticky |= (uint32)packMask;
+            g_DebugFaultSystemSticky |= (uint32)sysMask;
+        }
 
         Bms_Contactor_EnterState(
                 packId,

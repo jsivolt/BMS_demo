@@ -11,6 +11,16 @@
 #define BMS_STATE_LED_PORT    PTA_H_HALF
 #define BMS_STATE_LED_PIN     (15U)
 
+/*
+ * INIT settle window, in 100 ms MainFunction cycles.
+ *
+ * AFE / vPack / NTC report their data as invalid until the first
+ * measurement cycle completes, which raises critical faults that
+ * clear on their own. Contactors stay open during INIT, so waiting
+ * here is safe; a fault still latching after the window is real.
+ */
+#define BMS_STATE_INIT_SETTLE_CYCLES   (20U)
+
 
 /*
  * Temporary external CAN requests.
@@ -27,6 +37,10 @@ extern volatile boolean g_BmsClearFaultRequest;
  */
 static volatile Bms_StateType g_BmsState = BMS_STATE_INIT;
 
+static uint32 g_BmsInitCycles = 0U;
+
+volatile uint8 g_DebugBmsState = (uint8)BMS_STATE_INIT;
+
 
 /* ================================================================================================
  * Local function prototypes
@@ -42,6 +56,8 @@ static void Bms_StateMachine_UpdateLed(void);
 void Bms_StateMachine_Init(void)
 {
     g_BmsState = BMS_STATE_INIT;
+
+    g_BmsInitCycles = 0U;
 }
 
 
@@ -123,7 +139,12 @@ void Bms_StateMachine_MainFunction(void)
              */
             if (FaultManager_HasCriticalFault() == TRUE)
             {
-                g_BmsState = BMS_STATE_FAULT;
+                g_BmsInitCycles++;
+
+                if (g_BmsInitCycles >= BMS_STATE_INIT_SETTLE_CYCLES)
+                {
+                    g_BmsState = BMS_STATE_FAULT;
+                }
             }
             else
             {
@@ -312,4 +333,6 @@ void Bms_StateMachine_MainFunction(void)
      * Update state indication after processing transitions.
      */
     Bms_StateMachine_UpdateLed();
+
+    g_DebugBmsState = (uint8)g_BmsState;
 }

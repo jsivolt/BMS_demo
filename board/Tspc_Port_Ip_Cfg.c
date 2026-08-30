@@ -124,6 +124,9 @@ PortContainer_0_BOARD_InitPeripherals:
   - {pin_num: '97', peripheral: CAN1, signal: can1_rx, pin_signal: PTC9}
   - {pin_num: '158', peripheral: CAN2, signal: can2_rx, pin_signal: PTE25}
   - {pin_num: '157', peripheral: CAN2, signal: can2_tx, pin_signal: PTE24}
+  - {pin_num: '87', peripheral: SIUL2, signal: 'gpio, 87', pin_signal: PTC23, direction: OUTPUT}
+  - {pin_num: '88', peripheral: SIUL2, signal: 'gpio, 88', pin_signal: PTC24, direction: OUTPUT}
+  - {pin_num: '89', peripheral: SIUL2, signal: 'gpio, 89', pin_signal: PTC25, direction: OUTPUT}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */

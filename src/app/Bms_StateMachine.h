@@ -16,4 +16,8 @@ void Bms_StateMachine_MainFunction(void);
 
 Bms_StateType Bms_StateMachine_GetState(void);
 
+
+/* Debug mirror: g_BmsState is file-static and not visible to the debugger. */
+extern volatile uint8 g_DebugBmsState;
+
 #endif

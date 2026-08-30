@@ -71,4 +71,15 @@ void Bms_Contactor_SetPackVoltage(
 void Bms_Contactor_SetBusVoltage(float voltage);
 
 
+/*
+ * Fault masks latched at the first entry into FAULT (Pack1).
+ * The live masks self-clear once the first valid measurement arrives,
+ * so a startup fault is otherwise invisible after the fact.
+ */
+extern volatile uint32 g_DebugFaultPack1First;
+extern volatile uint32 g_DebugFaultSystemFirst;
+extern volatile uint32 g_DebugFaultPack1Sticky;
+extern volatile uint32 g_DebugFaultSystemSticky;
+
+
 #endif
