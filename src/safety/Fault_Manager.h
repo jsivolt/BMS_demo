@@ -97,6 +97,9 @@ boolean FaultManager_IsPackFaultActive(
 boolean FaultManager_PackHasCriticalFault(
         FaultPackIdType packId);
 
+FaultMaskType FaultManager_GetLastPackFaults(
+        FaultPackIdType packId);
+
 void FaultManager_SetSystem(FaultMaskType fault);
 
 void FaultManager_ClearSystem(FaultMaskType fault);
@@ -108,6 +111,15 @@ boolean FaultManager_IsSystemFaultActive(FaultMaskType fault);
 FaultMaskType FaultManager_GetSystemFaults(void);
 
 boolean FaultManager_SystemHasCriticalFault(void);
+
+FaultMaskType FaultManager_GetLastSystemFaults(void);
+
+/*
+ * Clear the latched fault history (both pack and system).
+ *
+ * Does not affect the current, real-time fault masks.
+ */
+void FaultManager_ClearLastFaults(void);
 
 void FaultManager_Set(FaultMaskType fault);
 void FaultManager_Clear(FaultMaskType fault);

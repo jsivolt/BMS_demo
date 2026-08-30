@@ -101,6 +101,12 @@ extern "C" {
 /** @brief CAN identifier used to broadcast SOC status. */
 #define BMS_CAN_CFG_TX_SOC_STATUS_ID    (0x308U)
 
+/** @brief CAN identifier used to broadcast latched Pack1/Pack2 fault history. */
+#define BMS_CAN_CFG_TX_LAST_FAULT_12_ID         (0x309U)
+
+/** @brief CAN identifier used to broadcast latched Pack3/system fault history. */
+#define BMS_CAN_CFG_TX_LAST_FAULT_3_SYSTEM_ID   (0x30AU)
+
 /** @brief CAN identifier used for incoming debug frames. */
 #define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)
 

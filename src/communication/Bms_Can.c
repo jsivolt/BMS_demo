@@ -336,6 +336,14 @@ static void Bms_Can_ProcessControlCommand(const uint8 *data, uint8 dlc)
             g_BmsClearFaultRequest = TRUE;
             break;
 
+        case 0x04U:
+            /*
+             * Clear latched fault history only.
+             * Does not affect the current fault masks or state machine.
+             */
+            FaultManager_ClearLastFaults();
+            break;
+
         default:
             break;
     }
@@ -974,6 +982,112 @@ void Bms_Can_SendFaultStatus2(void)
             BMS_CAN_CFG_TX_MB_INDEX,
             &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_FAULT_3_SYSTEM_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+/* ================================================================================================
+ * CAN TX latched Pack1 + Pack2 fault history frame
+ * CAN ID: 0x309
+ * ============================================================================================== */
+
+void Bms_Can_SendLastFaultStatus1(void)
+{
+    uint8 txData[8];
+
+    FaultMaskType lastPack1Faults;
+    FaultMaskType lastPack2Faults;
+
+    lastPack1Faults =
+        FaultManager_GetLastPackFaults(FAULT_PACK_1);
+
+    lastPack2Faults =
+        FaultManager_GetLastPackFaults(FAULT_PACK_2);
+
+    /*
+     * Bytes 0-3:
+     * Latched Pack1 fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[0],
+        (uint32)lastPack1Faults
+    );
+
+    /*
+     * Bytes 4-7:
+     * Latched Pack2 fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[4],
+        (uint32)lastPack2Faults
+    );
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_LAST_FAULT_12_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+/* ================================================================================================
+ * CAN TX latched Pack3 + System fault history frame
+ * CAN ID: 0x30A
+ * ============================================================================================== */
+
+void Bms_Can_SendLastFaultStatus2(void)
+{
+    uint8 txData[8];
+
+    FaultMaskType lastPack3Faults;
+    FaultMaskType lastSystemFaults;
+
+    lastPack3Faults =
+        FaultManager_GetLastPackFaults(FAULT_PACK_3);
+
+    lastSystemFaults =
+        FaultManager_GetLastSystemFaults();
+
+    /*
+     * Bytes 0-3:
+     * Latched Pack3 fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[0],
+        (uint32)lastPack3Faults
+    );
+
+    /*
+     * Bytes 4-7:
+     * Latched System fault mask, little endian
+     */
+    Bms_Can_PackUint32LE(
+        &txData[4],
+        (uint32)lastSystemFaults
+    );
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_LAST_FAULT_3_SYSTEM_ID,
             txData,
             BMS_CAN_TX_TIMEOUT_MS
         );

@@ -10,6 +10,8 @@ void Bms_Can_SendPackStatus(void);
 void Bms_Can_SendContactorStatus(void);
 void Bms_Can_SendFaultStatus1(void);
 void Bms_Can_SendFaultStatus2(void);
+void Bms_Can_SendLastFaultStatus1(void);
+void Bms_Can_SendLastFaultStatus2(void);
 
 void Bms_Can1_SendTest(void);
 
