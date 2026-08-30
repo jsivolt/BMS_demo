@@ -1,0 +1,4 @@
+# Standalone CLI build: keep the linked images, drop the intermediates
+/make/build/**/*.o
+/make/build/**/*.d
+/make/build/**/*.rsp
