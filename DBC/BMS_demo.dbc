@@ -121,9 +121,13 @@ BO_ 1028 vAFE_CellVoltage_13_16: 8 vAFE_Sim
  SG_ Cell15Voltage : 32|16@1+ (0.001,0) [0|65.535] "V" S32K344
  SG_ Cell16Voltage : 48|16@1+ (0.001,0) [0|65.535] "V" S32K344
 
-BO_ 1040 ADBMS2950_Current: 8 vPACK_Sim
+BO_ 1040 vPack_Current: 8 vPACK_Sim
+ SG_ Pack1Current_mA  : 0|32@1- (1,0) [-2147483648|2147483647] "mA" S32K344
+ SG_ Shunt1Voltage_uV : 32|16@1- (1,0) [-32768|32767] "uV" S32K344
+ SG_ AliveCounter    : 48|8@1+ (1,0) [0|255] "" S32K344
+ SG_ Status          : 56|8@1+ (1,0) [0|255] "" S32K344
 
-BO_ 1041 ADBMS2950_PackVoltage: 8 vPACK_Sim
+BO_ 1041 vPack_Voltage: 8 vPACK_Sim
  SG_ Pack1VoltageSim : 0|16@1+ (0.1,0) [0|6553.5] "V" S32K344
 
 VAL_ 512 DebugCommand 0 "NOP" 1 "LED2_ON" 2 "LED2_OFF" 3 "CLEAR_RX_COUNT";
