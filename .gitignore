@@ -1,1 +1,24 @@
+# Build output (S32 Design Studio configurations)
 Debug_FLASH/
+Debug_RAM/
+Release_FLASH/
+Release_RAM/
+.build-tmp/
+
+# Build artifacts that may appear outside output dirs
+*.o
+*.d
+*.elf
+*.map
+*.bin
+*.hex
+*.srec
+*.su
+
+# Eclipse/S32DS workspace metadata
+.metadata/
+
+# OS / editor junk
+Thumbs.db
+.DS_Store
+*.swp
