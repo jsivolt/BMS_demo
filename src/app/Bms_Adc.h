@@ -60,6 +60,8 @@ uint16 Bms_Adc_GetBusSpareVoltageMv(void);
  * @brief Returns the latest ADC1_P1 voltage in millivolts.
  */
 uint16 Bms_Adc_GetNtc1VoltageMv(void);
+uint16 Bms_Adc_GetNtc2VoltageMv(void);
+uint16 Bms_Adc_GetNtc3VoltageMv(void);
 
 /**
  * @brief Returns TRUE if the latest ADC acquisition round was fully valid.

@@ -46,6 +46,11 @@ static volatile boolean g_BmsAdcBusValid = FALSE;
 static boolean g_BmsAdcAdc1ConversionStarted = FALSE;
 static boolean g_BmsAdcAdc0ConversionStarted = FALSE;
 
+/* Mirrors of NTC voltage readings for direct inspection in S32DS Expressions view */
+volatile uint16 g_DebugNtc1VoltageMv = 0U;
+volatile uint16 g_DebugNtc2VoltageMv = 0U;
+volatile uint16 g_DebugNtc3VoltageMv = 0U;
+
 
 Std_ReturnType Bms_Adc_Init(void)
 {
@@ -193,6 +198,10 @@ void Bms_Adc_MainFunction(void)
             g_BmsAdcPackV2Raw = packV2Result.ConvData;
             g_BmsAdcPackV3Raw = packV3Result.ConvData;
 
+            g_DebugNtc1VoltageMv = Bms_Adc_GetNtc1VoltageMv();
+            g_DebugNtc2VoltageMv = Bms_Adc_GetNtc2VoltageMv();
+            g_DebugNtc3VoltageMv = Bms_Adc_GetNtc3VoltageMv();
+
             g_BmsAdcPackValid = TRUE;
         }
         else
@@ -336,6 +345,26 @@ uint16 Bms_Adc_GetPackV3VoltageMv(void)
 uint16 Bms_Adc_GetNtc1VoltageMv(void)
 {
     uint32 raw = (uint32)g_BmsAdcNtc1Raw;
+
+    return (uint16)(
+        (raw * BMS_NTC_CFG_ADC_VREF_MV) /
+        BMS_NTC_CFG_ADC_FULL_SCALE
+    );
+}
+
+uint16 Bms_Adc_GetNtc2VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcNtc2Raw;
+
+    return (uint16)(
+        (raw * BMS_NTC_CFG_ADC_VREF_MV) /
+        BMS_NTC_CFG_ADC_FULL_SCALE
+    );
+}
+
+uint16 Bms_Adc_GetNtc3VoltageMv(void)
+{
+    uint32 raw = (uint32)g_BmsAdcNtc3Raw;
 
     return (uint16)(
         (raw * BMS_NTC_CFG_ADC_VREF_MV) /
