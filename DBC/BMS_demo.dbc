@@ -129,6 +129,11 @@ BO_ 1028 vAFE_CellVoltage_13_16: 8 vAFE_Sim
  SG_ Cell15Voltage : 32|16@1+ (0.001,0) [0|65.535] "V" S32K344
  SG_ Cell16Voltage : 48|16@1+ (0.001,0) [0|65.535] "V" S32K344
 
+BO_ 1029 vAFE_Measurement_Header: 8 vAFE_Sim
+ SG_ MeasurementCounter : 0|8@1+ (1,0) [0|255] "" S32K344
+ SG_ AFEStatus : 8|8@1+ (1,0) [0|255] "" S32K344
+ SG_ Reserved : 16|48@1+ (1,0) [0|281474976710655] "" S32K344
+
 BO_ 1040 vPack_Current: 8 vPACK_Sim
  SG_ Pack1Current_mA  : 0|32@1- (1,0) [-2147483648|2147483647] "mA" S32K344
  SG_ Shunt1Voltage_uV : 32|16@1- (1,0) [-32768|32767] "uV" S32K344
@@ -154,6 +159,7 @@ CM_ BO_ 1025 "CAN1 RX mailbox slot 0, hardware MB1. Cell 1-4, little-endian uint
 CM_ BO_ 1026 "CAN1 RX mailbox slot 1, hardware MB2. Cell 5-8, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1027 "CAN1 RX mailbox slot 2, hardware MB3. Cell 9-12, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1028 "CAN1 RX mailbox slot 3, hardware MB4. Cell 13-16, little-endian uint16, 1 mV/bit.";
+CM_ BO_ 1029 "CAN1 ID 0x405. Measurement header: rolling counter and AFE status, bytes 2-7 reserved.";
 CM_ BO_ 1040 "CAN2 ADBMS2950 current frame. Signal layout is not defined by the supplied Bms_Can/Bms_Vafe sources.";
 CM_ BO_ 1041 "CAN2 ADBMS2950 voltage frame. Only bytes 0-1 Pack1VoltageSim are defined here because that mapping is explicit in Bms_Can.c.";
 CM_ SG_ 773 MinCellIndex "0-based cell index: 0=Cell1, 15=Cell16.";

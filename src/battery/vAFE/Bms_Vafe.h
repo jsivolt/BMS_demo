@@ -17,6 +17,9 @@ typedef struct
     uint8 MinCellIndex;
     uint8 MaxCellIndex;
 
+    uint8 MeasurementCounter;
+    boolean HeaderValid;
+
     boolean DataValid;
 } Bms_Vafe_DataType;
 

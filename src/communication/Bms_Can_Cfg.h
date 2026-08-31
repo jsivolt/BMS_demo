@@ -47,8 +47,12 @@ extern "C" {
 #define BMS_CAN1_CFG_RX_MB3_INDEX         (4U)
 #define BMS_CAN1_CFG_RX_MB3_ID            (0x404U)
 
+/** @brief CAN1 RX slot 4 - AFE Measurement Header. */
+#define BMS_CAN1_CFG_RX_MB4_INDEX         (5U)
+#define BMS_CAN1_CFG_RX_MB4_ID            (0x405U)
+
 /** @brief Number of CAN1 RX mailboxes. */
-#define BMS_CAN1_CFG_RX_MB_COUNT          (4U)
+#define BMS_CAN1_CFG_RX_MB_COUNT          (5U)
 
 /** @brief FlexCAN hardware instance 2 (CAN2), used for ADBMS2950 simulation. */
 #define BMS_CAN2_CFG_INSTANCE             (2U)

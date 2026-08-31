@@ -81,12 +81,13 @@ volatile Flexcan_Ip_StatusType g_BmsCan1InitStatus;
 volatile Flexcan_Ip_StatusType g_BmsCan1TxStatus;
 volatile Flexcan_Ip_StatusType g_BmsCan1RxStatus[BMS_CAN1_CFG_RX_MB_COUNT];
 
-volatile uint32 g_BmsCan1RxCount[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U };
-volatile uint32 g_BmsCan1RxId[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U };
-volatile uint8  g_BmsCan1RxDlc[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U };
+volatile uint32 g_BmsCan1RxCount[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U, 0U };
+volatile uint32 g_BmsCan1RxId[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U, 0U };
+volatile uint8  g_BmsCan1RxDlc[BMS_CAN1_CFG_RX_MB_COUNT] = { 0U, 0U, 0U, 0U, 0U };
 
 volatile uint8 g_BmsCan1RxData[BMS_CAN1_CFG_RX_MB_COUNT][8] =
 {
+    { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
     { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
     { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
     { 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U },
@@ -144,13 +145,14 @@ static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage[BMS_CAN1_CFG_RX_MB_COUNT];
 static Flexcan_Ip_MsgBuffType g_BmsCan2RxCurrentMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCan2RxVoltageMessage;
 
-/* CAN1 RX mailbox index/ID lookup tables, indexed by mailbox slot 0..3. */
+/* CAN1 RX mailbox index/ID lookup tables, indexed by mailbox slot 0..4. */
 static const uint8 g_BmsCan1RxMbIndex[BMS_CAN1_CFG_RX_MB_COUNT] =
 {
     BMS_CAN1_CFG_RX_MB0_INDEX,
     BMS_CAN1_CFG_RX_MB1_INDEX,
     BMS_CAN1_CFG_RX_MB2_INDEX,
-    BMS_CAN1_CFG_RX_MB3_INDEX
+    BMS_CAN1_CFG_RX_MB3_INDEX,
+    BMS_CAN1_CFG_RX_MB4_INDEX
 };
 
 static const uint32 g_BmsCan1RxMbId[BMS_CAN1_CFG_RX_MB_COUNT] =
@@ -158,7 +160,8 @@ static const uint32 g_BmsCan1RxMbId[BMS_CAN1_CFG_RX_MB_COUNT] =
     BMS_CAN1_CFG_RX_MB0_ID,
     BMS_CAN1_CFG_RX_MB1_ID,
     BMS_CAN1_CFG_RX_MB2_ID,
-    BMS_CAN1_CFG_RX_MB3_ID
+    BMS_CAN1_CFG_RX_MB3_ID,
+    BMS_CAN1_CFG_RX_MB4_ID
 };
 
 
@@ -1556,7 +1559,7 @@ void Bms_Can_MainFunction(void)
     }
 
 
-    /* Process CAN1 RX mailboxes (MB0..MB3). */
+    /* Process CAN1 RX mailboxes (slots 0..4). */
     for (i = 0U; i < BMS_CAN1_CFG_RX_MB_COUNT; i++)
     {
         FlexCAN_Ip_MainFunctionRead(
