@@ -71,8 +71,14 @@ extern "C" {
 /** @brief Message buffer index reserved for control reception. */
 #define BMS_CAN_CFG_RX_CONTROL_MB_INDEX   (2U)
 
-/** @brief Nominal CAN bit rate, in bits per second. */
-#define BMS_CAN_CFG_BAUDRATE_BPS        (500000U)
+/** @brief CAN0 nominal bit rate, in bits per second. */
+#define BMS_CAN0_CFG_BAUDRATE_BPS        (500000U)
+
+/** @brief CAN1 nominal bit rate, in bits per second. */
+#define BMS_CAN1_CFG_BAUDRATE_BPS       (1000000U)
+
+/** @brief CAN2 nominal bit rate, in bits per second. */
+#define BMS_CAN2_CFG_BAUDRATE_BPS       (1000000U)
 
 /** @brief CAN identifier used to broadcast BMS status frames. */
 #define BMS_CAN_CFG_TX_STATUS_ID          (0x300U)

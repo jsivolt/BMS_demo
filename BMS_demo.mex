@@ -1470,10 +1470,10 @@
                               <setting name="pe_clock_frequency" value="24000000"/>
                               <struct name="flexcan_time_segment">
                                  <setting name="Name" value="FlexCAN_Ip_TimeSeg1"/>
-                                 <setting name="flexcan_cfg_propSeg" value="7"/>
-                                 <setting name="flexcan_cfg_phaseSeg1" value="6"/>
+                                 <setting name="flexcan_cfg_propSeg" value="5"/>
+                                 <setting name="flexcan_cfg_phaseSeg1" value="4"/>
                                  <setting name="flexcan_cfg_phaseSeg2" value="2"/>
-                                 <setting name="flexcan_cfg_preDivider" value="3"/>
+                                 <setting name="flexcan_cfg_preDivider" value="2"/>
                                  <setting name="flexcan_cfg_rJumpwidth" value="2"/>
                               </struct>
                               <struct name="flexcan_time_segment_cbt">
@@ -1521,10 +1521,10 @@
                               <setting name="pe_clock_frequency" value="24000000"/>
                               <struct name="flexcan_time_segment">
                                  <setting name="Name" value="FlexCAN_Ip_TimeSeg2"/>
-                                 <setting name="flexcan_cfg_propSeg" value="7"/>
-                                 <setting name="flexcan_cfg_phaseSeg1" value="6"/>
+                                 <setting name="flexcan_cfg_propSeg" value="5"/>
+                                 <setting name="flexcan_cfg_phaseSeg1" value="4"/>
                                  <setting name="flexcan_cfg_phaseSeg2" value="2"/>
-                                 <setting name="flexcan_cfg_preDivider" value="3"/>
+                                 <setting name="flexcan_cfg_preDivider" value="2"/>
                                  <setting name="flexcan_cfg_rJumpwidth" value="2"/>
                               </struct>
                               <struct name="flexcan_time_segment_cbt">

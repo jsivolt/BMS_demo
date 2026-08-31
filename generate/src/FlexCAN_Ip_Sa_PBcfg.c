@@ -268,13 +268,13 @@ const Flexcan_Ip_ConfigType FlexCAN_Config0  = {
         (boolean)FALSE,
         /*values for normal baudrate .bitrate*/
         {   /* Prop Seg */
-            (6U),
+            (4U),
             /* Phase Seg 1 */
-            (5U),
+            (3U),
             /* Phase Seg 2*/
             (1U),
             /* Pre Divider */
-            (2U),
+            (1U),
             /* Resync jump width */
             (1U)
         },
@@ -359,13 +359,13 @@ const Flexcan_Ip_ConfigType FlexCAN_Config0  = {
         (boolean)FALSE,
         /*values for normal baudrate .bitrate*/
         {   /* Prop Seg */
-            (6U),
+            (4U),
             /* Phase Seg 1 */
-            (5U),
+            (3U),
             /* Phase Seg 2*/
             (1U),
             /* Pre Divider */
-            (2U),
+            (1U),
             /* Resync jump width */
             (1U)
         },
