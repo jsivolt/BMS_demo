@@ -2,8 +2,9 @@
 
 A bare-metal (no-OS) Battery Management System demo for the **NXP S32K344** (Cortex-M7), built on the
 **S32K3 RTD 7.0.1** low-level IP drivers. It monitors three battery packs, decodes 16 cell voltages
-from a CAN-based "virtual AFE", runs a precharge/contactor state machine per pack, tracks faults, and
-publishes everything over CAN.
+from a CAN-based "virtual AFE", decodes pack current/voltage from a CAN-based "virtual ADBMS2950"
+pack monitor, runs a precharge/contactor state machine per pack, estimates Pack 1 state-of-charge by
+Coulomb counting (persisted to data flash), tracks faults, and publishes everything over CAN.
 
 ---
 
@@ -40,13 +41,15 @@ src/
     Bms_StateMachine.*      INIT / STANDBY / ACTIVE / FAULT supervisor
     Bms_Adc.*               ADC_SAR wrapper (unit 0 = bus V, unit 1 = pack V + NTC)
   battery/
-    Battery_Monitor.*       Aggregates cell/pack/temperature data, applies thresholds
+    Battery_Monitor.*       Aggregates cell/pack/current/temperature data, applies thresholds
     Bms_Ntc.*               3-channel NTC (Beta equation) -> 0.1 degC
     Bms_Ntc_Cfg.h           NTC hardware constants
+    Bms_Soc.*               Pack 1 state-of-charge, Coulomb counting + periodic NVM save
     Bms_Afe.*               Physical AFE stub (unused)
     vAFE/Bms_Vafe.*         Decodes 16 cell voltages from CAN1 frames 0x401-0x404
+    vPACK/Bms_Vpack.*       Decodes pack current/voltage from CAN2 (virtual ADBMS2950) frames 0x410-0x411
   communication/
-    Bms_Can.*               CAN0 (host) + CAN1 (vAFE): polled RX, blocking TX
+    Bms_Can.*               CAN0 (host) + CAN1 (vAFE) + CAN2 (vPACK): polled RX, blocking TX
     Bms_Can_Cfg.h           Instances, mailbox indices, all message IDs
     Bms_Spi.*               LPSPI1 wrapper
   control/
@@ -56,7 +59,9 @@ src/
     Bms_Gpio.*              SIUL2 DIO abstraction (logical pin IDs)
     Bms_Led.*               Active-low LED helpers
   safety/
-    Fault_Manager.*         32-bit fault masks per pack + system, critical-fault mask
+    Fault_Manager.*         32-bit fault masks per pack + system, critical-fault mask, latched fault history
+  storage/
+    Bms_Nvm.*               SOC persistence in data flash (C40_Ip), sequence/checksum-guarded records
 
 board/        Generated pin mux (SIUL2 / TSPC)
 generate/     Generated RTD configs: Clock, ADC, FlexCAN, PIT, LPSPI, IntCtrl, OsIf
@@ -70,8 +75,9 @@ Project_Settings/  Linker scripts, startup code, debugger launches
 ## 3. Startup and scheduling
 
 `main()` initialises, in order: clocks → pins → LED off → interrupt controller → PIT0 → ADC (with
-calibration) → NTC → CAN0/CAN1 → LPSPI1 → fault manager → contactors → state machine → application →
-vAFE → battery monitor → scheduler → PIT start. Any init failure traps with LED1 red on.
+calibration) → NTC → CAN0/CAN1/CAN2 → LPSPI1 → fault manager → contactors → state machine → application →
+vAFE → vPACK → battery monitor → NVM (scans data flash) → SOC estimator → scheduler → PIT start. Any
+init failure traps with LED1 red on.
 
 The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`; all work runs from the main loop, which drains
 accumulated ticks so no period is lost if the loop falls behind.
@@ -79,8 +85,8 @@ accumulated ticks so no period is lost if the loop falls behind.
 | Task | Period | Contents |
 | --- | --- | --- |
 | `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, contactor state machine, 1 Hz LED blink |
-| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, state machine, TX of 0x300–0x305 and 0x400 |
-| `Bms_MainFunction_1000ms` | 1000 ms | Reserved |
+| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, SOC integration, state machine, TX of 0x300–0x30A and 0x400 |
+| `Bms_MainFunction_1000ms` | 1000 ms | SOC persistence (`Bms_Soc_1sFunction`, saves to NVM when due/changed) |
 
 ---
 
@@ -129,22 +135,29 @@ fault clears and an open request is received.
 
 ## 6. Fault manager
 
-Faults are bits in a 32-bit mask, tracked per pack (`FAULT_PACK_1..3`) and system-wide.
+Faults are bits in a 32-bit mask, tracked per pack (`FAULT_PACK_1..3`) and system-wide. Besides the
+live mask, `Fault_Manager` also keeps a latched "last fault" history mask per pack/system that is
+only cleared explicitly (see `FaultManager_GetLastPackFaults` / `FaultManager_GetLastSystemFaults`),
+reported on CAN 0x309/0x30A.
 
 | Bit | Fault | Bit | Fault |
 | --- | --- | --- | --- |
-| 0 | `FAULT_PACK_OV` | 8 | `FAULT_SPI_TIMEOUT` |
-| 1 | `FAULT_PACK_UV` | 9 | `FAULT_PRECHARGE_TIMEOUT` |
-| 2 | `FAULT_CELL_OV` | 10 | `FAULT_CONTACTOR_FEEDBACK` |
-| 3 | `FAULT_CELL_UV` | 11 | `FAULT_CONTACTOR_WELD` |
-| 4 | `FAULT_OVER_TEMP` | 12 | `FAULT_OVER_CURRENT` |
-| 5 | `FAULT_UNDER_TEMP` | 13 | `FAULT_TEMP_SENSOR` |
-| 6 | `FAULT_AFE_COMM` | 14 | `FAULT_TEMP_DELTA` |
-| 7 | `FAULT_CAN_TIMEOUT` | 15 | `FAULT_CELL_IMBALANCE` |
+| 0 | `FAULT_PACK_OV` | 11 | `FAULT_CONTACTOR_WELD` |
+| 1 | `FAULT_PACK_UV` | 12 | `FAULT_OVER_CURRENT` |
+| 2 | `FAULT_CELL_OV` | 13 | `FAULT_TEMP_SENSOR` |
+| 3 | `FAULT_CELL_UV` | 14 | `FAULT_TEMP_DELTA` |
+| 4 | `FAULT_OVER_TEMP` | 15 | `FAULT_CELL_IMBALANCE` |
+| 5 | `FAULT_UNDER_TEMP` | 16 | `FAULT_VPACK_COMM_TIMEOUT` |
+| 6 | `FAULT_AFE_COMM` | 17 | `FAULT_VPACK_ALIVE_ERROR` |
+| 7 | `FAULT_CAN_TIMEOUT` | 18 | `FAULT_VPACK_DEVICE_FAULT` |
+| 8 | `FAULT_SPI_TIMEOUT` | 19 | `FAULT_PACK1_VOLTAGE_TIMEOUT` |
+| 9 | `FAULT_PRECHARGE_TIMEOUT` | 20 | `FAULT_PACK_DISCHARGE_OC` |
+| 10 | `FAULT_CONTACTOR_FEEDBACK` | 21 | `FAULT_PACK_CHARGE_OC` |
 
 `FAULT_CRITICAL_MASK` = pack OV/UV, cell OV/UV, over-temp, temp sensor, AFE comm, precharge timeout,
-contactor feedback, contactor weld, over-current. Any critical fault opens the contactors and forces
-the supervisor into `FAULT`.
+contactor feedback, contactor weld, over-current, vPACK comm timeout/alive error/device fault, Pack 1
+voltage timeout, and pack discharge/charge over-current. Any critical fault opens the contactors and
+forces the supervisor into `FAULT`.
 
 ### Detection thresholds (hysteretic, `Battery_Monitor.c`)
 
@@ -152,10 +165,15 @@ the supervisor into `FAULT`.
 | --- | --- | --- |
 | Cell over-voltage | 4250 mV | 4150 mV |
 | Cell under-voltage | 2500 mV | 2700 mV |
-| Over-temperature | 60.0 °C | 55.0 °C |
+| Over-temperature | 200.0 °C | 195.0 °C |
 | Under-temperature | −20.0 °C | −15.0 °C |
-| Pack temperature delta | 15.0 °C | 10.0 °C |
+| Pack temperature delta | 30.0 °C | 10.0 °C |
 | Cell imbalance | 300 mV | 200 mV |
+| Pack charge over-current | 80.0 A | 70.0 A |
+| Pack discharge over-current | −100.0 A | −90.0 A |
+
+Current sign convention (`Battery_Monitor.c`, from the vPACK/ADBMS2950 simulation): positive = charge,
+negative = discharge.
 
 ---
 
@@ -164,7 +182,16 @@ the supervisor into `FAULT`.
 - **Cell voltages** — 16 cells, sourced over CAN1 from the virtual AFE. Frames `0x401..0x404` each
   carry four `uint16` little-endian values at 1 mV/bit. `Bms_Vafe` sets `DataValid` only once all
   four frames have arrived, then recomputes min/max/delta and the min/max cell indices.
-- **Pack voltages** — three ADC1 channels, 14-bit, 3.3 V reference.
+- **Pack voltages** — Pack 1 comes from the CAN2 vPACK voltage frame (`0x411`); Pack 2/Pack 3 remain
+  ADC1 channels, 14-bit, 3.3 V reference.
+- **Pack current / power** — decoded over CAN2 from the virtual ADBMS2950 (`Bms_Vpack`): current
+  frame `0x410` (current + shunt voltage), voltage frame `0x411` (pack + bus voltage), each with an
+  alive counter checked for timeout/rollover (`BMS_VPACK_TIMEOUT_TICKS` = 1000 ms). `Battery_Monitor`
+  derives `PackPower_W = PackCurrent_mA * PackV1 / 1000`.
+- **State of charge** — `Bms_Soc` Coulomb-counts Pack 1 current (100 ms sample period) starting from
+  a value restored from NVM at boot (or `BMS_SOC_INITIAL_PCT_X10` = 50.0 % if none saved), and saves
+  to data flash at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s) or sooner if it changes by more
+  than `BMS_SOC_SAVE_DELTA_X10` (0.1 %).
 - **Temperatures** — three NTCs on ADC1, Beta equation (`R25 = 10 kΩ`, `Beta = 3435 K`,
   series 10 kΩ), reported in 0.1 °C over −40.0 … 125.0 °C.
 - **Bus voltages** — ADC0 channels P0/P1/P3/P4 (bus 1/2/3 + spare), used for precharge completion.
@@ -173,9 +200,9 @@ the supervisor into `FAULT`.
 
 ## 8. CAN interface
 
-Both buses run at **500 kbit/s**. CAN0 talks to the host tool, CAN1 to the virtual AFE.
-TX is `SendBlocking` with a 100 ms timeout on MB0; RX is polled from the 100 ms task.
-Import `DBC/BMS_demo.dbc` (v0.6) into PCAN-Explorer/CANalyzer for decoding.
+All three buses run at **500 kbit/s**. CAN0 talks to the host tool, CAN1 to the virtual AFE, CAN2 to
+the virtual ADBMS2950 pack monitor (vPACK). TX is `SendBlocking` with a 100 ms timeout on MB0; RX is
+polled from the 100 ms task. Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding.
 
 ### CAN0 transmit (every 100 ms)
 
@@ -221,6 +248,40 @@ Import `DBC/BMS_demo.dbc` (v0.6) into PCAN-Explorer/CANalyzer for decoding.
 | 6 | bits 3:0 min cell index, bits 7:4 max cell index |
 | 7 | bit0 cell voltage valid, bit1 cell imbalance fault |
 
+**0x306 `BMS_PackCurrent`**
+
+| Byte | Content |
+| --- | --- |
+| 0–1 | Pack1 current, `int16` LE, 0.1 A/bit (+charge / −discharge) |
+| 2–3 | Pack2 current |
+| 4–5 | Pack3 current |
+| 6 | bit0/1/2 pack1/2/3 current valid |
+| 7 | bits 3:0 alive counter |
+
+**0x307 `BMS_PackPower`**
+
+| Byte | Content |
+| --- | --- |
+| 0–3 | Pack1 power, `int32` LE, 1 W/bit (+discharge / −charge) |
+| 4 | bit0 pack1 power valid |
+| 5–6 | Reserved |
+| 7 | bits 3:0 alive counter |
+
+**0x308 `BMS_SocStatus`**
+
+| Byte | Content |
+| --- | --- |
+| 0–1 | Pack1 SOC, `uint16` LE, 0.1 %/bit |
+| 2 | bit0 SOC valid |
+| 3–6 | Reserved |
+| 7 | bits 3:0 alive counter |
+
+**0x309 `BMS_LastFault12`** — bytes 0–3 latched pack1 fault history, bytes 4–7 latched pack2 fault
+history (`uint32` LE).
+
+**0x30A `BMS_LastFault3System`** — bytes 0–3 latched pack3 fault history, bytes 4–7 latched system
+fault history (`uint32` LE).
+
 ### CAN0 receive
 
 | ID | Mailbox | Byte 0 command |
@@ -238,13 +299,27 @@ Import `DBC/BMS_demo.dbc` (v0.6) into PCAN-Explorer/CANalyzer for decoding.
 | 0x403 | RX (MB3) | Cells 9–12 |
 | 0x404 | RX (MB4) | Cells 13–16 |
 
+### CAN2 (virtual ADBMS2950 pack monitor, vPACK)
+
+| ID | Direction | Content |
+| --- | --- | --- |
+| 0x410 | RX (MB1) | Pack current + shunt voltage |
+| 0x411 | RX (MB2) | Pack voltage + bus voltage (also feeds `BatteryMonitor.PackV1`) |
+
+Comm health uses an alive counter with a 1000 ms timeout (`BMS_VPACK_TIMEOUT_TICKS`); a stale/invalid
+counter raises `FAULT_VPACK_COMM_TIMEOUT` / `FAULT_VPACK_ALIVE_ERROR`, and the device status byte can
+raise `FAULT_VPACK_DEVICE_FAULT`. Signal layout beyond what `Bms_Vpack.c` decodes is not yet finalized
+(see comments in `DBC/BMS_demo.dbc`).
+
 ### Quick bring-up
 
-1. Connect a CAN tool to CAN0 (PTA6/PTA7) and the vAFE simulator to CAN1 (PTC8/PTC9) at 500 kbit/s.
-2. Power up — LED1 red blinks at 1 Hz and 0x300–0x305 appear every 100 ms.
+1. Connect a CAN tool to CAN0 (PTA6/PTA7), the vAFE simulator to CAN1 (PTC8/PTC9), and the vPACK
+   simulator to CAN2 (PTE24/PTE25), all at 500 kbit/s.
+2. Power up — LED1 red blinks at 1 Hz and 0x300–0x30A appear every 100 ms.
 3. Feed 0x401–0x404 so `CellVoltageValid` in 0x305 goes to 1.
-4. Send `0x201 / 0x01` to enable — state goes to ACTIVE, LED3 lights, contactors precharge and close.
-5. Send `0x201 / 0x02` to disable, or `0x201 / 0x03` after a fault to reset.
+4. Feed 0x410/0x411 so pack current/voltage/SOC (0x306–0x308) go valid and Pack1 voltage tracks CAN2.
+5. Send `0x201 / 0x01` to enable — state goes to ACTIVE, LED3 lights, contactors precharge and close.
+6. Send `0x201 / 0x02` to disable, or `0x201 / 0x03` after a fault to reset.
 
 ---
 
@@ -254,6 +329,7 @@ Import `DBC/BMS_demo.dbc` (v0.6) into PCAN-Explorer/CANalyzer for decoding.
 | --- | --- | --- |
 | PTA6 / PTA7 | CAN0_RX / CAN0_TX | Host CAN |
 | PTC9 / PTC8 | CAN1_RX / CAN1_TX | vAFE CAN |
+| PTE25 / PTE24 | CAN2_RX / CAN2_TX | vPACK CAN (virtual ADBMS2950) |
 | PTA18/19/20/21 | LPSPI1 SOUT/SCK/SIN/PCS0 | SPI |
 | PTD1, PTD0, PTE15, PTE16 | ADC0_P0/P1/P3/P4 | Bus1/2/3 + spare voltage |
 | PTA29 | LED1_RED | 1 Hz heartbeat, solid on init failure |
