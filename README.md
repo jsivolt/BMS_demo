@@ -185,7 +185,7 @@ forces the supervisor into `FAULT`.
 | Cell under-voltage | 2500 mV | 2700 mV |
 | Over-temperature | 200.0 °C | 195.0 °C |
 | Under-temperature | −20.0 °C | −15.0 °C |
-| Pack temperature delta | 30.0 °C | 10.0 °C |
+| Pack temperature delta | 50.0 °C | 10.0 °C |
 | Cell imbalance | 300 mV | 200 mV |
 | Pack charge over-current | 80.0 A | 70.0 A |
 | Pack discharge over-current | −100.0 A | −90.0 A |
@@ -197,9 +197,13 @@ negative = discharge.
 
 ## 7. Measurement chain
 
-- **Cell voltages** — 16 cells, sourced over CAN1 from the virtual AFE. Frames `0x401..0x404` each
-  carry four `uint16` little-endian values at 1 mV/bit. `Bms_Vafe` sets `DataValid` only once all
-  four frames have arrived, then recomputes min/max/delta and the min/max cell indices.
+- **Cell voltages** — 16 cells, sourced over CAN1 from the virtual AFE. The AFE starts a measurement
+  cycle with the header frame `0x405` (byte 0 = rolling measurement counter); it then sends the four
+  voltage frames `0x401..0x404`, each carrying four `uint16` little-endian values at 1 mV/bit.
+  `Bms_Vafe` only accepts the voltage frames while a cycle is active and sets `DataValid` once all
+  four frames of one cycle have arrived (an incomplete previous cycle is discarded), then recomputes
+  min/max/delta and the min/max cell indices. The header counter is exposed as
+  `g_BmsVafeData.MeasurementCounter` with `HeaderValid` set when a header has been received.
 - **Pack voltages** — Pack 1 comes from the CAN2 vPACK voltage frame (`0x411`); Pack 2/Pack 3 remain
   ADC1 channels, 14-bit, 3.3 V reference.
 - **Pack current / power** — decoded over CAN2 from the virtual ADBMS2950 (`Bms_Vpack`): current
@@ -218,9 +222,9 @@ negative = discharge.
 
 ## 8. CAN interface
 
-All three buses run at **500 kbit/s**. CAN0 talks to the host tool, CAN1 to the virtual AFE, CAN2 to
-the virtual ADBMS2950 pack monitor (vPACK). TX is `SendBlocking` with a 100 ms timeout on MB0; RX is
-polled from the 100 ms task. Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding.
+CAN0 runs at **500 kbit/s**; CAN1 (virtual AFE) and CAN2 (virtual ADBMS2950 pack monitor) run at
+**1 Mbit/s**. TX is `SendBlocking` with a 100 ms timeout on MB0; RX is polled from the 100 ms task.
+Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding.
 
 ### CAN0 transmit (every 100 ms)
 
@@ -280,7 +284,7 @@ polled from the 100 ms task. Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANaly
 
 | Byte | Content |
 | --- | --- |
-| 0–3 | Pack1 power, `int32` LE, 1 W/bit (+discharge / −charge) |
+| 0–3 | Pack1 power, `int32` LE, 1 W/bit (sign follows pack current: +charge / −discharge) |
 | 4 | bit0 pack1 power valid |
 | 5–6 | Reserved |
 | 7 | bits 3:0 alive counter |
@@ -305,7 +309,7 @@ fault history (`uint32` LE).
 | ID | Mailbox | Byte 0 command |
 | --- | --- | --- |
 | 0x200 `BMS_DebugCommand` | MB1 | `0x00` NOP · `0x01` LED2 green on · `0x02` LED2 green off · `0x03` reset RX counter |
-| 0x201 `BMS_ControlCommand` | MB2 | `0x00` NOP · `0x01` Enable · `0x02` Disable · `0x03` ClearFault |
+| 0x201 `BMS_ControlCommand` | MB2 | `0x00` NOP · `0x01` Enable · `0x02` Disable · `0x03` ClearFault · `0x04` ClearFaultHistory (clears latched 0x309/0x30A history only) |
 
 ### CAN1 (virtual AFE)
 
@@ -316,6 +320,7 @@ fault history (`uint32` LE).
 | 0x402 | RX (MB2) | Cells 5–8 |
 | 0x403 | RX (MB3) | Cells 9–12 |
 | 0x404 | RX (MB4) | Cells 13–16 |
+| 0x405 | RX (MB5) | `vAFE_Measurement_Header` — starts a new AFE measurement cycle; byte 0 = rolling counter, byte 1 = AFE status |
 
 ### CAN2 (virtual ADBMS2950 pack monitor, vPACK)
 
@@ -331,10 +336,11 @@ raise `FAULT_VPACK_DEVICE_FAULT`. Signal layout beyond what `Bms_Vpack.c` decode
 
 ### Quick bring-up
 
-1. Connect a CAN tool to CAN0 (PTA6/PTA7), the vAFE simulator to CAN1 (PTC8/PTC9), and the vPACK
-   simulator to CAN2 (PTE24/PTE25), all at 500 kbit/s.
+1. Connect a CAN tool to CAN0 (PTA6/PTA7) at 500 kbit/s, and the vAFE simulator to CAN1 (PTC8/PTC9)
+   and the vPACK simulator to CAN2 (PTE24/PTE25), both at 1 Mbit/s.
 2. Power up — LED1 red blinks at 1 Hz and 0x300–0x30A appear every 100 ms.
-3. Feed 0x401–0x404 so `CellVoltageValid` in 0x305 goes to 1.
+3. Feed 0x405 (measurement header, byte 0 = counter) followed by 0x401–0x404 so
+   `CellVoltageValid` in 0x305 goes to 1.
 4. Feed 0x410/0x411 so pack current/voltage/SOC (0x306–0x308) go valid and Pack1 voltage tracks CAN2.
 5. Send `0x201 / 0x01` to enable — state goes to ACTIVE, LED3 lights, contactors precharge and close.
 6. Send `0x201 / 0x02` to disable, or `0x201 / 0x03` after a fault to reset.

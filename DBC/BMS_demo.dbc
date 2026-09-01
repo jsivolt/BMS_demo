@@ -141,7 +141,8 @@ BO_ 1040 vPack_Current: 8 vPACK_Sim
  SG_ Status          : 56|8@1+ (1,0) [0|255] "" S32K344
 
 BO_ 1041 vPack_Voltage: 8 vPACK_Sim
- SG_ Pack1VoltageSim : 0|16@1+ (0.1,0) [0|6553.5] "V" S32K344
+ SG_ Pack1VoltageSim : 0|32@1+ (1,0) [0|4294967295] "mV" S32K344
+ SG_ BusVoltage_mV   : 32|32@1+ (1,0) [0|4294967295] "mV" S32K344
 
 VAL_ 512 DebugCommand 0 "NOP" 1 "LED2_ON" 2 "LED2_OFF" 3 "CLEAR_RX_COUNT";
 VAL_ 513 ControlCommand
@@ -160,13 +161,13 @@ CM_ BO_ 1026 "CAN1 RX mailbox slot 1, hardware MB2. Cell 5-8, little-endian uint
 CM_ BO_ 1027 "CAN1 RX mailbox slot 2, hardware MB3. Cell 9-12, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1028 "CAN1 RX mailbox slot 3, hardware MB4. Cell 13-16, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1029 "CAN1 ID 0x405. Measurement header: rolling counter and AFE status, bytes 2-7 reserved.";
-CM_ BO_ 1040 "CAN2 ADBMS2950 current frame. Signal layout is not defined by the supplied Bms_Can/Bms_Vafe sources.";
-CM_ BO_ 1041 "CAN2 ADBMS2950 voltage frame. Only bytes 0-1 Pack1VoltageSim are defined here because that mapping is explicit in Bms_Can.c.";
+CM_ BO_ 1040 "CAN2 ID 0x410 ADBMS2950 current frame. Bytes 0-3 Pack1Current_mA (s32 LE, 1 mA), 4-5 Shunt1Voltage_uV (s16 LE, 1 uV), 6 AliveCounter, 7 Status. Decoded by Bms_Vpack.c.";
+CM_ BO_ 1041 "CAN2 ID 0x411 ADBMS2950 voltage frame. Bytes 0-3 Pack1VoltageSim (u32 LE, 1 mV), 4-7 BusVoltage_mV (u32 LE, 1 mV). Decoded by Bms_Vpack.c.";
 CM_ SG_ 773 MinCellIndex "0-based cell index: 0=Cell1, 15=Cell16.";
 CM_ SG_ 773 MaxCellIndex "0-based cell index: 0=Cell1, 15=Cell16.";
-CM_ SG_ 774 Pack1Current "Positive = discharge, negative = charge.";
-CM_ SG_ 774 Pack2Current "Positive = discharge, negative = charge.";
-CM_ SG_ 774 Pack3Current "Positive = discharge, negative = charge.";
+CM_ SG_ 774 Pack1Current "Positive = charge, negative = discharge (matches Battery_Monitor.c sign convention).";
+CM_ SG_ 774 Pack2Current "Positive = charge, negative = discharge (matches Battery_Monitor.c sign convention).";
+CM_ SG_ 774 Pack3Current "Positive = charge, negative = discharge (matches Battery_Monitor.c sign convention).";
 
 CM_ BO_ 777 "CAN0 ID 0x309. Latched Pack1 and Pack2 fault history. Fault bits remain set after the active fault clears.";
 CM_ BO_ 778 "CAN0 ID 0x30A. Latched Pack3 and System fault history. Fault bits remain set after the active fault clears.";
