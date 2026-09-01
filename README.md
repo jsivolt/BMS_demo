@@ -19,14 +19,32 @@ Coulomb counting (persisted to data flash), tracks faults, and publishes everyth
 | Build configs | `Debug_FLASH`, `Release_RAM` |
 | Base tick | PIT0 CH0, 400 000 ticks @ 40 MHz AIPS_SLOW = **10 ms** |
 
-Build from S32DS (Project → Build), or from a shell in the config folder:
+Build from S32DS (Project → Build), or from PowerShell using the provided script:
 
 ```powershell
-cd Debug_FLASH
-make -j all
+.\build.bat                    # Debug_FLASH, target "all" (default)
+.\build.bat Release_RAM        # Release_RAM, target "all"
+.\build.bat Debug_FLASH clean  # clean a specific config
 ```
 
-Flash/debug launch configurations for SEGGER are in `Project_Settings/Debugger/`.
+`build.bat` invokes `make` through the S32DS MSYS bash, since `make`/`arm-none-eabi-*` are not on the
+plain Windows `PATH`. To run `make` directly yourself, use the same MSYS bash with the toolchain
+prepended to `PATH`:
+
+```powershell
+& "C:\NXP\S32DS.3.6.10\S32DS\build_tools\msys32\usr\bin\bash.exe" -lc 'export PATH="/c/NXP/S32DS.3.6.10/S32DS/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin:$PATH" && cd /c/S32K344/workspace/BMS_demo/Debug_FLASH && make -j28 all'
+```
+
+Flash/debug launch configurations for SEGGER are in `Project_Settings/Debugger/` (use these from S32DS for
+interactive debugging). To flash from the command line instead (J-Link probe connected, board powered):
+
+```powershell
+.\flash.bat   # flashes Debug_FLASH\BMS_demo.elf via J-Link and starts execution
+```
+
+`flash.bat` drives the S32DS-bundled `JLinkGDBServerCL.exe` + `arm-none-eabi-gdb.exe` non-interactively
+(no separate SEGGER J-Link software install needed). It currently supports `Debug_FLASH` only — `Release_RAM`
+needs a different load sequence and isn't wired up yet.
 
 ---
 
