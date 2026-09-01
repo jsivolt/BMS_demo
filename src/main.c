@@ -284,6 +284,14 @@ static void Bms_MainFunction_100ms(void)
 
     Bms_Can_SendCellSummary();
 
+    Bms_Can_SendCellVoltage1_4();
+
+    Bms_Can_SendCellVoltage5_8();
+
+    Bms_Can_SendCellVoltage9_12();
+
+    Bms_Can_SendCellVoltage13_16();
+
     Bms_Can_SendPackCurrent();
 
     Bms_Can_SendPackPower();

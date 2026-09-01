@@ -2,7 +2,7 @@
 --entry=Reset_Handler
 -ggdb3
 -T
-"../Project_Settings/Linker_Files/linker_ram_s32k344.ld"
+"C:/S32K344/workspace/BMS_demo/Project_Settings/Linker_Files/linker_ram_s32k344.ld"
 -Wl,-Map,"BMS_demo.map"
 -mcpu=cortex-m7
 -mthumb

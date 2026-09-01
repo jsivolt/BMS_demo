@@ -1184,6 +1184,103 @@ void Bms_Can_SendCellSummary(void)
 
 
 /* ================================================================================================
+ * CAN TX individual cell voltage frames
+ * CAN ID: 0x310 - 0x313
+ *
+ * Each frame carries 4 cells x uint16 LE at 1 mV/bit:
+ *   0x310: cells 1-4
+ *   0x311: cells 5-8
+ *   0x312: cells 9-12
+ *   0x313: cells 13-16
+ * ============================================================================================== */
+
+static void Bms_Can_SendCellVoltageFrame(
+        uint32 canId,
+        uint8 firstCell,
+        uint8 cellCount)
+{
+    uint8 txData[8] = {0U};
+    uint8 i;
+
+    /* Guard against out-of-range cell indexing / txData overflow. */
+    if ((firstCell >= 16U) ||
+        (cellCount > 4U) ||
+        ((firstCell + cellCount) > 16U))
+    {
+        return;
+    }
+
+    for (i = 0U; i < cellCount; i++)
+    {
+        uint16 cellMv =
+            g_BmsVafeData.CellVoltage_mV[firstCell + i];
+
+        txData[(i * 2U)] =
+            (uint8)(cellMv & 0xFFU);
+
+        txData[(i * 2U) + 1U] =
+            (uint8)((cellMv >> 8U) & 0xFFU);
+    }
+
+    /* Handle previous polling TX completion. */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            canId,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+void Bms_Can_SendCellVoltage1_4(void)
+{
+    Bms_Can_SendCellVoltageFrame(
+        BMS_CAN_CFG_TX_CELL_VOLTAGE_1_4_ID,
+        0U,
+        4U
+    );
+}
+
+
+void Bms_Can_SendCellVoltage5_8(void)
+{
+    Bms_Can_SendCellVoltageFrame(
+        BMS_CAN_CFG_TX_CELL_VOLTAGE_5_8_ID,
+        4U,
+        4U
+    );
+}
+
+
+void Bms_Can_SendCellVoltage9_12(void)
+{
+    Bms_Can_SendCellVoltageFrame(
+        BMS_CAN_CFG_TX_CELL_VOLTAGE_9_12_ID,
+        8U,
+        4U
+    );
+}
+
+
+void Bms_Can_SendCellVoltage13_16(void)
+{
+    Bms_Can_SendCellVoltageFrame(
+        BMS_CAN_CFG_TX_CELL_VOLTAGE_13_16_ID,
+        12U,
+        4U
+    );
+}
+
+
+/* ================================================================================================
  * CAN TX pack current status frame
  * CAN ID: 0x306
  *

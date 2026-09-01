@@ -270,6 +270,17 @@ Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding.
 | 6 | bits 3:0 min cell index, bits 7:4 max cell index |
 | 7 | bit0 cell voltage valid, bit1 cell imbalance fault |
 
+**0x310–0x313 `BMS_CellVoltage_01_04` … `BMS_CellVoltage_13_16`**
+
+Each frame carries 4 cells × `uint16` LE at 1 mV/bit (all 16 cells every cycle).
+
+| Frame | Cells | Bytes |
+| --- | --- | --- |
+| 0x310 | 1–4 | 0–1 cell1, 2–3 cell2, 4–5 cell3, 6–7 cell4 |
+| 0x311 | 5–8 | 0–1 cell5, 2–3 cell6, 4–5 cell7, 6–7 cell8 |
+| 0x312 | 9–12 | 0–1 cell9, 2–3 cell10, 4–5 cell11, 6–7 cell12 |
+| 0x313 | 13–16 | 0–1 cell13, 2–3 cell14, 4–5 cell15, 6–7 cell16 |
+
 **0x306 `BMS_PackCurrent`**
 
 | Byte | Content |
@@ -338,7 +349,7 @@ raise `FAULT_VPACK_DEVICE_FAULT`. Signal layout beyond what `Bms_Vpack.c` decode
 
 1. Connect a CAN tool to CAN0 (PTA6/PTA7) at 500 kbit/s, and the vAFE simulator to CAN1 (PTC8/PTC9)
    and the vPACK simulator to CAN2 (PTE24/PTE25), both at 1 Mbit/s.
-2. Power up — LED1 red blinks at 1 Hz and 0x300–0x30A appear every 100 ms.
+2. Power up — LED1 red blinks at 1 Hz and 0x300–0x30A plus 0x310–0x313 appear every 100 ms.
 3. Feed 0x405 (measurement header, byte 0 = counter) followed by 0x401–0x404 so
    `CellVoltageValid` in 0x305 goes to 1.
 4. Feed 0x410/0x411 so pack current/voltage/SOC (0x306–0x308) go valid and Pack1 voltage tracks CAN2.

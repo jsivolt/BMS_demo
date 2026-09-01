@@ -42,7 +42,7 @@ BMS_demo.siz \
 all: BMS_demo.elf secondary-outputs
 
 # Tool invocations
-BMS_demo.elf: $(OBJS) ../Project_Settings/Linker_Files/linker_ram_s32k344.ld $(USER_OBJS)
+BMS_demo.elf: $(OBJS) C:/S32K344/workspace/BMS_demo/Project_Settings/Linker_Files/linker_ram_s32k344.ld $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Standard S32DS C Linker'
 	arm-none-eabi-gcc -o "BMS_demo.elf" "@BMS_demo.args"  $(USER_OBJS)

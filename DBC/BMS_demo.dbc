@@ -1,4 +1,4 @@
-VERSION "BMS_demo updated - CAN1 cell voltage frames 0x401-0x404"
+VERSION "BMS_demo updated - CAN0 individual cell voltage frames 0x310-0x313"
 
 NS_ :
     NS_DESC_
@@ -67,6 +67,30 @@ BO_ 773 BMS_Cell_Summary: 8 S32K344
  SG_ MaxCellIndex : 52|4@1+ (1,0) [0|15] "" PCAN
  SG_ CellVoltageValid : 56|1@1+ (1,0) [0|1] "" PCAN
  SG_ CellImbalanceFault : 57|1@1+ (1,0) [0|1] "" PCAN
+
+BO_ 784 BMS_CellVoltage_01_04: 8 S32K344
+ SG_ Cell01Voltage : 0|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell02Voltage : 16|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell03Voltage : 32|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell04Voltage : 48|16@1+ (0.001,0) [0|65.535] "V" PCAN
+
+BO_ 785 BMS_CellVoltage_05_08: 8 S32K344
+ SG_ Cell05Voltage : 0|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell06Voltage : 16|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell07Voltage : 32|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell08Voltage : 48|16@1+ (0.001,0) [0|65.535] "V" PCAN
+
+BO_ 786 BMS_CellVoltage_09_12: 8 S32K344
+ SG_ Cell09Voltage : 0|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell10Voltage : 16|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell11Voltage : 32|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell12Voltage : 48|16@1+ (0.001,0) [0|65.535] "V" PCAN
+
+BO_ 787 BMS_CellVoltage_13_16: 8 S32K344
+ SG_ Cell13Voltage : 0|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell14Voltage : 16|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell15Voltage : 32|16@1+ (0.001,0) [0|65.535] "V" PCAN
+ SG_ Cell16Voltage : 48|16@1+ (0.001,0) [0|65.535] "V" PCAN
 
 BO_ 774 BMS_Pack_Current: 8 S32K344
  SG_ Pack1Current : 0|16@1- (0.1,0) [-3276.8|3276.7] "A" PCAN
@@ -160,6 +184,10 @@ CM_ BO_ 1025 "CAN1 RX mailbox slot 0, hardware MB1. Cell 1-4, little-endian uint
 CM_ BO_ 1026 "CAN1 RX mailbox slot 1, hardware MB2. Cell 5-8, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1027 "CAN1 RX mailbox slot 2, hardware MB3. Cell 9-12, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1028 "CAN1 RX mailbox slot 3, hardware MB4. Cell 13-16, little-endian uint16, 1 mV/bit.";
+CM_ BO_ 784 "CAN0 ID 0x310. Individual cell voltages 1-4, little-endian uint16, 1 mV/bit. Sent every 100 ms.";
+CM_ BO_ 785 "CAN0 ID 0x311. Individual cell voltages 5-8, little-endian uint16, 1 mV/bit. Sent every 100 ms.";
+CM_ BO_ 786 "CAN0 ID 0x312. Individual cell voltages 9-12, little-endian uint16, 1 mV/bit. Sent every 100 ms.";
+CM_ BO_ 787 "CAN0 ID 0x313. Individual cell voltages 13-16, little-endian uint16, 1 mV/bit. Sent every 100 ms.";
 CM_ BO_ 1029 "CAN1 ID 0x405. Measurement header: rolling counter and AFE status, bytes 2-7 reserved.";
 CM_ BO_ 1040 "CAN2 ID 0x410 ADBMS2950 current frame. Bytes 0-3 Pack1Current_mA (s32 LE, 1 mA), 4-5 Shunt1Voltage_uV (s16 LE, 1 uV), 6 AliveCounter, 7 Status. Decoded by Bms_Vpack.c.";
 CM_ BO_ 1041 "CAN2 ID 0x411 ADBMS2950 voltage frame. Bytes 0-3 Pack1VoltageSim (u32 LE, 1 mV), 4-7 BusVoltage_mV (u32 LE, 1 mV). Decoded by Bms_Vpack.c.";

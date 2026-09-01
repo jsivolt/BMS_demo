@@ -16,6 +16,10 @@ void Bms_Can_SendLastFaultStatus2(void);
 void Bms_Can1_SendTest(void);
 
 void Bms_Can_SendCellSummary(void);
+void Bms_Can_SendCellVoltage1_4(void);
+void Bms_Can_SendCellVoltage5_8(void);
+void Bms_Can_SendCellVoltage9_12(void);
+void Bms_Can_SendCellVoltage13_16(void);
 void Bms_Can_SendPackCurrent(void);
 void Bms_Can_SendPackPower(void);
 void Bms_Can_SendSocStatus(void);

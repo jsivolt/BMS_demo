@@ -102,6 +102,18 @@ extern "C" {
 /** @brief CAN identifier used to broadcast cell voltage summary. */
 #define BMS_CAN_CFG_TX_CELL_SUMMARY_ID    (0x305U)
 
+/** @brief CAN identifier used to broadcast cell 1-4 individual voltages. */
+#define BMS_CAN_CFG_TX_CELL_VOLTAGE_1_4_ID     (0x310U)
+
+/** @brief CAN identifier used to broadcast cell 5-8 individual voltages. */
+#define BMS_CAN_CFG_TX_CELL_VOLTAGE_5_8_ID     (0x311U)
+
+/** @brief CAN identifier used to broadcast cell 9-12 individual voltages. */
+#define BMS_CAN_CFG_TX_CELL_VOLTAGE_9_12_ID    (0x312U)
+
+/** @brief CAN identifier used to broadcast cell 13-16 individual voltages. */
+#define BMS_CAN_CFG_TX_CELL_VOLTAGE_13_16_ID   (0x313U)
+
 /** @brief CAN identifier used to broadcast pack current status. */
 #define BMS_CAN_CFG_TX_PACK_CURRENT_ID      (0x306U)
 
