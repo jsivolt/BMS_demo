@@ -1,8 +1,9 @@
 # Build output (S32 Design Studio configurations)
-Debug_FLASH/
+# makefile/sources.mk/objects.mk/subdir.mk/*.args are tracked (relative paths,
+# portable) so a fresh clone can build immediately; only actual outputs are ignored
+# via the *.o/*.d/*.elf/*.map/*.siz rules below.
 Debug_RAM/
 Release_FLASH/
-Release_RAM/
 .build-tmp/
 
 # Build artifacts that may appear outside output dirs
@@ -10,6 +11,7 @@ Release_RAM/
 *.d
 *.elf
 *.map
+*.siz
 *.bin
 *.hex
 *.srec
