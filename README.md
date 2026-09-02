@@ -24,8 +24,22 @@ Build from S32DS (Project → Build), or from PowerShell using the provided scri
 ```powershell
 .\build.bat                    # Debug_FLASH, target "all" (default)
 .\build.bat Release_RAM        # Release_RAM, target "all"
-.\build.bat Debug_FLASH clean  # clean a specific config
 ```
+
+`build.bat` takes the config as the first argument and the make target as the second. **Avoid
+`.\build.bat <config> clean`** — the Eclipse-generated makefile's `clean` target is `rm -rf ./*` inside
+the config directory and also wipes the CDT-generated per-file `.args` response files that plain `make`
+has no rule to regenerate (only the S32DS IDE can, via Project → Clean). Use `clean.bat` for a safe,
+selective clean instead:
+
+```powershell
+.\clean.bat                    # clean Debug_FLASH (default)
+.\clean.bat Release_RAM        # clean Release_RAM
+```
+
+`clean.bat` deletes only the actual build artifacts (`*.o *.d *.elf *.map *.siz`) and leaves the
+`.args`/`.mk` files intact. If the `.args` files are ever lost anyway, recover in S32DS: right-click the
+project → Refresh, then Project → Clean… (with "start a build immediately") for the affected config.
 
 `build.bat` invokes `make` through the S32DS MSYS bash, since `make`/`arm-none-eabi-*` are not on the
 plain Windows `PATH`. To run `make` directly yourself, use the same MSYS bash with the toolchain
@@ -86,6 +100,9 @@ generate/     Generated RTD configs: Clock, ADC, FlexCAN, PIT, LPSPI, IntCtrl, O
 RTD/          NXP Real-Time Drivers source + headers
 DBC/          BMS_demo.dbc  — CAN database for PCAN / CANalyzer
 Project_Settings/  Linker scripts, startup code, debugger launches
+
+Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_reset.bat ·
+               debug_live.bat · fault_snapshot.bat · fault_decode.gdb  (see §1 and §10)
 ```
 
 ---
@@ -375,7 +392,83 @@ All LEDs are active-low (0 = on).
 
 ---
 
-## 10. Regenerating peripheral configuration
+## 10. Debugging and fault-inspection tooling
+
+All tooling below is `Debug_FLASH`-only (same scope as `flash.bat`) and uses the S32DS-bundled J-Link
+software — no separate SEGGER J-Link install needed: `JLinkGDBServerCL.exe` +
+`arm-none-eabi-gdb.exe` (the one under `S32DS\tools\gdb-arm\...`, **not** the gcc_v10.2 toolchain bin,
+which has no gdb). Probe connected, board powered. Note that on this MCU/jlinkscript combo every fresh
+GDB-server connection halts the core once at `_start` — that one-time reset is unavoidable and the
+tooling below is designed around it.
+
+### CMD #1 — `debug_server.bat` (J-Link GDB server)
+
+Starts `JLinkGDBServerCL.exe` (S32K344, SWD, 4000 kHz, port 2331) in the foreground and blocks until
+Ctrl+C. Run this first in one terminal, then one of the two modes below in a second terminal.
+
+### CMD #2 — `debug_reset.bat` (reset debug)
+
+`target remote` + `monitor halt`, landing at `_start` (reset vector) for stepping/breakpointing through
+the boot sequence. Use this when you *want* a clean restart and don't care about transient runtime state.
+
+### CMD #2 — `debug_live.bat` (live attach)
+
+For inspecting a BMS that is already running (e.g. transient/latched faults) without wiping state via a
+second reset. Uses `set mi-async on` + `continue&` so the target is already running when the `(gdb)`
+prompt appears. It preloads breakpoints in a fixed order:
+
+| # | Function | # | Function |
+| --- | --- | --- | --- |
+| 1 | `FaultManager_SetSystem` | 3 | `FaultManager_ClearSystem` |
+| 2 | `FaultManager_SetPack` | 4 | `FaultManager_ClearPack` |
+
+so gdb stops on its own the next time any fault is set **or** cleared — at the exact call site, with
+accurate state. Once stopped:
+
+```text
+faultname fault        # decode the bitmask to FAULT_* names, e.g. FAULT_VPACK_COMM_TIMEOUT
+bt                     # call chain that set/cleared it
+faultdump              # full current + latched snapshot (system + packs 1-3), decoded
+continue&              # resume
+```
+
+- Pause/resume with `interrupt` / `continue&` (repeatable). **Never use `monitor go` / `monitor halt`**
+  here — GDB does not refresh its register/memory cache after those raw pass-through commands, so `p/x`
+  reads can show stale data from the very first halt.
+- A noisy fault can be filtered with a conditional breakpoint, e.g. `condition 1 fault == 0x80000`
+  (bp 1 = SetSystem only stops for `FAULT_PACK1_VOLTAGE_TIMEOUT`); clear it again with `condition 1`.
+- To catch a **direct write** to a fault mask from any code path (not just through the Set*/Clear* APIs),
+  set a DWT watchpoint: `wsysfault` / `wsyslast` watch `g_SystemFaults` / `g_LastSystemFaults` and
+  auto-print the decoded value + a short backtrace on every hit.
+- `faultsnapshot` captures a one-shot record (host timestamp + PC + `faultdump` + full `bt`) — handy to
+  paste into a bug report right after any breakpoint/watchpoint hit.
+
+### `fault_decode.gdb` — GDB helper commands
+
+Sourced by `debug_live.bat` (and `fault_snapshot.bat`). Pure GDB command language — the S32DS-bundled
+gdb has **no Python support**, so this is a hand-written bit-table mirror of the `FAULT_*` `#define`s
+in `src/safety/Fault_Manager.h` and must be kept in sync manually if fault bits change.
+
+| Command | Purpose |
+| --- | --- |
+| `faultname <expr>` | Decode a fault mask to names, e.g. `faultname g_SystemFaults`, `faultname 0x30040` |
+| `faultdump` | Snapshot of current + latched masks for system and packs 1-3, all decoded |
+| `wsysfault` / `wsyslast` | DWT watchpoints on `g_SystemFaults` / `g_LastSystemFaults` |
+| `faultsnapshot` | Timestamp + PC + `faultdump` + full backtrace |
+
+### `fault_snapshot.bat` — non-interactive snapshot
+
+Self-contained one-shot tool for HIL/periodic sampling or bug reports: starts and stops its own J-Link
+GDB server per run (no `debug_server.bat` needed) and writes `fault_snapshot_<yyyyMMdd_HHmmss>.txt`
+(PC + `faultdump` + full backtrace). Because gdb's async `continue&`/`interrupt` races in `-batch` mode,
+it runs `monitor go` → host delay → `monitor halt` → **detach → reconnect** to the same still-running
+server before reading anything — the reconnect forces gdb to re-read all state from scratch and,
+crucially, does **not** reset the core (reset only happens on a server process's very first client
+connection). Note a fresh `.bat` run still starts a new server process, so it costs that one-time reset.
+
+---
+
+## 11. Regenerating peripheral configuration
 
 Open `BMS_demo.mex` with the S32 Configuration Tools inside S32DS, edit clocks/pins/peripherals, and
 regenerate. Do not hand-edit anything under `generate/` or `board/` — those files are overwritten.
