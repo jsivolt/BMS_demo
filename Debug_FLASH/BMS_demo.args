@@ -90,6 +90,8 @@
 "./src/battery/vPACK/Bms_Vpack.o"
 "./src/communication/Bms_Can.o"
 "./src/communication/Bms_Spi.o"
+"./src/communication/xcp/Xcp.o"
+"./src/communication/xcp/Xcp_Can.o"
 "./src/control/Bms_Contactor.o"
 "./src/drivers/Bms_Gpio.o"
 "./src/drivers/Bms_Led.o"

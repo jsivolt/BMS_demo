@@ -84,24 +84,6 @@ extern "C" {
 /** @brief CAN2 nominal bit rate, in bits per second. */
 #define BMS_CAN2_CFG_BAUDRATE_BPS       (1000000U)
 
-/** @brief FlexCAN hardware instance 5, reserved for XCP. */
-#define BMS_CAN5_CFG_INSTANCE              (5U)
-
-/** @brief CAN5 RX mailbox for XCP/test commands. */
-#define BMS_CAN5_CFG_RX_MB_INDEX           (0U)
-
-/** @brief CAN5 TX mailbox for XCP/test responses. */
-#define BMS_CAN5_CFG_TX_MB_INDEX           (1U)
-
-/** @brief CAN5 test/XCP command CAN ID. */
-#define BMS_CAN5_CFG_RX_ID                 (0x600U)
-
-/** @brief CAN5 test/XCP response CAN ID. */
-#define BMS_CAN5_CFG_TX_ID                 (0x601U)
-
-/** @brief CAN5 nominal bit rate. */
-#define BMS_CAN5_CFG_BAUDRATE_BPS          (1000000U)
-
 /** @brief CAN identifier used to broadcast BMS status frames. */
 #define BMS_CAN_CFG_TX_STATUS_ID          (0x300U)
 

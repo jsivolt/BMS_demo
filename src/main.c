@@ -55,6 +55,7 @@
 #include "battery/vPACK/Bms_Vpack.h"
 #include "communication/Bms_Can.h"
 #include "communication/Bms_Spi.h"
+#include "communication/xcp/Xcp_Can.h"
 #include "storage/Bms_Nvm.h"
 
 #include "Bms_StateMachine.h"
@@ -183,6 +184,9 @@ static void Bms_MainFunction_10ms(void)
 
     Bms_App_MainFunction();
 
+    /* XCP CAN5 must be polled faster than 100 ms for a real XCP master / DAQ. */
+    Xcp_Can_MainFunction();
+
     /* Millivolts; Bms_Contactor_SetBusVoltage() must use the same unit. */
     if (Bms_Adc_IsPackValid() == TRUE)
     {
@@ -281,8 +285,6 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendLastFaultStatus2();
 
     Bms_Can1_SendTest();
-
-    /* Bms_Can5_SendTest(); disabled: 0x601 now used for XCP responses */
 
     Bms_Can_SendCellSummary();
 
@@ -457,6 +459,22 @@ int main(void)
         while (1)
         {
             /* CAN init failed */
+        }
+    }
+
+    /* Initialize CAN5 (XCP transport), independently of Bms_Can. */
+    if (Xcp_Can_Init() != (Std_ReturnType)E_OK)
+    {
+        /* XCP CAN init failed: turn RED LED permanently ON and trap. */
+        Siul2_Dio_Ip_WritePin(
+            LED_RED_PORT,
+            LED_RED_PIN,
+            0U
+        );
+
+        while (1)
+        {
+            /* XCP CAN init failed */
         }
     }
 

@@ -29,6 +29,7 @@ src/battery \
 src/battery/vAFE \
 src/battery/vPACK \
 src/communication \
+src/communication/xcp \
 src/control \
 src/drivers \
 src \
