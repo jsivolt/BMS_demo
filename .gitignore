@@ -1,0 +1,31 @@
+# Build output (S32 Design Studio configurations)
+# makefile/sources.mk/objects.mk/subdir.mk/*.args are tracked (relative paths,
+# portable) so a fresh clone can build immediately; only actual outputs are ignored
+# via the *.o/*.d/*.elf/*.map/*.siz rules below.
+Debug_RAM/
+Release_FLASH/
+.build-tmp/
+
+# Build artifacts that may appear outside output dirs
+*.o
+*.d
+*.elf
+*.map
+*.siz
+*.bin
+*.hex
+*.srec
+*.su
+
+# Standalone CLI build: keep the linked images, drop the intermediates
+/make/build/**/*.o
+/make/build/**/*.d
+/make/build/**/*.rsp
+
+# Eclipse/S32DS workspace metadata
+.metadata/
+
+# OS / editor junk
+Thumbs.db
+.DS_Store
+*.swp

@@ -1,22 +1,22 @@
 /*==================================================================================================
-* Project : RTD AUTOSAR 4.9
-* Platform : CORTEXM
-* Peripheral : S32K3XX
-* Dependencies : none
+*   Project              : RTD AUTOSAR 4.9
+*   Platform             : CORTEXM
+*   Peripheral           : SIUL2
+*   Dependencies         : none
 *
-* Autosar Version : 4.9.0
-* Autosar Revision : ASR_REL_4_9_REV_0000
-* Autosar Conf.Variant :
-* SW Version : 7.0.1
-* Build Version : S32K3_RTD_7_0_1_D2602_ASR_REL_4_9_REV_0000_20260206
+*   Autosar Version      : 4.9.0
+*   Autosar Revision     : ASR_REL_4_9_REV_0000
+*   Autosar Conf.Variant :
+*   SW Version           : 7.0.1
+*   Build Version        : S32K3_RTD_7_0_1_D2602_ASR_REL_4_9_REV_0000_20260206
 *
-* Copyright 2020 - 2026 NXP
+*   Copyright 2020 - 2026 NXP
 *
-* NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be
-*   used strictly in accordance with the applicable license terms. By expressly
-*   accepting such terms or by downloading, installing, activating and/or otherwise
-*   using the software, you are agreeing that you have read, and that you agree to
-*   comply with and are bound by, such license terms. If you do not agree to be
+*   NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be 
+*   used strictly in accordance with the applicable license terms. By expressly 
+*   accepting such terms or by downloading, installing, activating and/or otherwise 
+*   using the software, you are agreeing that you have read, and that you agree to 
+*   comply with and are bound by, such license terms. If you do not agree to be 
 *   bound by the applicable license terms, then you may not retain, install,
 *   activate or otherwise use the software.
 ==================================================================================================*/
@@ -73,7 +73,7 @@ extern "C"{
 /* S32K3XX */
 #define SIUL2_PORT_IP_HAS_ONEBIT_SLEWRATE           (STD_ON)
 #define SIUL2_PORT_IP_HAS_ADC_INTERLEAVE            (STD_ON)
-#define SIUL2_PORT_IP_HAS_NO_RECEIVER_SELECT        (STD_ON)
+#define FEATURE_SIUL2_PORT_IP_HAS_RECEIVER_SELECT   (STD_OFF)
 
 /*! @brief SIUL2 module has DSE bit */
 #define FEATURE_SIUL2_PORT_IP_HAS_DRIVE_STRENGTH    (STD_ON)

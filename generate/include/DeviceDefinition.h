@@ -12,29 +12,31 @@
 *
 *   Copyright 2020 - 2026 NXP
 *
-*   NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be
-*   used strictly in accordance with the applicable license terms. By expressly
-*   accepting such terms or by downloading, installing, activating and/or otherwise
-*   using the software, you are agreeing that you have read, and that you agree to
-*   comply with and are bound by, such license terms. If you do not agree to be
+*   NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be 
+*   used strictly in accordance with the applicable license terms. By expressly 
+*   accepting such terms or by downloading, installing, activating and/or otherwise 
+*   using the software, you are agreeing that you have read, and that you agree to 
+*   comply with and are bound by, such license terms. If you do not agree to be 
 *   bound by the applicable license terms, then you may not retain, install,
 *   activate or otherwise use the software.
 ==================================================================================================*/
+/**
+*   @file    DeviceDefinition.h
+*   @version 7.0.1
+*
+*   @brief   BaseNXP - Project configuration.
+*   @details Header file contains the specific derivative, sub derivative and platform definitions.
+*
+*   @addtogroup BASENXP_COMPONENT
+*   @{
+*/
 
 #ifndef DEVICEDEFINITION_H
 #define DEVICEDEFINITION_H
 
-/**
-*   @file   DeviceDefinition.h
-*
-*   @addtogroup {{BASE}}NXP{{_}}COMPONENT
-*   @{
-*/
-
 #ifdef __cplusplus
 extern "C"{
 #endif
-
 
 /*==================================================================================================
 *                                         INCLUDE FILES
@@ -46,15 +48,21 @@ extern "C"{
 /*==================================================================================================
 *                               SOURCE FILE VERSION INFORMATION
 ==================================================================================================*/
-#define DEVICEDEFINITION_VENDOR_ID_H                  43
-#define DEVICEDEFINITION_MODULE_ID_H                  0
-#define DEVICEDEFINITION_AR_RELEASE_MAJOR_VERSION_H   4
-#define DEVICEDEFINITION_AR_RELEASE_MINOR_VERSION_H   9
-#define DEVICEDEFINITION_AR_RELEASE_REVISION_VERSION_H 0
-#define DEVICEDEFINITION_SW_MAJOR_VERSION_H           7
-#define DEVICEDEFINITION_SW_MINOR_VERSION_H           0
-#define DEVICEDEFINITION_SW_PATCH_VERSION_H           1
 
+/** 
+@{
+* @brief Parameters that shall be published within the modules header file.
+*       The integration of incompatible files shall be avoided.
+*/
+#define DEVICEDEFINITION_VENDOR_ID_H                     43
+#define DEVICEDEFINITION_MODULE_ID_H                     0
+#define DEVICEDEFINITION_AR_RELEASE_MAJOR_VERSION_H      4
+#define DEVICEDEFINITION_AR_RELEASE_MINOR_VERSION_H      9
+#define DEVICEDEFINITION_AR_RELEASE_REVISION_VERSION_H   0
+#define DEVICEDEFINITION_SW_MAJOR_VERSION_H              7
+#define DEVICEDEFINITION_SW_MINOR_VERSION_H              0
+#define DEVICEDEFINITION_SW_PATCH_VERSION_H              1
+/**@}*/
 /*==================================================================================================
 *                                      FILE VERSION CHECKS
 ==================================================================================================*/
@@ -66,7 +74,7 @@ extern "C"{
 /*==================================================================================================
 *                                       DEFINES AND MACROS
 ==================================================================================================*/
-/**
+/** 
 * @brief This macro define specific derivative and sub derivative.
 */
 
@@ -77,8 +85,7 @@ extern "C"{
 #ifndef DERIVATIVE_S32K344
 #define DERIVATIVE_S32K344
 #endif
-
-/**
+/** 
 * @brief This macro define specific platform.
 */
 #ifndef S32K3XX
@@ -105,7 +112,8 @@ extern "C"{
 }
 #endif
 
+#endif /* DEVICEDEFINITION_H */
 
 /** @} */
 
-#endif /* DEVICEDEFINITION_H */
+

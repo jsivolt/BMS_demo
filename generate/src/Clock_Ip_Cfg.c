@@ -1,26 +1,41 @@
 /*==================================================================================================
-* Project : RTD AUTOSAR 4.9
-* Platform : CORTEXM
-* Peripheral : S32K3XX
-* Dependencies : none
+*   Project              : M4_SRC_PROJECT_NAME
+*   Platform             : M4_SRC_MCU_FAMILY
+*   Peripheral           : M4_SRC_USED_PERIPHERAL
+*   Dependencies         : M4_SRC_AR_MODULE_DEPENDENCY
 *
-* Autosar Version : 4.9.0
-* Autosar Revision : ASR_REL_4_9_REV_0000
-* Autosar Conf.Variant :
-* SW Version : 7.0.1
-* Build Version : S32K3_RTD_7_0_1_D2602_ASR_REL_4_9_REV_0000_20260206
+*   Autosar Version      : M4_SRC_AR_SPEC_VERSION_MAJOR.M4_SRC_AR_SPEC_VERSION_MINOR.M4_SRC_AR_SPEC_VERSION_PATCH
+*   Autosar Revision     : M4_SRC_AR_RELEASE_REVISION
+*   Autosar Conf.Variant :
+*   SW Version           : M4_SRC_SW_VERSION_MAJOR.M4_SRC_SW_VERSION_MINOR.M4_SRC_SW_VERSION_PATCH
+*   Build Version        : M4_SRC_BUILD_ID
 *
-* Copyright 2020 - 2026 NXP
+*   Copyright M4_SRC_YEAR_ID M4_SRC_COPYRIGHTED_TO
 *
-* NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be
-*   used strictly in accordance with the applicable license terms. By expressly
-*   accepting such terms or by downloading, installing, activating and/or otherwise
-*   using the software, you are agreeing that you have read, and that you agree to
-*   comply with and are bound by, such license terms. If you do not agree to be
+*   M4_SRC_LICENSE_INDICATOR
+==================================================================================================*/
+/*==================================================================================================
+*   Project              : RTD AUTOSAR 4.9
+*   Platform             : CORTEXM
+*   Peripheral           : 
+*   Dependencies         : none
+*
+*   Autosar Version      : 4.9.0
+*   Autosar Revision     : ASR_REL_4_9_REV_0000
+*   Autosar Conf.Variant :
+*   SW Version           : 7.0.1
+*   Build Version        : S32K3_RTD_7_0_1_D2602_ASR_REL_4_9_REV_0000_20260206
+*
+*   Copyright 2020 - 2026 NXP
+*
+*   NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be 
+*   used strictly in accordance with the applicable license terms.  By expressly 
+*   accepting such terms or by downloading, installing, activating and/or otherwise 
+*   using the software, you are agreeing that you have read, and that you agree to 
+*   comply with and are bound by, such license terms.  If you do not agree to be 
 *   bound by the applicable license terms, then you may not retain, install,
 *   activate or otherwise use the software.
 ==================================================================================================*/
-
 
 /**
 *   @file       Clock_Ip_Cfg.c
@@ -208,11 +223,11 @@ static const Clock_Ip_XoscConfigType Clock_Ip_XoscConfigurations_0[CLOCK_IP_CONF
     #if CLOCK_IP_CONFIGURED_XOSCS_0_NO > 0U
     {
         FXOSC_CLK,              /* name */
-        16000000U,              /* frequency */
+        16000000U,              /* frequency */ 
         1U,                     /* enable */
         157U,                   /* startupDelay */
-        0U,                     /* bypassOption: Xosc use crystal */
-        1U,                     /* Comparator is enabled */
+        0U,                     /* bypassOption: Xosc use crystal */ 
+        1U,                     /* Comparator is enabled */ 
         12U,                    /* TransConductance */
         0U,                     /* Gain value */
         0U,                     /* Monitor type */
@@ -225,17 +240,17 @@ static const Clock_Ip_XoscConfigType Clock_Ip_XoscConfigurations_0[CLOCK_IP_CONF
     #if CLOCK_IP_CONFIGURED_XOSCS_0_NO > 1U
     {
         SXOSC_CLK,              /* name */
-        32768U,              /* frequency */
+        32768U,              /* frequency */ 
         1U,                     /* enable */
         125U,                   /* startupDelay */
-        0U,                     /* bypassOption */
-        0U,                     /* Comparator is not enabled */
-        0U,                     /* Crystal overdrive protection */
+        0U,                     /* bypassOption */ 
+        0U,                     /* Comparator is not enabled */ 
+        0U,                    /* TransConductance */
         0U,                     /* Gain value */
         0U,                     /* Monitor type */
         0U,                     /* Automatic level controller */
-        0U,                     /* Level Shifter Current */
-        0U,                     /* Comparator Current */
+        0U,                    /* Level Shifter Current */
+        0U,                    /* Comparator Current */
     },
     #endif
 };
@@ -255,7 +270,7 @@ static const Clock_Ip_PllConfigType Clock_Ip_PllConfigurations_0[CLOCK_IP_CONFIG
         0U,                     /* numeratorFracLoopDiv */
         120U,                   /* mulFactorDiv */
         1U,                     /* ModulationBypass */
-        1U,                     /* Modulation type: Spread spectrum modulation bypassed */
+        1U,                     /* Modulation type: Spread spectrum modulation bypassed */ 
         0U,                     /* modulationPeriod */
         0U,                     /* incrementStep */
         0U,                     /* sigmaDelta */
@@ -1337,7 +1352,7 @@ static const Clock_Ip_CmuConfigType Clock_Ip_CmuConfigurations_0[CLOCK_IP_CONFIG
             CMU_FC_IER_FHHAIE(0U)
         ),
         CLOCK_IP_MAXIMUM_5_PERCENTAGE_DEVIATION,            /* Monitor maximum allowed frequency variation. */
-        CLOCK_IP_LOW_LATENCY_1US,            /* Latency of clock monitor reaction. */
+        CLOCK_IP_LOWEST_LATENCY,            /* Latency of clock monitor reaction. */
         16000000U,
         {
                 0U,          /* Start index in register values array */
@@ -1356,7 +1371,7 @@ static const Clock_Ip_CmuConfigType Clock_Ip_CmuConfigurations_0[CLOCK_IP_CONFIG
             CMU_FC_IER_FHHAIE(0U)
         ),
         CLOCK_IP_MAXIMUM_5_PERCENTAGE_DEVIATION,            /* Monitor maximum allowed frequency variation. */
-        CLOCK_IP_LOW_LATENCY_1US,            /* Latency of clock monitor reaction. */
+        CLOCK_IP_LOWEST_LATENCY,            /* Latency of clock monitor reaction. */
         160000000U,
         {
                 0U,          /* Start index in register values array */
@@ -1375,7 +1390,7 @@ static const Clock_Ip_CmuConfigType Clock_Ip_CmuConfigurations_0[CLOCK_IP_CONFIG
             CMU_FC_IER_FHHAIE(0U)
         ),
         CLOCK_IP_MAXIMUM_5_PERCENTAGE_DEVIATION,            /* Monitor maximum allowed frequency variation. */
-        CLOCK_IP_LOW_LATENCY_1US,            /* Latency of clock monitor reaction. */
+        CLOCK_IP_LOWEST_LATENCY,            /* Latency of clock monitor reaction. */
         80000000U,
         {
                 0U,          /* Start index in register values array */
@@ -1426,7 +1441,7 @@ static const Clock_Ip_ConfiguredFrequencyType Clock_Ip_ConfiguredFrequencyConfig
 
 
 /* *************************************************************************
- * Configuration structure for Clock Configuration
+ * Configuration structure for Clock Configuration 
  * ************************************************************************* */
 const Clock_Ip_ClockConfigType Clock_Ip_aClockConfig[1U] = {
 

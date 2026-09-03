@@ -1,18 +1,18 @@
 /*==================================================================================================
-* Project : RTD AUTOSAR 4.9
-* Platform : CORTEXM
-* Peripheral : S32K3XX
-* Dependencies : none
+*   Project              : RTD AUTOSAR 4.9 
+*   Platform             : CORTEXM
+*   Peripheral           : SIUL2
+*   Dependencies         : none
 *
-* Autosar Version : 4.9.0
-* Autosar Revision : ASR_REL_4_9_REV_0000
-* Autosar Conf.Variant :
-* SW Version : 7.0.1
-* Build Version : S32K3_RTD_7_0_1_D2602_ASR_REL_4_9_REV_0000_20260206
+*   Autosar Version      : 4.9.0
+*   Autosar Revision     : ASR_REL_4_9_REV_0000
+*   Autosar Conf.Variant :
+*   SW Version           : 7.0.1
+*   Build Version        : S32K3_S32M27x_Real-Time_Drivers_AUTOSAR_R23-11_Version_7_0_1_D2602_ASR_REL_4_9_REV_0000_20260206
 *
-* Copyright 2020 - 2026 NXP
+*   Copyright 2020 - 2026 NXP
 *
-* NXP Confidential and Proprietary. This software is owned or controlled by NXP and may only be
+*   NXP Confidential. This software is owned or controlled by NXP and may only be
 *   used strictly in accordance with the applicable license terms. By expressly
 *   accepting such terms or by downloading, installing, activating and/or otherwise
 *   using the software, you are agreeing that you have read, and that you agree to
@@ -102,9 +102,31 @@ extern "C"{
 
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
-BOARD_InitPins:
+PortContainer_0_BOARD_InitPeripherals:
 - options: {callFromInitBoot: 'true', coreID: M7_0}
-- pin_list: []
+- pin_list:
+  - {pin_num: '137', peripheral: SIUL2, signal: 'gpio, 0', pin_signal: PTA0, direction: INPUT/OUTPUT}
+  - {pin_num: '32', peripheral: SIUL2, signal: 'gpio, 29', pin_signal: PTA29, direction: OUTPUT, InitValue: state_1}
+  - {pin_num: '33', peripheral: SIUL2, signal: 'gpio, 30', pin_signal: PTA30, direction: OUTPUT, InitValue: state_1}
+  - {pin_num: '39', peripheral: SIUL2, signal: 'gpio, 31', pin_signal: PTA31, direction: OUTPUT, InitValue: state_1}
+  - {pin_num: '42', peripheral: SIUL2, signal: 'gpio, 50', pin_signal: PTB18, direction: OUTPUT, InitValue: state_1}
+  - {pin_num: '1', peripheral: LPSPI1, signal: lpspi1_sout, pin_signal: PTA18, direction: OUTPUT}
+  - {pin_num: '2', peripheral: LPSPI1, signal: lpspi1_sck, pin_signal: PTA19, direction: OUTPUT}
+  - {pin_num: '3', peripheral: LPSPI1, signal: lpspi1_sin, pin_signal: PTA20, direction: INPUT}
+  - {pin_num: '6', peripheral: LPSPI1, signal: lpspi1_pcs0, pin_signal: PTA21, direction: OUTPUT}
+  - {pin_num: '7', peripheral: ADC0, signal: adc0_p0, pin_signal: PTD1}
+  - {pin_num: '8', peripheral: ADC0, signal: adc0_p1, pin_signal: PTD0}
+  - {pin_num: '5', peripheral: ADC0, signal: adc0_p3, pin_signal: PTE15}
+  - {pin_num: '4', peripheral: ADC0, signal: adc0_p4, pin_signal: PTE16}
+  - {pin_num: '102', peripheral: CAN0, signal: can0_rx, pin_signal: PTA6}
+  - {pin_num: '100', peripheral: CAN0, signal: can0_tx, pin_signal: PTA7}
+  - {pin_num: '98', peripheral: CAN1, signal: can1_tx, pin_signal: PTC8}
+  - {pin_num: '97', peripheral: CAN1, signal: can1_rx, pin_signal: PTC9}
+  - {pin_num: '158', peripheral: CAN2, signal: can2_rx, pin_signal: PTE25}
+  - {pin_num: '157', peripheral: CAN2, signal: can2_tx, pin_signal: PTE24}
+  - {pin_num: '87', peripheral: SIUL2, signal: 'gpio, 87', pin_signal: PTC23, direction: OUTPUT}
+  - {pin_num: '88', peripheral: SIUL2, signal: 'gpio, 88', pin_signal: PTC24, direction: OUTPUT}
+  - {pin_num: '89', peripheral: SIUL2, signal: 'gpio, 89', pin_signal: PTC25, direction: OUTPUT}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */

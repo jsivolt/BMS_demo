@@ -1,0 +1,17 @@
+_start () at ../Project_Settings/Startup_Code/startup_cm7.s:294
+294	 cpsid i
+=== Fault snapshot 20260901_131014 ===
+PC = Selected thread is running.
+
+System current:
+  Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
+Backtrace:
+Selected thread is running.
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
