@@ -84,6 +84,10 @@ src/
     Bms_Can.*               CAN0 (host) + CAN1 (vAFE) + CAN2 (vPACK): polled RX, blocking TX
     Bms_Can_Cfg.h           Instances, mailbox indices, all message IDs
     Bms_Spi.*               LPSPI1 wrapper
+    xcp/Xcp.*               XCP protocol command processing (CONNECT/GET_STATUS/SET_MTA/UPLOAD/
+                            SHORT_UPLOAD/DOWNLOAD), transport-agnostic
+    xcp/Xcp_Can.*           CAN5 transport layer for XCP (own FlexCAN instance, polled RX, TX responses)
+    xcp/Xcp_Cfg.h           XCP CAN5 IDs/baudrate + protocol constants + RAM whitelist
   control/
     Bms_Contactor.*         Per-pack contactor + precharge state machine
     Bms_Contactor_Cfg.h     Precharge timing / thresholds
@@ -110,18 +114,21 @@ Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_
 ## 3. Startup and scheduling
 
 `main()` initialises, in order: clocks → pins → LED off → interrupt controller → PIT0 → ADC (with
-calibration) → NTC → CAN0/CAN1/CAN2 → LPSPI1 → fault manager → contactors → state machine → application →
-vAFE → vPACK → battery monitor → NVM (scans data flash) → SOC estimator → scheduler → PIT start. Any
-init failure traps with LED1 red on.
+calibration) → NTC → CAN0/CAN1/CAN2 → CAN5 (XCP transport, `Xcp_Can_Init`) → LPSPI1 → fault manager →
+contactors → state machine → application → vAFE → vPACK → battery monitor → NVM (scans data flash) →
+SOC estimator → scheduler → PIT start. Any init failure traps with LED1 red on.
 
 The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`; all work runs from the main loop, which drains
 accumulated ticks so no period is lost if the loop falls behind.
 
 | Task | Period | Contents |
 | --- | --- | --- |
-| `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, contactor state machine, 1 Hz LED blink |
+| `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, **XCP CAN5 poll (`Xcp_Can_MainFunction`)**, contactor state machine, 1 Hz LED blink |
 | `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, SOC integration, state machine, TX of 0x300–0x30A and 0x400 |
 | `Bms_MainFunction_1000ms` | 1000 ms | SOC persistence (`Bms_Soc_1sFunction`, saves to NVM when due/changed) |
+
+XCP is polled from the 10 ms task (not 100 ms) since a real XCP master/DAQ tool expects lower latency
+than the other CAN traffic.
 
 ---
 
@@ -382,6 +389,7 @@ raise `FAULT_VPACK_DEVICE_FAULT`. Signal layout beyond what `Bms_Vpack.c` decode
 | PTA6 / PTA7 | CAN0_RX / CAN0_TX | Host CAN |
 | PTC9 / PTC8 | CAN1_RX / CAN1_TX | vAFE CAN |
 | PTE25 / PTE24 | CAN2_RX / CAN2_TX | vPACK CAN (virtual ADBMS2950) |
+| PTC26 / PTC27 | CAN5_RX / CAN5_TX | XCP CAN (development/calibration, separate from CAN0-2) |
 | PTA18/19/20/21 | LPSPI1 SOUT/SCK/SIN/PCS0 | SPI |
 | PTD1, PTD0, PTE15, PTE16 | ADC0_P0/P1/P3/P4 | Bus1/2/3 + spare voltage |
 | PTA29 | LED1_RED | 1 Hz heartbeat, solid on init failure |
@@ -468,7 +476,43 @@ connection). Note a fresh `.bat` run still starts a new server process, so it co
 
 ---
 
-## 11. Regenerating peripheral configuration
+## 11. XCP-over-CAN (CAN5)
+
+A minimal XCP slave runs on its own CAN bus (**CAN5**, pins PTC26/PTC27), fully independent of
+CAN0/CAN1/CAN2 — `Xcp_Can` owns a dedicated FlexCAN instance and is polled every 10 ms
+(`Xcp_Can_MainFunction`), separately from `Bms_Can_MainFunction()`'s 100 ms poll. Intended for a
+development/calibration tool (e.g. a DAQ/measurement-and-calibration master), not for the host CAN0 link.
+
+| Item | Value |
+| --- | --- |
+| Bus speed | 1 Mbit/s |
+| Command CAN ID | `0x600` (`XCP_CAN_CFG_RX_ID`) |
+| Response CAN ID | `0x601` (`XCP_CAN_CFG_TX_ID`) |
+| Max CTO/DTO | 8 bytes (classical CAN) |
+| Protocol / transport version | 1.0 / 1.0 (BCD `0x10`/`0x10`) |
+
+`Xcp_ProcessCommand()` (in `Xcp.c`) is transport-agnostic and currently handles:
+
+| Command | Code | Notes |
+| --- | --- | --- |
+| `CONNECT` | `0xFF` | Normal mode only (`mode = 0x00`); replies RESOURCE/COMM_MODE/MAX_CTO/MAX_DTO/versions |
+| `GET_STATUS` | `0xFD` | Always reports session status 0, no resource protection |
+| `SET_MTA` | `0xF6` | Sets the 32-bit memory transfer address + extension (extension currently unused) |
+| `UPLOAD` | `0xF5` | Reads up to 7 bytes from the current MTA, auto-increments it |
+| `SHORT_UPLOAD` | `0xF4` | Reads up to 7 bytes from an explicit address (extension 0 only) |
+| `DOWNLOAD` | `0xF0` | Writes up to 6 bytes to the current MTA |
+
+Reads (`UPLOAD`/`SHORT_UPLOAD`) are allowed anywhere in a whitelisted SRAM range
+(`XCP_CFG_VALID_RAM_START`..`XCP_CFG_VALID_RAM_END`, currently `0x20400000`-`0x2047FFFF`); addresses
+outside it get an `ERR_OUT_OF_RANGE` (`0xFE 0x22`) error response. Writes (`DOWNLOAD`) are further
+restricted to a single first-bring-up test variable, `g_BmsXcpTestCalibration` — this whitelist is
+expected to grow as real calibration parameters are added. Debug counters/state
+(`g_BmsXcpConnected`, `g_BmsXcpConnectCount`, `g_BmsXcpMta`, `g_BmsXcpUploadCount`,
+`g_BmsXcpDownloadCount`, etc.) are left non-static so they can be watched directly in S32DS Expressions.
+
+---
+
+## 12. Regenerating peripheral configuration
 
 Open `BMS_demo.mex` with the S32 Configuration Tools inside S32DS, edit clocks/pins/peripherals, and
 regenerate. Do not hand-edit anything under `generate/` or `board/` — those files are overwritten.
