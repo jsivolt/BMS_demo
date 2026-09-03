@@ -282,6 +282,8 @@ static void Bms_MainFunction_100ms(void)
 
     Bms_Can1_SendTest();
 
+    /* Bms_Can5_SendTest(); disabled: 0x601 now used for XCP responses */
+
     Bms_Can_SendCellSummary();
 
     Bms_Can_SendCellVoltage1_4();

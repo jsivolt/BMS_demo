@@ -120,10 +120,12 @@ PortContainer_0_BOARD_InitPeripherals:
   - {pin_num: '4', peripheral: ADC0, signal: adc0_p4, pin_signal: PTE16}
   - {pin_num: '102', peripheral: CAN0, signal: can0_rx, pin_signal: PTA6}
   - {pin_num: '100', peripheral: CAN0, signal: can0_tx, pin_signal: PTA7}
-  - {pin_num: '98', peripheral: CAN1, signal: can1_tx, pin_signal: PTC8}
   - {pin_num: '97', peripheral: CAN1, signal: can1_rx, pin_signal: PTC9}
+  - {pin_num: '98', peripheral: CAN1, signal: can1_tx, pin_signal: PTC8}
   - {pin_num: '158', peripheral: CAN2, signal: can2_rx, pin_signal: PTE25}
   - {pin_num: '157', peripheral: CAN2, signal: can2_tx, pin_signal: PTE24}
+  - {pin_num: '91', peripheral: CAN5, signal: can5_rx, pin_signal: PTC26}
+  - {pin_num: '93', peripheral: CAN5, signal: can5_tx, pin_signal: PTC27}
   - {pin_num: '87', peripheral: SIUL2, signal: 'gpio, 87', pin_signal: PTC23, direction: OUTPUT}
   - {pin_num: '88', peripheral: SIUL2, signal: 'gpio, 88', pin_signal: PTC24, direction: OUTPUT}
   - {pin_num: '89', peripheral: SIUL2, signal: 'gpio, 89', pin_signal: PTC25, direction: OUTPUT}

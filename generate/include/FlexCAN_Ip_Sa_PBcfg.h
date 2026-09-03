@@ -73,16 +73,19 @@ extern "C"{
 #define INST_FLEXCAN_0 0U
 #define INST_FLEXCAN_1 1U
 #define INST_FLEXCAN_2 2U
+#define INST_FLEXCAN_5 5U
 
 #define FLEXCAN_IP_SA_STATE_PB_CFG \
     extern Flexcan_Ip_StateType FlexCAN_State0; \
     extern Flexcan_Ip_StateType FlexCAN_State1; \
-    extern Flexcan_Ip_StateType FlexCAN_State2; 
+    extern Flexcan_Ip_StateType FlexCAN_State2; \
+    extern Flexcan_Ip_StateType FlexCAN_State3; 
 
 #define FLEXCAN_IP_SA_PB_CFG \
     extern const Flexcan_Ip_ConfigType FlexCAN_Config0; \
     extern const Flexcan_Ip_ConfigType FlexCAN_Config1; \
-    extern const Flexcan_Ip_ConfigType FlexCAN_Config2; 
+    extern const Flexcan_Ip_ConfigType FlexCAN_Config2; \
+    extern const Flexcan_Ip_ConfigType FlexCAN_Config5; 
 
 #ifdef __cplusplus
 }

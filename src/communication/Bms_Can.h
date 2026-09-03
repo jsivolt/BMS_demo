@@ -14,6 +14,7 @@ void Bms_Can_SendLastFaultStatus1(void);
 void Bms_Can_SendLastFaultStatus2(void);
 
 void Bms_Can1_SendTest(void);
+void Bms_Can5_SendTest(void);
 
 void Bms_Can_SendCellSummary(void);
 void Bms_Can_SendCellVoltage1_4(void);

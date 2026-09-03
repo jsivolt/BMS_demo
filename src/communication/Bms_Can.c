@@ -112,6 +112,38 @@ volatile uint8 g_BmsCan2RxData[8] =
     0U, 0U, 0U, 0U
 };
 
+volatile Flexcan_Ip_StatusType g_BmsCan5InitStatus;
+volatile Flexcan_Ip_StatusType g_BmsCan5RxStatus;
+volatile Flexcan_Ip_StatusType g_BmsCan5TxStatus;
+
+volatile uint32 g_BmsCan5RxCount = 0U;
+volatile uint32 g_BmsCan5RxId = 0U;
+volatile uint8  g_BmsCan5RxDlc = 0U;
+
+volatile uint8 g_BmsCan5RxData[8] =
+{
+    0U, 0U, 0U, 0U,
+    0U, 0U, 0U, 0U
+};
+
+volatile boolean g_BmsXcpConnected = FALSE;
+volatile uint32 g_BmsXcpConnectCount = 0U;
+
+volatile uint32 g_BmsXcpMta = 0U;
+volatile uint8  g_BmsXcpMtaExt = 0U;
+
+volatile uint32 g_BmsXcpSetMtaCount = 0U;
+volatile uint32 g_BmsXcpUploadCount = 0U;
+
+volatile uint32 g_BmsXcpTestCalibration = 100U;
+volatile uint32 g_BmsXcpDownloadCount = 0U;
+
+volatile uint32 g_BmsXcpDownloadAddress = 0U;
+volatile uint32 g_BmsXcpDownloadCalAddress = 0U;
+volatile uint8  g_BmsXcpDownloadLength = 0U;
+volatile boolean g_BmsXcpDownloadWritable = FALSE;
+volatile uint32 g_BmsXcpDownloadEnteredCount = 0U;
+
 volatile uint32 g_BmsCanRxCount = 0U;
 volatile uint32 g_BmsCanRxInvalidCount = 0U;
 volatile uint32 g_BmsCanRxId = 0U;
@@ -144,6 +176,7 @@ static Flexcan_Ip_MsgBuffType g_BmsCanRxControlMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCan1RxMessage[BMS_CAN1_CFG_RX_MB_COUNT];
 static Flexcan_Ip_MsgBuffType g_BmsCan2RxCurrentMessage;
 static Flexcan_Ip_MsgBuffType g_BmsCan2RxVoltageMessage;
+static Flexcan_Ip_MsgBuffType g_BmsCan5RxMessage;
 
 /* CAN1 RX mailbox index/ID lookup tables, indexed by mailbox slot 0..4. */
 static const uint8 g_BmsCan1RxMbIndex[BMS_CAN1_CFG_RX_MB_COUNT] =
@@ -582,6 +615,64 @@ Std_ReturnType Bms_Can_Init(void)
     );
 
     if (g_BmsCan2RxStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Initialize CAN5.
+     * CAN5 is reserved for XCP / development communication.
+     */
+    g_BmsCan5InitStatus = FlexCAN_Ip_Init(
+        BMS_CAN5_CFG_INSTANCE,
+        &FlexCAN_State3,
+        &FlexCAN_Config5
+    );
+
+    if (g_BmsCan5InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Configure CAN5 RX mailbox.
+     * MB0 receives CAN ID 0x600.
+     */
+    g_BmsCan5InitStatus = FlexCAN_Ip_ConfigRxMb(
+        BMS_CAN5_CFG_INSTANCE,
+        BMS_CAN5_CFG_RX_MB_INDEX,
+        &g_BmsCanRxInfo,
+        BMS_CAN5_CFG_RX_ID
+    );
+
+    if (g_BmsCan5InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Start CAN5.
+     */
+    g_BmsCan5InitStatus = FlexCAN_Ip_SetStartMode(
+        BMS_CAN5_CFG_INSTANCE
+    );
+
+    if (g_BmsCan5InitStatus != FLEXCAN_STATUS_SUCCESS)
+    {
+        return (Std_ReturnType)E_NOT_OK;
+    }
+
+    /*
+     * Arm CAN5 RX.
+     */
+    g_BmsCan5RxStatus = FlexCAN_Ip_Receive(
+        BMS_CAN5_CFG_INSTANCE,
+        BMS_CAN5_CFG_RX_MB_INDEX,
+        &g_BmsCan5RxMessage,
+        TRUE
+    );
+
+    if (g_BmsCan5RxStatus != FLEXCAN_STATUS_SUCCESS)
     {
         return (Std_ReturnType)E_NOT_OK;
     }
@@ -1564,6 +1655,8 @@ void Bms_Can_SendSocStatus(void)
 }
 
 
+static void Bms_Xcp_ProcessCommand(const uint8 *data, uint8 dlc);
+
 /* ================================================================================================
  * CAN RX polling
  * ============================================================================================== */
@@ -1810,6 +1903,55 @@ void Bms_Can_MainFunction(void)
             TRUE
         );
     }
+
+    /*
+     * Process CAN5 XCP/test RX.
+     */
+    FlexCAN_Ip_MainFunctionRead(
+        BMS_CAN5_CFG_INSTANCE,
+        BMS_CAN5_CFG_RX_MB_INDEX
+    );
+
+    g_BmsCan5RxStatus = FlexCAN_Ip_GetTransferStatus(
+        BMS_CAN5_CFG_INSTANCE,
+        BMS_CAN5_CFG_RX_MB_INDEX
+    );
+
+    if (g_BmsCan5RxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        uint8 j;
+
+        g_BmsCan5RxId  = g_BmsCan5RxMessage.msgId;
+        g_BmsCan5RxDlc = g_BmsCan5RxMessage.dataLen;
+
+        if (g_BmsCan5RxDlc > 8U)
+        {
+            g_BmsCan5RxDlc = 8U;
+        }
+
+        for (j = 0U; j < g_BmsCan5RxDlc; j++)
+        {
+            g_BmsCan5RxData[j] =
+                g_BmsCan5RxMessage.data[j];
+        }
+
+        g_BmsCan5RxCount++;
+
+        Bms_Xcp_ProcessCommand(
+            (const uint8 *)g_BmsCan5RxData,
+            g_BmsCan5RxDlc
+        );
+
+        /*
+         * Re-arm CAN5 RX mailbox.
+         */
+        g_BmsCan5RxStatus = FlexCAN_Ip_Receive(
+            BMS_CAN5_CFG_INSTANCE,
+            BMS_CAN5_CFG_RX_MB_INDEX,
+            &g_BmsCan5RxMessage,
+            TRUE
+        );
+    }
 }
 
 
@@ -1841,4 +1983,475 @@ void Bms_Can1_SendTest(void)
             txData,
             BMS_CAN_TX_TIMEOUT_MS
         );
+}
+
+
+void Bms_Can5_SendTest(void)
+{
+    uint8 txData[8] =
+    {
+        0x55U,
+        0xAAU,
+        0x05U,
+        0x00U,
+        0x11U,
+        0x22U,
+        0x33U,
+        0x44U
+    };
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN5_CFG_INSTANCE,
+        BMS_CAN5_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCan5TxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN5_CFG_INSTANCE,
+            BMS_CAN5_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN5_CFG_TX_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+static void Bms_Can5_SendResponse(
+        const uint8 *data,
+        uint8 length)
+{
+    uint8 txData[8] = {0U};
+    uint8 i;
+
+    if ((data == NULL_PTR) || (length > 8U))
+    {
+        return;
+    }
+
+    for (i = 0U; i < length; i++)
+    {
+        txData[i] = data[i];
+    }
+
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN5_CFG_INSTANCE,
+        BMS_CAN5_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCan5TxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN5_CFG_INSTANCE,
+            BMS_CAN5_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN5_CFG_TX_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+}
+
+
+static void Bms_Xcp_ProcessConnect(
+        const uint8 *data,
+        uint8 dlc)
+{
+    uint8 response[8];
+
+    if ((data == NULL_PTR) || (dlc < 2U))
+    {
+        return;
+    }
+
+    /*
+     * CONNECT:
+     * Byte0 = 0xFF
+     * Byte1 = mode
+     *
+     * Only Normal mode (0x00) supported for now.
+     */
+    if (data[1] != 0x00U)
+    {
+        return;
+    }
+
+    g_BmsXcpConnected = TRUE;
+    g_BmsXcpConnectCount++;
+
+    /*
+     * XCP CONNECT positive response.
+     */
+    response[0] = 0xFFU;  /* RES */
+    response[1] = 0x00U;  /* RESOURCE */
+    response[2] = 0x00U;  /* COMM_MODE_BASIC */
+    response[3] = 0x08U;  /* MAX_CTO */
+
+    response[4] = 0x08U;  /* MAX_DTO low */
+    response[5] = 0x00U;  /* MAX_DTO high */
+
+    response[6] = 0x10U;  /* XCP Protocol 1.0 */
+    response[7] = 0x10U;  /* XCP Transport 1.0 */
+
+    Bms_Can5_SendResponse(
+        response,
+        8U
+    );
+}
+
+
+/* Reads a little-endian uint32 out of a 4-byte XCP field. */
+static uint32 Bms_Xcp_ReadUint32LE(
+        const uint8 *data)
+{
+    return ((uint32)data[0]) |
+           ((uint32)data[1] << 8U) |
+           ((uint32)data[2] << 16U) |
+           ((uint32)data[3] << 24U);
+}
+
+
+static boolean Bms_Xcp_IsValidRamRange(
+        uint32 address,
+        uint32 length)
+{
+    uint32 endAddress;
+
+    if (length == 0U)
+    {
+        return FALSE;
+    }
+
+    endAddress = address + length - 1U;
+
+    /*
+     * First bring-up whitelist.
+     * Allow only SRAM around the current application RAM area.
+     *
+     * We can tighten/expand this later based on the linker map.
+     */
+    if ((address >= 0x20400000U) &&
+        (endAddress <= 0x2047FFFFU) &&
+        (endAddress >= address))
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+static boolean Bms_Xcp_IsWritableRange(
+        uint32 address,
+        uint32 length)
+{
+    uint32 calAddress;
+
+    calAddress = (uint32)&g_BmsXcpTestCalibration;
+
+    if ((address == calAddress) &&
+        (length <= sizeof(g_BmsXcpTestCalibration)))
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+static void Bms_Xcp_ProcessCommand(
+        const uint8 *data,
+        uint8 dlc)
+{
+    if ((data == NULL_PTR) || (dlc == 0U))
+    {
+        return;
+    }
+
+    switch (data[0])
+    {
+        case 0xFFU:
+            /*
+             * XCP CONNECT
+             */
+            Bms_Xcp_ProcessConnect(
+                data,
+                dlc
+            );
+            break;
+
+        case 0xFDU:
+        {
+            /*
+             * XCP GET_STATUS
+             */
+            uint8 response[8] =
+            {
+                0xFFU, /* RES */
+                0x00U, /* Session status */
+                0x00U, /* Resource protection */
+                0x00U,
+                0x00U,
+                0x00U,
+                0x00U,
+                0x00U
+            };
+
+            Bms_Can5_SendResponse(
+                response,
+                8U
+            );
+
+            break;
+        }
+
+        case 0xF6U:
+        {
+            /*
+             * XCP SET_MTA
+             */
+            uint8 response[8] = {0U};
+
+            if (dlc < 8U)
+            {
+                break;
+            }
+
+            g_BmsXcpMtaExt = data[3];
+
+            g_BmsXcpMta =
+                Bms_Xcp_ReadUint32LE(&data[4]);
+
+            g_BmsXcpSetMtaCount++;
+
+            response[0] = 0xFFU;
+
+            Bms_Can5_SendResponse(
+                response,
+                8U
+            );
+
+            break;
+        }
+
+        case 0xF5U:
+        {
+            /*
+             * XCP UPLOAD
+             */
+            uint8 response[8] = {0U};
+            uint8 count;
+            uint8 i;
+            const volatile uint8 *src;
+
+            if (dlc < 2U)
+            {
+                break;
+            }
+
+            count = data[1];
+
+            if ((count == 0U) || (count > 7U))
+            {
+                break;
+            }
+
+            if (Bms_Xcp_IsValidRamRange(
+                    g_BmsXcpMta,
+                    (uint32)count) == FALSE)
+            {
+                uint8 errorResponse[8] = {0U};
+
+                errorResponse[0] = 0xFEU; /* ERR */
+                errorResponse[1] = 0x22U; /* ERR_OUT_OF_RANGE */
+
+                Bms_Can5_SendResponse(
+                    errorResponse,
+                    8U
+                );
+
+                break;
+            }
+
+            src = (const volatile uint8 *)g_BmsXcpMta;
+
+            response[0] = 0xFFU;
+
+            for (i = 0U; i < count; i++)
+            {
+                response[i + 1U] = src[i];
+            }
+
+            g_BmsXcpMta += count;
+            g_BmsXcpUploadCount++;
+
+            Bms_Can5_SendResponse(
+                response,
+                8U
+            );
+
+            break;
+        }
+
+        case 0xF4U:
+        {
+            /*
+             * XCP SHORT_UPLOAD
+             */
+            uint8 response[8] = {0U};
+            uint8 count;
+            uint8 i;
+            uint8 addressExt;
+            uint32 address;
+            const volatile uint8 *src;
+
+            if (dlc < 8U)
+            {
+                break;
+            }
+
+            count = data[1];
+            addressExt = data[3];
+
+            address =
+                Bms_Xcp_ReadUint32LE(&data[4]);
+
+            /*
+             * Classical CAN:
+             * Byte0 of response is RES (0xFF),
+             * so maximum payload is 7 bytes.
+             */
+            if ((count == 0U) || (count > 7U))
+            {
+                break;
+            }
+
+            /*
+             * For now we only support address extension 0.
+             */
+            if (addressExt != 0U)
+            {
+                break;
+            }
+
+            if (Bms_Xcp_IsValidRamRange(
+                    address,
+                    (uint32)count) == FALSE)
+            {
+                uint8 errorResponse[8] = {0U};
+
+                errorResponse[0] = 0xFEU; /* ERR */
+                errorResponse[1] = 0x22U; /* ERR_OUT_OF_RANGE */
+
+                Bms_Can5_SendResponse(
+                    errorResponse,
+                    8U
+                );
+
+                break;
+            }
+
+            src = (const volatile uint8 *)address;
+
+            response[0] = 0xFFU;
+
+            for (i = 0U; i < count; i++)
+            {
+                response[i + 1U] = src[i];
+            }
+
+            Bms_Can5_SendResponse(
+                response,
+                8U
+            );
+
+            break;
+        }
+
+        case 0xF0U:
+        {
+            /*
+             * XCP DOWNLOAD
+             */
+            uint8 response[8] = {0U};
+            uint8 count;
+            uint8 i;
+            volatile uint8 *dst;
+
+            if (dlc < 2U)
+            {
+                break;
+            }
+
+            count = data[1];
+
+            g_BmsXcpDownloadEnteredCount++;
+
+            g_BmsXcpDownloadAddress =
+                g_BmsXcpMta;
+
+            g_BmsXcpDownloadCalAddress =
+                (uint32)&g_BmsXcpTestCalibration;
+
+            g_BmsXcpDownloadLength =
+                count;
+
+            g_BmsXcpDownloadWritable =
+                Bms_Xcp_IsWritableRange(
+                    g_BmsXcpMta,
+                    (uint32)count
+                );
+
+            /*
+             * Classical CAN:
+             * Byte0 = command
+             * Byte1 = count
+             * Byte2... = payload
+             *
+             * Max writable data in one frame = 6 bytes.
+             */
+            if ((count == 0U) ||
+                (count > 6U) ||
+                ((uint8)(count + 2U) > dlc))
+            {
+                break;
+            }
+
+            if (g_BmsXcpDownloadWritable == FALSE)
+            {
+                response[0] = 0xFEU;
+                response[1] = 0x22U;
+
+                Bms_Can5_SendResponse(
+                    response,
+                    8U
+                );
+
+                break;
+            }
+
+            dst = (volatile uint8 *)g_BmsXcpMta;
+
+            for (i = 0U; i < count; i++)
+            {
+                dst[i] = data[i + 2U];
+            }
+
+            g_BmsXcpMta += count;
+            g_BmsXcpDownloadCount++;
+
+            response[0] = 0xFFU;
+
+            Bms_Can5_SendResponse(
+                response,
+                8U
+            );
+
+            break;
+        }
+
+        default:
+            /*
+             * Unsupported XCP command for now.
+             */
+            break;
+    }
 }
