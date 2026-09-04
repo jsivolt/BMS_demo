@@ -134,13 +134,13 @@ void BatteryMonitor_MainFunction(void)
      */
 
     if ((Bms_Adc_IsPackValid() == TRUE) &&
-        (g_CanPack1VoltageValid == TRUE))
+        (g_BmsVpackData.VoltageValid == TRUE))
     {
         /*
-         * Pack 1 voltage from CAN2 simulation.
+         * Pack 1 voltage from vPACK (ADBMS2950, CAN2 0x411).
          */
         g_BatteryData.PackV1 =
-            g_CanPack1Voltage_V;
+            (float)g_BmsVpackData.PackVoltage_mV / 1000.0f;
 
         /*
          * Pack 2 / Pack 3 remain ADC inputs.
@@ -160,20 +160,17 @@ void BatteryMonitor_MainFunction(void)
         g_BatteryData.Status = BAT_MON_STATUS_INVALID;
     }
 
-    if (g_CanPack1VoltageRxCount > 0U)
+    if (g_BmsVpackData.VoltageValid == FALSE)
     {
-        if (g_CanPack1VoltageValid == FALSE)
-        {
-            FaultManager_SetPack(
-                FAULT_PACK_1,
-                FAULT_PACK1_VOLTAGE_TIMEOUT);
-        }
-        else
-        {
-            FaultManager_ClearPack(
-                FAULT_PACK_1,
-                FAULT_PACK1_VOLTAGE_TIMEOUT);
-        }
+        FaultManager_SetPack(
+            FAULT_PACK_1,
+            FAULT_PACK1_VOLTAGE_TIMEOUT);
+    }
+    else
+    {
+        FaultManager_ClearPack(
+            FAULT_PACK_1,
+            FAULT_PACK1_VOLTAGE_TIMEOUT);
     }
 
 
@@ -325,7 +322,7 @@ static void BatteryMonitor_UpdatePackPower(void)
      * Pack 1 power is valid only when both
      * voltage and current are valid.
      */
-    if ((g_CanPack1VoltageValid == TRUE) &&
+    if ((g_BmsVpackData.VoltageValid == TRUE) &&
         (g_BatteryData.PackCurrentValid[0] == TRUE))
     {
         g_BatteryData.PackPower_W[0] =
