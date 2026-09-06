@@ -2,8 +2,9 @@
 
 ## Scope discipline
 
-Implement only what the plan document (e.g. `SOC_DESIGN.md`) or the chat request
-specifies. Do not add functions, helpers, or features that were not asked for.
+Implement only what the plan document (e.g. `src/battery/SOC_DESIGN.md`) or the
+chat request specifies. Do not add functions, helpers, or features that were not
+asked for.
 
 - If a spec lists the functions to add, add exactly those.
 - If you spot a gap, a missing piece, or a worthwhile improvement, **describe it

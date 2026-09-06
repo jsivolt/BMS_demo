@@ -548,7 +548,7 @@ existing consumers.
 
 **Platform:** SIL — the application layer compiled natively (MinGW-w64 GCC 16.1.0,
 same `-std=c99` dialect and warning set as the ARM build) and driven from Python
-via ctypes. See [sil/README.md](sil/README.md).
+via ctypes. See [sil/README.md](../../sil/README.md).
 
 **Status:** 41 passed, 1 skipped, 1 xfail (a live defect, see §5.11).
 Full suite runs in ~1 s. Reproduce with:
@@ -562,11 +562,11 @@ requirement trace — is in the generated reports**, one per feature:
 
 | Component | Test module | Report |
 |---|---|---|
-| **SOC** — estimation (SA-\*), initialization (IT-\*), signal chain (CH-\*) | `test_soc.py` | [reports/soc.md](sil/reports/soc.md) |
-| `Bms_Nvm` — persistence (PS-\*) | `test_persistence.py` | [reports/persistence.md](sil/reports/persistence.md) |
-| `Lib_Interp` — table interpolation (LI-\*) | `test_lib_interp.py` | [reports/lib_interp.md](sil/reports/lib_interp.md) |
+| **SOC** — estimation (SA-\*), initialization (IT-\*), signal chain (CH-\*) | `test_soc.py` | [reports/soc.md](../../sil/reports/soc.md) |
+| `Bms_Nvm` — persistence (PS-\*) | `test_persistence.py` | [reports/persistence.md](../../sil/reports/persistence.md) |
+| `Lib_Interp` — table interpolation (LI-\*) | `test_lib_interp.py` | [reports/lib_interp.md](../../sil/reports/lib_interp.md) |
 
-Roll-up index: [sil/TEST_REPORT.md](sil/TEST_REPORT.md).
+Roll-up index: [sil/TEST_REPORT.md](../../sil/TEST_REPORT.md).
 
 Those reports are regenerated from the executed tests on every run (procedure
 extracted from the test source, results from the run itself), so they cannot
@@ -720,7 +720,7 @@ If power is lost between the sector erase and the first record write, the sector
 **Found by SIL, 2026-09-05.** Not a limitation of the design — a bug in the
 implementation, in `Battery_Monitor`, surfaced by the SOC test suite.
 
-[Battery_Monitor.c:286](src/battery/Battery_Monitor.c:286) sets the validity flag
+[Battery_Monitor.c:286](Battery_Monitor.c:286) sets the validity flag
 and copies the data under **different** gates:
 
 ```c
