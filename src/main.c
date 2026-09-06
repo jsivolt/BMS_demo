@@ -301,6 +301,8 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendPackPower();
 
     Bms_Can_SendSocStatus();
+
+    Bms_Can_SendCellSoc();
 }
 
 static void Bms_MainFunction_1000ms(void)

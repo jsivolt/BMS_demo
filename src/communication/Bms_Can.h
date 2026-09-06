@@ -24,6 +24,11 @@ void Bms_Can_SendPackCurrent(void);
 void Bms_Can_SendPackPower(void);
 void Bms_Can_SendSocStatus(void);
 
+/**
+ * @brief Transmits the per-cell-extreme SOC estimates (min / max / avg) on 0x30B.
+ */
+void Bms_Can_SendCellSoc(void);
+
 /*
  * Poll CAN RX mailbox.
  *

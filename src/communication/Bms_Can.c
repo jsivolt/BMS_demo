@@ -128,6 +128,7 @@ static uint8 g_BmsCanContactorAliveCounter = 0U;
 static uint8 g_BmsCanPackCurrentAliveCounter = 0U;
 static uint8 g_BmsCanPackPowerAliveCounter = 0U;
 static uint8 g_BmsCanSocAliveCounter = 0U;
+static uint8 g_BmsCanCellSocAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -1521,12 +1522,17 @@ void Bms_Can_SendSocStatus(void)
     txData[1] = (uint8)((socRaw >> 8U) & 0xFFU);
 
     /*
-     * Byte2 bit0 = Pack1 SOC valid
+     * Byte2 bit0    = Pack1 SOC valid
+     * Byte2 bit1-3  = SOC initialization source (0 = default/guess,
+     *                 1 = OCV reset, 2 = NVM restore)
+     * Byte2 bit4-7  = reserved
      */
     if (socData->Valid == TRUE)
     {
         txData[2] |= 0x01U;
     }
+
+    txData[2] |= (uint8)(((uint8)Bms_Soc_GetPackData()->InitSource & 0x07U) << 1U);
 
     /*
      * Byte3-6 reserved
@@ -1560,6 +1566,95 @@ void Bms_Can_SendSocStatus(void)
     {
         g_BmsCanSocAliveCounter =
             (uint8)((g_BmsCanSocAliveCounter + 1U) & 0x0FU);
+    }
+}
+
+void Bms_Can_SendCellSoc(void)
+{
+    const Bms_Soc_PackType *packData;
+    uint8 txData[8] = {0U};
+    uint16 socRaw;
+
+    packData = Bms_Soc_GetPackData();
+
+    if (packData == NULL_PTR)
+    {
+        return;
+    }
+
+    /*
+     * Byte0-1 = weakest-cell SOC, unit 0.1 %
+     */
+    socRaw = packData->Min.Soc_pct_x10;
+
+    txData[0] = (uint8)(socRaw & 0xFFU);
+    txData[1] = (uint8)((socRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte2-3 = strongest-cell SOC, unit 0.1 %
+     */
+    socRaw = packData->Max.Soc_pct_x10;
+
+    txData[2] = (uint8)(socRaw & 0xFFU);
+    txData[3] = (uint8)((socRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte4-5 = average-cell SOC, unit 0.1 %
+     */
+    socRaw = packData->Avg.Soc_pct_x10;
+
+    txData[4] = (uint8)(socRaw & 0xFFU);
+    txData[5] = (uint8)((socRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte6 bit0 = min SOC valid
+     * Byte6 bit1 = max SOC valid
+     * Byte6 bit2 = avg SOC valid
+     * Byte6 bit3-7 reserved
+     */
+    if (packData->Min.Valid == TRUE)
+    {
+        txData[6] |= 0x01U;
+    }
+
+    if (packData->Max.Valid == TRUE)
+    {
+        txData[6] |= 0x02U;
+    }
+
+    if (packData->Avg.Valid == TRUE)
+    {
+        txData[6] |= 0x04U;
+    }
+
+    /*
+     * Byte7 bit0-3 = alive counter
+     */
+    txData[7] =
+        (uint8)(g_BmsCanCellSocAliveCounter & 0x0FU);
+
+    /*
+     * Handle previous polling TX completion.
+     */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        FlexCAN_Ip_SendBlocking(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            &g_BmsCanTxInfo,
+            BMS_CAN_CFG_TX_CELL_SOC_ID,
+            txData,
+            BMS_CAN_TX_TIMEOUT_MS
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanCellSocAliveCounter =
+            (uint8)((g_BmsCanCellSocAliveCounter + 1U) & 0x0FU);
     }
 }
 
