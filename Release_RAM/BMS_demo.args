@@ -88,6 +88,7 @@
 "./src/battery/Bms_Soc.o"
 "./src/battery/vAFE/Bms_Vafe.o"
 "./src/battery/vPACK/Bms_Vpack.o"
+"./src/common/Lib_Interp.o"
 "./src/communication/Bms_Can.o"
 "./src/communication/Bms_Spi.o"
 "./src/communication/xcp/Xcp.o"

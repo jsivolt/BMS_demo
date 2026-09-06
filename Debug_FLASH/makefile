@@ -14,6 +14,7 @@ RM := rm -rf
 -include src/control/subdir.mk
 -include src/communication/xcp/subdir.mk
 -include src/communication/subdir.mk
+-include src/common/subdir.mk
 -include src/battery/vPACK/subdir.mk
 -include src/battery/vAFE/subdir.mk
 -include src/battery/subdir.mk
