@@ -13,6 +13,7 @@ typedef struct
     uint16 MinCellVoltage_mV;
     uint16 MaxCellVoltage_mV;
     uint16 DeltaCellVoltage_mV;
+    uint16 AverageCellVoltage_mV;
 
     uint8 MinCellIndex;
     uint8 MaxCellIndex;
