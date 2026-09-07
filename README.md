@@ -120,8 +120,14 @@ calibration) → NTC → CAN0/CAN1/CAN2 → CAN5 (XCP transport, `Xcp_Can_Init`)
 contactors → state machine → application → vAFE → vPACK → battery monitor → NVM (scans data flash) →
 SOC estimator → scheduler → PIT start. Any init failure traps with LED1 red on.
 
-The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`; all work runs from the main loop, which drains
-accumulated ticks so no period is lost if the loop falls behind.
+The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`, which increments a pending-tick count; all work
+runs from the main loop. `Bms_Scheduler_MainFunction` atomically captures and clears the pending count,
+then advances every task's counter by that many ticks but **executes each due task at most once per
+call** (counter reduced modulo its period, preserving phase) — this avoids the CAN-cycle-time bursts
+that a naive "run once per missed tick" catch-up loop would cause if the main loop temporarily falls
+behind. Diagnostics: `g_BmsSchedulerPendingTicks` (last call's elapsed ticks), a running peak
+`g_BmsSchedulerPendingTicksMax`, and a cumulative `g_BmsSchedulerMissedTickCount` (ticks beyond the
+first per call) are exposed for inspection (e.g. via the XCP/debugger tooling in §10/§11).
 
 | Task | Period | Contents |
 | --- | --- | --- |
