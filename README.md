@@ -76,7 +76,8 @@ src/
     Battery_Monitor.*       Aggregates cell/pack/current/temperature data, applies thresholds
     Bms_Ntc.*               3-channel NTC (Beta equation) -> 0.1 degC
     Bms_Ntc_Cfg.h           NTC hardware constants
-    Bms_Soc.*               Pack 1 state-of-charge, Coulomb counting + periodic NVM save
+    Bms_Soc.*               Pack 1 state-of-charge: three cell-based estimators, OCV/NVM/default init
+    Bms_SleepTime.*         Elapsed power-off time provider for the SOC OCV reset (stubbed, no RTC yet)
     Bms_Afe.*               Physical AFE stub (unused)
     vAFE/Bms_Vafe.*         Decodes 16 cell voltages from CAN1 frames 0x401-0x404
     vPACK/Bms_Vpack.*       Decodes pack current/voltage from CAN2 (virtual ADBMS2950) frames 0x410-0x411
@@ -104,6 +105,7 @@ generate/     Generated RTD configs: Clock, ADC, FlexCAN, PIT, LPSPI, IntCtrl, O
 RTD/          NXP Real-Time Drivers source + headers
 DBC/          BMS_demo.dbc  — CAN database for PCAN / CANalyzer
 Project_Settings/  Linker scripts, startup code, debugger launches
+sil/          Software-in-the-loop test platform: same src/ code, native build, pytest (see §13)
 
 Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_reset.bat ·
                debug_live.bat · fault_snapshot.bat · fault_decode.gdb  (see §1 and §10)
@@ -234,10 +236,9 @@ negative = discharge.
   frame `0x410` (current + shunt voltage), voltage frame `0x411` (pack + bus voltage), each with an
   alive counter checked for timeout/rollover (`BMS_VPACK_TIMEOUT_TICKS` = 1000 ms). `Battery_Monitor`
   derives `PackPower_W = PackCurrent_mA * PackV1 / 1000`.
-- **State of charge** — `Bms_Soc` Coulomb-counts Pack 1 current (100 ms sample period) starting from
-  a value restored from NVM at boot (or `BMS_SOC_INITIAL_PCT_X10` = 50.0 % if none saved), and saves
-  to data flash at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s) or sooner if it changes by more
-  than `BMS_SOC_SAVE_DELTA_X10` (0.1 %).
+- **State of charge** — `Bms_Soc` Coulomb-counts Pack 1 current (100 ms sample period) into three
+  estimators, saving to data flash at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s) or sooner if it
+  changes by more than `BMS_SOC_SAVE_DELTA_X10` (0.1 %) — see §13.
 - **Temperatures** — three NTCs on ADC1, Beta equation (`R25 = 10 kΩ`, `Beta = 3435 K`,
   series 10 kΩ), reported in 0.1 °C over −40.0 … 125.0 °C.
 - **Bus voltages** — ADC0 channels P0/P1/P3/P4 (bus 1/2/3 + spare), used for precharge completion.
@@ -328,8 +329,8 @@ Each frame carries 4 cells × `uint16` LE at 1 mV/bit (all 16 cells every cycle)
 
 | Byte | Content |
 | --- | --- |
-| 0–1 | Pack1 SOC, `uint16` LE, 0.1 %/bit |
-| 2 | bit0 SOC valid |
+| 0–1 | Pack1 blended SOC, `uint16` LE, 0.1 %/bit |
+| 2 | bit0 SOC valid; bits 3:1 init source (0 default, 1 OCV, 2 NVM, 3 pending); bits 7:4 reserved |
 | 3–6 | Reserved |
 | 7 | bits 3:0 alive counter |
 
@@ -338,6 +339,10 @@ history (`uint32` LE).
 
 **0x30A `BMS_LastFault3System`** — bytes 0–3 latched pack3 fault history, bytes 4–7 latched system
 fault history (`uint32` LE).
+
+**0x30B `BMS_CellSoc`** — per-estimator SOC, `uint16` LE, 0.1 %/bit each: bytes 0–1 weakest cell
+(`Min`), 2–3 strongest cell (`Max`), 4–5 average (`Avg`); byte 6 bits 2:0 = Min/Max/Avg valid; byte 7
+bits 3:0 alive counter. See §13 for what the three estimators are.
 
 ### CAN0 receive
 
@@ -516,3 +521,53 @@ expected to grow as real calibration parameters are added. Debug counters/state
 
 Open `BMS_demo.mex` with the S32 Configuration Tools inside S32DS, edit clocks/pins/peripherals, and
 regenerate. Do not hand-edit anything under `generate/` or `board/` — those files are overwritten.
+
+---
+
+## 13. State-of-charge (SOC) estimation
+
+`Bms_Soc` Coulomb-counts Pack 1 current into three independent estimators — weakest cell (`Min`),
+strongest cell (`Max`), and cell average (`Avg`) — each against `BMS_SOC_PACK1_CAPACITY_MAH`
+(100 Ah, placeholder). The reported pack SOC blends `Min`/`Max`, weighted by how close `Avg` sits to
+empty or full (near-empty converges to the weak cell, near-full to the strong cell).
+
+Initialization tries three sources in order, recorded as `InitSource` on CAN 0x308:
+
+| Tier | Source | Condition |
+| --- | --- | --- |
+| 1 (`OCV`) | 6-point OCV lookup table, per estimator's own cell voltage | Elapsed sleep time ready and ≥ `BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S` (8 h, placeholder), and `CellVoltageValid` |
+| 2 (`NVM`) | Last value persisted to data flash | Tier 1 not taken, a valid record exists |
+| 3 (`Default`) | `BMS_SOC_INITIAL_PCT_X10` (50.0 %) | Neither above available |
+
+Tier 1's two inputs — sleep time and cell voltage — are never both ready at boot (the scheduler that
+polls CAN hasn't started yet), so `Bms_Soc_Init()` defers: it marks the estimators unseeded
+(`InitSource = Pending`, no integration) and `Bms_Soc_MainFunctionPack()` resolves the wait once both
+inputs arrive, or after `g_BmsSocOcvWaitTimeout_ms` (500 ms, calibratable) expires — falling through to
+NVM, then the default. Elapsed sleep time comes from `Bms_SleepTime`, a small provider module (no RTC
+on target yet, so it currently reports 0 s) kept separate for the same reason `Bms_Adc`/`Bms_Ntc` are:
+so a real timekeeping source, or a test double, can replace it without touching the estimator.
+
+SOC is saved to data flash via `Bms_Nvm` at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s), or sooner
+if it moves by more than `BMS_SOC_SAVE_DELTA_X10` (0.1 %). Full design, known limitations (OCV table
+not characterized, no per-cell capacity data, float precision floor, etc.) in
+[`src/battery/SOC_DESIGN.md`](src/battery/SOC_DESIGN.md).
+
+---
+
+## 14. Software-in-the-loop (SIL) test platform
+
+`sil/` compiles the SOC/battery-monitor/fault/NVM production `.c` files unmodified into a native DLL
+and drives them from Python via `pytest` — no hardware, no target build, real application logic.
+Stimulus goes in as actual CAN frames through the production decoders (`0x405`/`0x401-0x404` for cell
+voltages, `0x410`/`0x411` for pack current/voltage), so a test also catches an upstream decoder or
+downstream flash-write regression, not just the estimator it names. Only the RTD driver layer
+(`Bms_Adc`, `Bms_Ntc`, `Bms_SleepTime`, `C40_Ip`) is replaced with settable test doubles.
+
+```bash
+python sil/build.py          # compile the shared library
+cd sil && python -m pytest   # run the suite
+```
+
+Needs a host C compiler (MinGW-w64 GCC) and `pytest`; see [`sil/README.md`](sil/README.md) for setup,
+layout, and how to write a new test. Test reports are generated per feature under `sil/reports/`, rolled
+up in [`sil/TEST_REPORT.md`](sil/TEST_REPORT.md).
