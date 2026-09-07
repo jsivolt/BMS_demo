@@ -28,6 +28,7 @@ src/app \
 src/battery \
 src/battery/vAFE \
 src/battery/vPACK \
+src/common \
 src/communication \
 src/communication/xcp \
 src/control \

@@ -34,12 +34,15 @@ static void Bms_Vafe_UpdateStatistics(void)
     uint16 maxVoltage;
     uint8 minIndex;
     uint8 maxIndex;
+    uint32 sumVoltage;
 
     minVoltage = g_BmsVafeData.CellVoltage_mV[0];
     maxVoltage = g_BmsVafeData.CellVoltage_mV[0];
 
     minIndex = 0U;
     maxIndex = 0U;
+
+    sumVoltage = (uint32)g_BmsVafeData.CellVoltage_mV[0];
 
     for (i = 1U; i < BMS_VAFE_CELL_COUNT; i++)
     {
@@ -54,12 +57,21 @@ static void Bms_Vafe_UpdateStatistics(void)
             maxVoltage = g_BmsVafeData.CellVoltage_mV[i];
             maxIndex = i;
         }
+
+        sumVoltage += (uint32)g_BmsVafeData.CellVoltage_mV[i];
     }
 
     g_BmsVafeData.MinCellVoltage_mV = minVoltage;
     g_BmsVafeData.MaxCellVoltage_mV = maxVoltage;
     g_BmsVafeData.DeltaCellVoltage_mV =
         (uint16)(maxVoltage - minVoltage);
+
+    /*
+     * All BMS_VAFE_CELL_COUNT entries are always populated together by a
+     * measurement cycle, so a plain mean matches how min/max treat the set.
+     */
+    g_BmsVafeData.AverageCellVoltage_mV =
+        (uint16)(sumVoltage / (uint32)BMS_VAFE_CELL_COUNT);
 
     g_BmsVafeData.MinCellIndex = minIndex;
     g_BmsVafeData.MaxCellIndex = maxIndex;
@@ -98,6 +110,7 @@ void Bms_Vafe_Init(void)
     g_BmsVafeData.MinCellVoltage_mV = 0U;
     g_BmsVafeData.MaxCellVoltage_mV = 0U;
     g_BmsVafeData.DeltaCellVoltage_mV = 0U;
+    g_BmsVafeData.AverageCellVoltage_mV = 0U;
 
     g_BmsVafeData.MinCellIndex = 0U;
     g_BmsVafeData.MaxCellIndex = 0U;

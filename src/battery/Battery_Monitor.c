@@ -91,6 +91,7 @@ void BatteryMonitor_Init(void)
     g_BatteryData.MinCellVoltage = 0.0f;
     g_BatteryData.MaxCellVoltage = 0.0f;
     g_BatteryData.DeltaCellVoltage = 0.0f;
+    g_BatteryData.AverageCellVoltage = 0.0f;
 
     g_BatteryData.MinCellIndex = 0U;
     g_BatteryData.MaxCellIndex = 0U;
@@ -513,6 +514,9 @@ static void BatteryMonitor_UpdateCellVoltages(void)
 
         g_BatteryData.DeltaCellVoltage =
             (float)g_BmsVafeData.DeltaCellVoltage_mV / 1000.0f;
+
+        g_BatteryData.AverageCellVoltage =
+            (float)g_BmsVafeData.AverageCellVoltage_mV / 1000.0f;
 
         g_BatteryData.MinCellIndex =
             g_BmsVafeData.MinCellIndex;

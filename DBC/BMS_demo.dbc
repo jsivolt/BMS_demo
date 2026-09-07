@@ -109,6 +109,7 @@ BO_ 775 Pack_Power_Status: 8 S32K344_BMS
 BO_ 776 SOC_Status: 8 S32K344_BMS
  SG_ Pack1SOC : 0|16@1+ (0.1,0) [0|100] "%" PCAN
  SG_ Pack1SOCValid : 16|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1SOCInitSource : 17|3@1+ (1,0) [0|7] "" PCAN
  SG_ SOCAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
 
 BO_ 777 BMS_LastFaultStatus12: 8 S32K344
@@ -118,6 +119,15 @@ BO_ 777 BMS_LastFaultStatus12: 8 S32K344
 BO_ 778 BMS_LastFaultStatus3System: 8 S32K344
  SG_ LastPack3FaultMask : 0|32@1+ (1,0) [0|4294967295] "" PCAN
  SG_ LastSystemFaultMask : 32|32@1+ (1,0) [0|4294967295] "" PCAN
+
+BO_ 779 SOC_CellBased: 8 S32K344_BMS
+ SG_ Pack1SOCMin : 0|16@1+ (0.1,0) [0|100] "%" PCAN
+ SG_ Pack1SOCMax : 16|16@1+ (0.1,0) [0|100] "%" PCAN
+ SG_ Pack1SOCAvg : 32|16@1+ (0.1,0) [0|100] "%" PCAN
+ SG_ Pack1SOCMinValid : 48|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1SOCMaxValid : 49|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1SOCAvgValid : 50|1@1+ (1,0) [0|1] "" PCAN
+ SG_ CellSOCAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
 
 BO_ 1024 CAN1_Test: 8 S32K344
  SG_ TestByte0 : 0|8@1+ (1,0) [0|255] "" PCAN
@@ -179,6 +189,14 @@ VAL_ 768 BmsState 0 "INIT" 1 "STANDBY" 2 "ACTIVE" 3 "FAULT";
 VAL_ 776 Pack1SOCValid
     0 "Invalid"
     1 "Valid";
+VAL_ 776 Pack1SOCInitSource
+    0 "Default_NoReference"
+    1 "OCV_Reset"
+    2 "NVM_Restore"
+    3 "Pending_WaitingCellVoltage";
+VAL_ 779 Pack1SOCMinValid 0 "Invalid" 1 "Valid";
+VAL_ 779 Pack1SOCMaxValid 0 "Invalid" 1 "Valid";
+VAL_ 779 Pack1SOCAvgValid 0 "Invalid" 1 "Valid";
 
 CM_ BO_ 1025 "CAN1 RX mailbox slot 0, hardware MB1. Cell 1-4, little-endian uint16, 1 mV/bit.";
 CM_ BO_ 1026 "CAN1 RX mailbox slot 1, hardware MB2. Cell 5-8, little-endian uint16, 1 mV/bit.";
@@ -204,3 +222,6 @@ CM_ SG_ 777 LastPack1FaultMask "Latched Pack1 fault history.";
 CM_ SG_ 777 LastPack2FaultMask "Latched Pack2 fault history.";
 CM_ SG_ 778 LastPack3FaultMask "Latched Pack3 fault history.";
 CM_ SG_ 778 LastSystemFaultMask "Latched System fault history.";
+
+CM_ BO_ 779 "Per-cell-extreme SOC estimates. Min = weakest cell, Max = strongest cell, Avg = cell average.";
+CM_ SG_ 776 Pack1SOCInitSource "How the SOC estimators were seeded at startup. Latched by Bms_Soc_InitPack, not changed by runtime integration.";

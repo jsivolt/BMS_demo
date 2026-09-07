@@ -14,6 +14,7 @@ RM := rm -rf
 -include src/control/subdir.mk
 -include src/communication/xcp/subdir.mk
 -include src/communication/subdir.mk
+-include src/common/subdir.mk
 -include src/battery/vPACK/subdir.mk
 -include src/battery/vAFE/subdir.mk
 -include src/battery/subdir.mk
@@ -43,7 +44,7 @@ BMS_demo.siz \
 all: BMS_demo.elf secondary-outputs
 
 # Tool invocations
-BMS_demo.elf: $(OBJS) C:/S32K344/workspace/BMS_demo/Project_Settings/Linker_Files/linker_flash_s32k344.ld $(USER_OBJS)
+BMS_demo.elf: $(OBJS) ../Project_Settings/Linker_Files/linker_flash_s32k344.ld $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Standard S32DS C Linker'
 	arm-none-eabi-gcc -o "BMS_demo.elf" "@BMS_demo.args"  $(USER_OBJS)

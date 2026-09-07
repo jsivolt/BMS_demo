@@ -35,8 +35,8 @@ typedef struct
      *
      * Unit: mA
      *
-     * Positive = discharge
-     * Negative = charge
+     * Positive = charge
+     * Negative = discharge
      */
     sint32 PackCurrent_mA[BATTERY_MONITOR_PACK_COUNT];
 
@@ -83,6 +83,7 @@ typedef struct
     float MinCellVoltage;
     float MaxCellVoltage;
     float DeltaCellVoltage;
+    float AverageCellVoltage;
 
     /* 0-based cell index */
     uint8 MinCellIndex;

@@ -29,3 +29,9 @@ Release_FLASH/
 Thumbs.db
 .DS_Store
 *.swp
+.tmp.driveupload/
+
+# SIL host build outputs
+/sil/build/
+__pycache__/
+.pytest_cache/
