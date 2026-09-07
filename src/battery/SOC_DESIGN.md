@@ -50,7 +50,7 @@
 | **SOC-IR-02** | Cell voltage references are consumed from `BatteryMonitor_GetData()`: `MinCellVoltage`, `MaxCellVoltage`, `AverageCellVoltage` (float, volts), gated by `CellVoltageValid`. |
 | **SOC-IR-03** | The blended pack SOC is published on CAN frame `0x308` via `Bms_Can_SendSocStatus()`, which reads `Bms_Soc_GetData()`. |
 | **SOC-IR-05** | The three cell-based estimates are published on CAN frame `0x30B` via `Bms_Can_SendCellSoc()`, with a validity bit per estimator. |
-| **SOC-IR-06** | The provenance of the SOC anchor is published on `0x308` as `Pack1SOCInitSource` (byte 2, bits 1-3): 0 = default/no reference, 1 = OCV reset, 2 = NVM restore. It is latched at initialization and not altered by runtime integration. |
+| **SOC-IR-06** | The provenance of the SOC anchor is published on `0x308` as `Pack1SOCInitSource` (byte 2, bits 1-3): 0 = default/no reference, 1 = OCV reset, 2 = NVM restore, 3 = pending (an eligible OCV reset is waiting for the first valid cell-voltage set). It is latched at initialization and not altered by runtime integration. |
 | **SOC-IR-04** | Persistence uses `Bms_Nvm_LoadSoc()` / `Bms_Nvm_SaveSoc()`, each carrying the three SOC values. |
 
 ### 1.4 Timing requirements
@@ -389,9 +389,42 @@ Linear scan rather than binary search is intentional — these tables hold singl
 
 `Bms_Soc_Init()` → `Bms_Soc_InitPack()`. Three sources are tried in strict priority; the first that succeeds wins and the rest are skipped.
 
+**Deferred start.** Tier 1 depends on two inputs, and neither is guaranteed when `Bms_Soc_Init()` runs — it executes before the scheduler starts:
+
+| Input | Provider | Why it can be late |
+|---|---|---|
+| Elapsed sleep time readable | `Bms_Soc_IsElapsedSleepTimeReady()` | A real timekeeper (RTC, external counter) may need time to acquire its value; until then the elapsed time means nothing (§5.2) |
+| `CellVoltageValid` | `Battery_Monitor` ← `Bms_Vafe` | Cell voltages arrive over CAN1 and no CAN poll has run yet |
+
+`Bms_Soc_Init()` therefore initializes immediately in only one case — the sleep time is readable **and** below the relax threshold, so tier 1 is already ruled out. Everything else defers: the estimators are marked unseeded (`InitSource = PENDING`, all `Valid = FALSE`) and `Bms_Soc_MainFunctionPack()` resolves the wait on the 100 ms task. Both stages share **one** `g_BmsSocOcvWaitTimeout_ms` budget.
+
 ```mermaid
 flowchart TD
-    START(["Bms_Soc_InitPack"]) --> C1{"elapsed sleep time >= 8 h<br/>AND batteryData not NULL<br/>AND CellVoltageValid"}
+    INIT(["Bms_Soc_Init<br/>before scheduler start"]) --> E{"sleep time ready<br/>AND < 8 h"}
+    E -->|yes| DIRECT["Bms_Soc_InitPack now<br/>tier 2 / tier 3"]
+    E -->|no| PEND["MarkUnseeded<br/>InitSource = PENDING<br/>pending = TRUE"]
+
+    PEND --> TASK(["every 100 ms<br/>ResolvePendingInit"])
+    TASK --> RDY{"STAGE 1<br/>sleep time ready"}
+    RDY -->|no| TO
+    RDY -->|yes| ELIG{"elapsed sleep >= 8 h"}
+    ELIG -->|no| NOTELIG["Bms_Soc_InitPack<br/>nothing to wait for<br/>tier 2 / tier 3"]
+    ELIG -->|yes| CV{"STAGE 2<br/>CellVoltageValid"}
+    CV -->|yes| OCV["Bms_Soc_InitPack<br/>tier 1 OCV succeeds"]
+    CV -->|no| TO{"elapsed += 100 ms<br/>>= g_BmsSocOcvWaitTimeout_ms"}
+    TO -->|no| WAIT["skip integration<br/>this cycle"]
+    TO -->|yes| FALL["Bms_Soc_InitPack<br/>tier 1 fails on the missing<br/>input, tier 2 / tier 3"]
+    WAIT --> TASK
+
+    classDef guess fill:#fdecea,stroke:#c0392b
+    class FALL guess
+```
+
+No current is integrated while the wait is pending, so the Coulomb counters never accumulate onto an unseeded anchor. With the default 500 ms budget and a 100 ms task, the fallback fires on the fifth call, 500 ms after `Bms_Soc_Init()` — regardless of which stage the wait was stuck in.
+
+```mermaid
+flowchart TD
+    START(["Bms_Soc_InitPack"]) --> C1{"sleep time ready<br/>AND elapsed sleep time >= 8 h<br/>AND batteryData not NULL<br/>AND CellVoltageValid"}
 
     C1 -->|yes| T1["TIER 1 — OCV reset<br/>ApplyOcvReset on Min from min cell V<br/>ApplyOcvReset on Max from max cell V<br/>ApplyOcvReset on Avg from average cell V<br/>InitSource = OCV<br/>initialized = TRUE"]
     C1 -->|no| C2{"Bms_Nvm_LoadSoc<br/>min, max, avg"}
@@ -416,7 +449,7 @@ flowchart TD
 
 Tiers 1 and 2 leave the estimates **valid**; only tier 3 flags them **invalid** (`Valid == FALSE`), so a blind 50 % start is distinguishable from a real reference.
 
-> **Tier 1 does not fire today.** `Bms_Soc_GetElapsedSleepTime_s()` is hardcoded to `0` (§5.2), and independently `CellVoltageValid` is `FALSE` this early in startup because cell voltages arrive over CAN from the vAFE. Every boot therefore lands on tier 2, or tier 3 when flash holds nothing valid.
+> **Tier 1 does not fire today.** `Bms_Soc_GetElapsedSleepTime_s()` is hardcoded to `0` (§5.2), so an OCV reset is never eligible, the deferred path above is never entered, and every boot initializes immediately on tier 2 — or tier 3 when flash holds nothing valid. The second obstacle (`CellVoltageValid` being `FALSE` at init time) is now handled by the deferred start, so once a real sleep-time source exists tier 1 becomes reachable without further change.
 
 ### 3.9 Flow: 100 ms update
 
@@ -550,7 +583,7 @@ existing consumers.
 same `-std=c99` dialect and warning set as the ARM build) and driven from Python
 via ctypes. See [sil/README.md](../../sil/README.md).
 
-**Status:** 41 passed, 1 skipped, 1 xfail (a live defect, see §5.11).
+**Status:** 48 passed, 1 xfail (a live defect, see §5.11).
 Full suite runs in ~1 s. Reproduce with:
 
 ```bash
@@ -624,11 +657,17 @@ if an upstream decoder or a downstream flash write regresses.
 | IT-01 | Flash holds a valid record | tier 2; three estimators restored individually; `Valid == TRUE` | **PASS** |
 | IT-02 | Flash erased / no valid record | tier 3; all three at 50.0 %; `Valid == FALSE` | **PASS** |
 | IT-03 | Flash holds old `"SOC1"` records | treated as no valid record ⇒ tier 3 for one boot | **PASS** |
-| IT-04 | Tier 1 forced (OCV reset) | OCV reset applied; NVM skipped | **SKIPPED** — unreachable, §5.2 |
+| IT-04 | Tier 1 forced (OCV reset) | OCV reset applied; NVM skipped | **PASS** |
 | IT-05 | Tier 3 then first valid current tick | `Valid` transitions to `TRUE` | **PASS** |
 | IT-06 | Tier 3 start, no current | nothing written to flash | **PASS** |
 | IT-07 | `InitSource` after 10 min of integration | still reports the seeding tier, not the running state | **PASS** |
 | IT-08 | `InitSource` range | every value fits the 3-bit `Pack1SOCInitSource` field on `0x308` | **PASS** |
+| IT-09 | Deferred wait in progress | `InitSource` = PENDING, estimates invalid, wait does not resolve early | **PASS** |
+| IT-10 | Stage 2 times out (no cell voltages) | falls back to tier 2 NVM, not tier 1 | **PASS** |
+| IT-11 | Stage 1 never ready, cells healthy | OCV refused; tier 3 on virgin flash | **PASS** |
+| IT-12 | Sleep time becomes ready inside the budget | tier 1 OCV still applied | **PASS** |
+| IT-13 | Sleep time reads short once ready | resolves immediately without spending the budget | **PASS** |
+| IT-14 | Charge current during the wait | no charge accumulates onto the unseeded anchor; estimate stays invalid | **PASS** |
 
 ### 4.4 Integration — persistence
 
@@ -672,14 +711,18 @@ The runtime path deliberately does not read cell voltages at all, so imbalance d
 
 **Improvement.** Making them genuinely diverge under load requires per-estimator capacity constants (a weak cell holds less charge, so the same current moves its SOC faster): `dSOC = dQ / C_est` with `C_min < C_avg < C_max`. That needs per-cell capacity characterization data this project does not have.
 
-### 5.2 OCV reset is unreachable — two independent blockers
+### 5.2 OCV reset is unreachable — one blocker left
 
-**Blocker A — no sleep-time source.** `Bms_Soc_GetElapsedSleepTime_s()` is hardcoded to return `0`, so the threshold is never met. Nothing in the firmware measures off-time: the NVM record carries no timestamp and there is no RTC in use. Resolving this needs one of:
+**Blocker A — no sleep-time source (open).** `Bms_Soc_GetElapsedSleepTime_s()` is hardcoded to return `0`, so the threshold is never met. Nothing in the firmware measures off-time: the NVM record carries no timestamp and there is no RTC in use. Resolving this needs one of:
 
 - an RTC (the S32K344 has one on-chip) on a supply that survives power-off, so elapsed time is `currentRtcTime − lastSavedTimestamp`. The record has a spare `Reserved` (16-bit) and `Reserved2` (32-bit) that could carry a seconds-resolution timestamp without regrowing it — though the magic would need bumping again.
 - some other signal that at least separates "long off" from "brief reset" (supercap/keep-alive circuit, ignition-line timer, wake-reason register).
 
-**Blocker B — cell voltages are not available at init time.** `Bms_Soc_Init()` runs during startup, but cell voltages arrive over CAN from the vAFE and only become valid after a complete measurement cycle. `CellVoltageValid` is `FALSE` at that point. Enabling OCV reset therefore also requires **deferring** it to the first complete vAFE measurement — e.g. a one-shot "OCV reset pending" flag consumed by `Bms_Soc_MainFunctionPack()` — not merely making the sleep-time function return a real value.
+**Blocker B — cell voltages are not available at init time (closed 2026-09-06).** `Bms_Soc_Init()` runs during startup, but cell voltages arrive over CAN from the vAFE and only become valid after a complete measurement cycle, so `CellVoltageValid` is `FALSE` at that point. This is now handled by the deferred start in §3.8: initialization is postponed and completed by `Bms_Soc_MainFunctionPack()` once the inputs arrive.
+
+Blocker A now has a defined home: `src/battery/Bms_SleepTime.c`, a hardware-backed provider module doubled in SIL exactly like `Bms_Adc` / `Bms_Ntc`, rather than stubs buried inside the estimator. `Bms_Soc_GetElapsedSleepTime_s()` / `Bms_Soc_IsElapsedSleepTimeReady()` stay the SOC-facing API and delegate to it, so closing the blocker means replacing one small module and nothing else.
+
+Whoever closes it must also implement `Bms_SleepTime_IsReady()` honestly — it must report `FALSE` until the timekeeper's value has actually been acquired, and only then `TRUE`. It is the first term of the tier 1 condition and the stage 1 gate of the deferred wait; leaving it hardcoded to `TRUE` alongside a slow source would let the eligibility test run against an unpopulated elapsed time. If acquisition can take longer than `g_BmsSocOcvWaitTimeout_ms` (500 ms), that budget needs raising too, or every boot will time out into NVM restore.
 
 ### 5.3 OCV table is not characterized
 
@@ -764,6 +807,10 @@ so it flips to a failure the moment the defect is fixed.
 
 | Date | Change | Rationale |
 |---|---|---|
+| 2026-09-06 | **Deferred OCV initialization** (§3.8), a two-stage wait under one calibratable budget (`g_BmsSocOcvWaitTimeout_ms`, default 500 ms): stage 1 waits for the elapsed sleep time to become readable, stage 2 for `CellVoltageValid`. On timeout it falls back to NVM restore and then the default. New `InitSource` value 3 = `PENDING`. | Tier 1 was structurally unreachable: `Bms_Soc_Init()` runs before the scheduler, so cell voltages — which arrive over CAN1 from the vAFE — cannot be valid yet. Fixing only the sleep-time source (§5.2) would not have been enough. |
+| 2026-09-06 | Added `Bms_Soc_IsElapsedSleepTimeReady()` as an explicit input alongside `Bms_Soc_GetElapsedSleepTime_s()`, and made it the first term of the tier 1 condition. | A future timekeeping source will not have its value at boot. Without a readiness flag the OCV eligibility test would be evaluated against an unpopulated elapsed time and could wrongly seed — or wrongly skip — the reset. |
+| 2026-09-06 | Extracted both sleep-time functions into a new provider module **`src/battery/Bms_SleepTime.c/.h`**; the `Bms_Soc_*` entry points now delegate to it. | Elapsed power-off time is a hardware-backed input, not estimator logic — the same category as `Bms_Adc` / `Bms_Ntc`, which SIL already replaces wholesale. Keeping it inside `Bms_Soc.c` made the OCV path untestable (its stub could not be overridden without duplicate symbols) and left the future RTC work with no obvious home. |
+| 2026-09-06 | **SIL: 6 new cases (IT-09 … IT-14) plus IT-04 un-skipped**, covering both wait stages, both timeouts, the immediate-resolve path and the no-integration-while-pending guard. `Sil_PowerOnWithSleepTime()` / `Sil_SetSleepTime()` added to the harness. | The deferred-init logic shipped with no coverage. IT-11 and IT-14 were both verified to fail against deliberately mutated builds, so they are not vacuous. |
 | 2026-09-05 | **Document restructured** into requirements / architecture / detailed design / validation / limitations / change log. | Previous structure was a linear design narrative that had accumulated revision history inline; it no longer matched the implementation. |
 | 2026-09-05 | `Bms_Nvm` — added **erase-and-wrap** when the sector is full. | Previously `Bms_Nvm_SaveSoc()` simply returned `FALSE` forever once full (~341 writes, ≈5.7 h of active operation), silently ending persistence. |
 | 2026-09-05 | `Bms_Nvm` — fixed sector-full boundary check to test whether the *next record fits* rather than whether the pointer is past the end. | With 24-byte records 8192 does not divide evenly; the old `>=` test would have allowed one write to run 16 bytes past the sector. Latent only after the record grew. |

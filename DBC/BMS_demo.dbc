@@ -192,7 +192,8 @@ VAL_ 776 Pack1SOCValid
 VAL_ 776 Pack1SOCInitSource
     0 "Default_NoReference"
     1 "OCV_Reset"
-    2 "NVM_Restore";
+    2 "NVM_Restore"
+    3 "Pending_WaitingCellVoltage";
 VAL_ 779 Pack1SOCMinValid 0 "Invalid" 1 "Valid";
 VAL_ 779 Pack1SOCMaxValid 0 "Invalid" 1 "Valid";
 VAL_ 779 Pack1SOCAvgValid 0 "Invalid" 1 "Valid";

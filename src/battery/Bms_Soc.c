@@ -16,6 +16,7 @@
 
 #include "Bms_Soc.h"
 #include "Battery_Monitor.h"
+#include "Bms_SleepTime.h"
 #include "../storage/Bms_Nvm.h"
 #include "../common/Lib_Interp.h"
 
@@ -55,6 +56,23 @@ static uint16 g_LastSavedSocMin_pct_x10;
 static uint16 g_LastSavedSocMax_pct_x10;
 static uint16 g_LastSavedSocAvg_pct_x10;
 static uint32 g_SocSaveTimer_ms;
+
+/**
+ * @brief TRUE while an eligible OCV reset is waiting for CellVoltageValid.
+ *
+ * Set by Bms_Soc_Init(), cleared by Bms_Soc_ResolvePendingInit() once the wait
+ * ends - either because cell voltages became valid or because the timeout
+ * expired. The estimators hold no usable anchor while this is TRUE.
+ */
+static boolean g_BmsSocInitPending;
+
+/*==================================================================================================
+*                                       GLOBAL VARIABLES
+==================================================================================================*/
+
+volatile uint16 g_BmsSocOcvWaitTimeout_ms = BMS_SOC_OCV_WAIT_TIMEOUT_MS;
+
+volatile uint32 g_BmsSocOcvWaitElapsed_ms = 0U;
 
 /*==================================================================================================
 *                                       LOCAL FUNCTIONS
@@ -194,18 +212,124 @@ static void Bms_Soc_ComputePackSoc(void)
     g_BmsSocData.Valid                 = g_BmsSocPack.Valid;
 }
 
+/**
+ * @brief Puts the estimators in the "no anchor yet" state used while a deferred
+ *        OCV reset is waiting for cell voltages.
+ *
+ * Capacities are zeroed rather than pre-seeded so that a consumer reading SOC
+ * during the wait sees an explicitly invalid value instead of a plausible
+ * number that is about to be replaced.
+ */
+static void Bms_Soc_MarkUnseeded(void)
+{
+    Bms_Soc_SetEstimatorCapacity(&g_BmsSocPack.Min, 0.0f);
+    Bms_Soc_SetEstimatorCapacity(&g_BmsSocPack.Max, 0.0f);
+    Bms_Soc_SetEstimatorCapacity(&g_BmsSocPack.Avg, 0.0f);
+
+    g_BmsSocPack.Min.Valid = FALSE;
+    g_BmsSocPack.Max.Valid = FALSE;
+    g_BmsSocPack.Avg.Valid = FALSE;
+
+    g_BmsSocPack.InitSource = BMS_SOC_INIT_SOURCE_PENDING;
+
+    Bms_Soc_ComputePackSoc();
+}
+
+/**
+ * @brief Ends the deferred wait and runs the normal 3-tier initialization.
+ */
+static void Bms_Soc_FinishPendingInit(void)
+{
+    g_BmsSocInitPending = FALSE;
+
+    Bms_Soc_InitPack();
+}
+
+/**
+ * @brief Advances the deferred-initialization wait by one task period.
+ *
+ * @return TRUE when the estimators are initialized and integration may run,
+ *         FALSE while the wait is still in progress.
+ *
+ * Two inputs have to arrive before an OCV reset can be applied, and both are
+ * covered by one shared g_BmsSocOcvWaitTimeout_ms budget:
+ *
+ *   Stage 1 - the elapsed sleep time must become readable. Until
+ *             Bms_Soc_IsElapsedSleepTimeReady() reports TRUE there is no way to
+ *             tell whether an OCV reset is even eligible, so nothing else can
+ *             be decided.
+ *   Stage 2 - once the sleep time is readable it decides the outcome:
+ *             below the relax threshold there is nothing to wait for and
+ *             initialization runs immediately (tier 2 / tier 3); at or above it
+ *             the wait continues for CellVoltageValid, which is what makes the
+ *             tier 1 OCV branch reachable.
+ *
+ * If the budget expires in either stage, Bms_Soc_InitPack() is called anyway:
+ * its tier 1 condition fails on whichever input is still missing, so it falls
+ * through to NVM restore and then to the default guess.
+ *
+ * The elapsed counter is advanced before the timeout test so that a 500 ms
+ * timeout expires on the fifth 100 ms call, i.e. 500 ms after Bms_Soc_Init().
+ */
+static boolean Bms_Soc_ResolvePendingInit(void)
+{
+    const BatteryMonitor_DataType *batteryData;
+
+    if (g_BmsSocInitPending == FALSE)
+    {
+        return TRUE;
+    }
+
+    if (Bms_Soc_IsElapsedSleepTimeReady() == TRUE)
+    {
+        if (Bms_Soc_GetElapsedSleepTime_s() <
+                BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S)
+        {
+            /*
+             * Sleep time known and too short for relaxed cells: an OCV reset is
+             * not eligible, so there is nothing left to wait for.
+             */
+            Bms_Soc_FinishPendingInit();
+
+            return TRUE;
+        }
+
+        batteryData = BatteryMonitor_GetData();
+
+        if ((batteryData != NULL_PTR) &&
+            (batteryData->CellVoltageValid == TRUE))
+        {
+            /* Both inputs present: tier 1 OCV reset can now be applied. */
+            Bms_Soc_FinishPendingInit();
+
+            return TRUE;
+        }
+    }
+
+    g_BmsSocOcvWaitElapsed_ms += (uint32)BMS_SOC_SAMPLE_PERIOD_MS;
+
+    if (g_BmsSocOcvWaitElapsed_ms >= (uint32)g_BmsSocOcvWaitTimeout_ms)
+    {
+        Bms_Soc_FinishPendingInit();
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /*==================================================================================================
 *                                       GLOBAL FUNCTIONS
 ==================================================================================================*/
 
+boolean Bms_Soc_IsElapsedSleepTimeReady(void)
+{
+    return Bms_SleepTime_IsReady();
+}
+
 uint32 Bms_Soc_GetElapsedSleepTime_s(void)
 {
-    /*
-     * TODO: no timekeeping source survives power-off on this hardware yet -
-     * see SOC_DESIGN.md 5.2. Hardcoded to 0 so the OCV-reset branch in
-     * Bms_Soc_InitPack() is never taken and every boot restores from NVM.
-     */
-    return 0UL;
+    return Bms_SleepTime_GetElapsed_s();
 }
 
 uint16 Bms_Soc_OcvToSoc(uint16 voltage_mV)
@@ -225,16 +349,26 @@ void Bms_Soc_InitPack(void)
     boolean initialized = FALSE;
 
     /*
-     * 1. OCV reset. Taken only when the pack slept long enough for the cells to
-     *    relax AND a valid cell-voltage dataset is available. When taken, it
-     *    fully initializes all three estimators and NVM restore is skipped.
+     * 1. OCV reset. Taken only when the elapsed sleep time is READABLE, is long
+     *    enough for the cells to have relaxed, AND a valid cell-voltage dataset
+     *    is available. When taken, it fully initializes all three estimators and
+     *    NVM restore is skipped.
      *
-     *    NOTE: cell voltages arrive over CAN from the vAFE and are not valid
-     *    this early during startup, so this branch does not fire today. Once a
-     *    real sleep-time source exists (SOC_DESIGN.md 5.2) the reset will have
-     *    to be deferred to the first complete vAFE measurement.
+     *    None of those three inputs is guaranteed on the call made from
+     *    Bms_Soc_Init() itself, so that call defers instead and
+     *    Bms_Soc_ResolvePendingInit() calls back in here once they have arrived
+     *    - or after the shared wait times out, in which case this condition
+     *    fails on whichever input is still missing and tier 2 takes over.
+     *
+     *    The readiness test comes first deliberately: an unready timekeeping
+     *    source has no meaningful elapsed time to compare against the threshold.
+     *
+     *    It still does not fire today: Bms_Soc_GetElapsedSleepTime_s() is
+     *    hardcoded to 0 (SOC_DESIGN.md 5.2), so the reset is never eligible and
+     *    every boot initializes immediately from NVM.
      */
-    if ((Bms_Soc_GetElapsedSleepTime_s() >= BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S) &&
+    if ((Bms_Soc_IsElapsedSleepTimeReady() == TRUE) &&
+        (Bms_Soc_GetElapsedSleepTime_s() >= BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S) &&
         (batteryData != NULL_PTR) &&
         (batteryData->CellVoltageValid == TRUE))
     {
@@ -305,7 +439,38 @@ void Bms_Soc_InitPack(void)
 
 void Bms_Soc_Init(void)
 {
-    Bms_Soc_InitPack();
+    g_BmsSocInitPending = FALSE;
+    g_BmsSocOcvWaitElapsed_ms = 0U;
+
+    /*
+     * A tier 1 OCV reset depends on two inputs that are not necessarily
+     * available at this point in startup:
+     *
+     *   - the elapsed sleep time, which decides whether the cells are relaxed
+     *     enough to be read as OCV at all, and which a real timekeeping source
+     *     may not have acquired yet (Bms_Soc_IsElapsedSleepTimeReady());
+     *   - the cell voltages themselves, which arrive over CAN1 from the vAFE.
+     *     This function runs before the scheduler starts, so no CAN poll has
+     *     executed and CellVoltageValid is necessarily FALSE here.
+     *
+     * Initialization can only complete immediately in the one case where both
+     * are already settled against tier 1: the sleep time is readable AND too
+     * short for an OCV reset. Anything else is deferred to
+     * Bms_Soc_ResolvePendingInit(), which waits on the 100 ms task and falls
+     * back to NVM / default when the shared timeout expires.
+     */
+    if ((Bms_Soc_IsElapsedSleepTimeReady() == TRUE) &&
+        (Bms_Soc_GetElapsedSleepTime_s() <
+             BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S))
+    {
+        Bms_Soc_InitPack();
+    }
+    else
+    {
+        g_BmsSocInitPending = TRUE;
+
+        Bms_Soc_MarkUnseeded();
+    }
 }
 
 void Bms_Soc_1sFunction(void)
@@ -351,8 +516,20 @@ void Bms_Soc_1sFunction(void)
 
 void Bms_Soc_MainFunctionPack(void)
 {
-    const BatteryMonitor_DataType *batteryData = BatteryMonitor_GetData();
+    const BatteryMonitor_DataType *batteryData;
     sint32 current_mA;
+
+    /*
+     * Finish a deferred OCV initialization first. While that wait is pending the
+     * estimators hold no anchor, so no current sample may be accumulated onto
+     * them - integration resumes on the cycle the wait resolves.
+     */
+    if (Bms_Soc_ResolvePendingInit() == FALSE)
+    {
+        return;
+    }
+
+    batteryData = BatteryMonitor_GetData();
 
     if ((batteryData == NULL_PTR) || (batteryData->PackCurrentValid[0] == FALSE))
     {

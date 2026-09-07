@@ -51,6 +51,20 @@ extern "C"{
  */
 #define BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S  (28800UL)
 
+/**
+ * @brief Default budget for the whole startup wait that precedes an OCV reset.
+ *
+ * Covers both inputs tier 1 depends on, in order: first the elapsed sleep time
+ * becoming readable (Bms_Soc_IsElapsedSleepTimeReady()), then BatteryMonitor
+ * reporting CellVoltageValid. Neither can be satisfied while Bms_Soc_Init()
+ * runs, because the scheduler that polls CAN has not started yet. If both have
+ * not arrived within this one shared window, initialization falls back to NVM
+ * restore and then to the default guess.
+ *
+ * Compile-time default only; tune at runtime through g_BmsSocOcvWaitTimeout_ms.
+ */
+#define BMS_SOC_OCV_WAIT_TIMEOUT_MS     (500U)
+
 /*==================================================================================================
 *                                       TYPE DEFINITIONS
 ==================================================================================================*/
@@ -93,7 +107,16 @@ typedef enum
     BMS_SOC_INIT_SOURCE_OCV     = 1U,
 
     /** @brief Tier 2: restored from the last values persisted in Data Flash. */
-    BMS_SOC_INIT_SOURCE_NVM     = 2U
+    BMS_SOC_INIT_SOURCE_NVM     = 2U,
+
+    /**
+     * @brief Transient: the estimators are waiting for the inputs a tier 1 OCV
+     *        reset needs - the elapsed sleep time becoming readable, then a
+     *        valid cell-voltage set. Estimates are invalid while this is
+     *        reported; it is replaced by OCV, NVM or DEFAULT once the wait
+     *        resolves (at the latest after g_BmsSocOcvWaitTimeout_ms).
+     */
+    BMS_SOC_INIT_SOURCE_PENDING = 3U
 
 } Bms_Soc_InitSourceType;
 
@@ -116,11 +139,41 @@ typedef struct
 } Bms_Soc_PackType;
 
 /*==================================================================================================
+*                                       GLOBAL VARIABLES
+==================================================================================================*/
+
+/**
+ * @brief Calibratable OCV-wait timeout. Unit: ms.
+ *
+ * Initialized to BMS_SOC_OCV_WAIT_TIMEOUT_MS. Left non-static so it can be
+ * tuned live from a debugger or an XCP master. Effective resolution is the
+ * Bms_Soc_MainFunction period (BMS_SOC_SAMPLE_PERIOD_MS), so the wait always
+ * ends on a task boundary.
+ */
+extern volatile uint16 g_BmsSocOcvWaitTimeout_ms;
+
+/**
+ * @brief Time already spent waiting for CellVoltageValid. Unit: ms.
+ *
+ * Diagnostic only: stops advancing once initialization has resolved, so it also
+ * records how long the OCV reset actually had to wait.
+ */
+extern volatile uint32 g_BmsSocOcvWaitElapsed_ms;
+
+/*==================================================================================================
 *                                       FUNCTION PROTOTYPES
 ==================================================================================================*/
 
 /**
- * @brief Scheduler entry point for SOC initialization. Wraps Bms_Soc_InitPack().
+ * @brief Startup entry point for SOC initialization.
+ *
+ * Runs before the scheduler starts, where neither input a tier 1 OCV reset
+ * needs is guaranteed: the elapsed sleep time may not be acquired yet, and cell
+ * voltages arrive over CAN so no poll has produced them. It initializes
+ * immediately only when the sleep time is readable AND too short for an OCV
+ * reset - the one case where tier 1 is already ruled out. Otherwise
+ * initialization is deferred to Bms_Soc_MainFunctionPack(), which waits for
+ * both inputs and falls back to NVM / default after g_BmsSocOcvWaitTimeout_ms.
  */
 void Bms_Soc_Init(void);
 
@@ -142,6 +195,10 @@ void Bms_Soc_MainFunction(void);
  * @brief Integrates Pack 1 current into all three estimators and recomputes the
  *        blended pack SOC. Must be called at a fixed BMS_SOC_SAMPLE_PERIOD_MS
  *        rate, after BatteryMonitor_MainFunction().
+ *
+ * Also resolves an initialization deferred by Bms_Soc_Init(). No integration
+ * happens while that wait is still pending, so the Coulomb counters never
+ * accumulate onto an unseeded anchor.
  */
 void Bms_Soc_MainFunctionPack(void);
 
@@ -169,10 +226,23 @@ void Bms_Soc_SetSoc_pct_x10(uint16 NewSoc_pct_x10);
 uint16 Bms_Soc_OcvToSoc(uint16 voltage_mV);
 
 /**
+ * @brief Whether the elapsed sleep time has been acquired and may be read.
+ *
+ * Input to the startup OCV decision: Bms_Soc_GetElapsedSleepTime_s() carries no
+ * meaningful value until this reports TRUE, so initialization waits for it
+ * before judging whether an OCV reset is eligible. The current source is a
+ * compile-time constant and is therefore ready immediately; a real timekeeping
+ * source must report FALSE until its value has actually been acquired.
+ * See SOC_DESIGN.md 5.2.
+ */
+boolean Bms_Soc_IsElapsedSleepTimeReady(void);
+
+/**
  * @brief Elapsed time the system was powered off before this boot.
  *
- * No timekeeping source exists on this hardware yet, so this currently returns
- * 0, which disables the startup OCV reset. See SOC_DESIGN.md 5.2.
+ * Only meaningful once Bms_Soc_IsElapsedSleepTimeReady() reports TRUE. No
+ * timekeeping source exists on this hardware yet, so this currently returns 0,
+ * which disables the startup OCV reset. See SOC_DESIGN.md 5.2.
  */
 uint32 Bms_Soc_GetElapsedSleepTime_s(void);
 

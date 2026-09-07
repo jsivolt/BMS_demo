@@ -1524,7 +1524,8 @@ void Bms_Can_SendSocStatus(void)
     /*
      * Byte2 bit0    = Pack1 SOC valid
      * Byte2 bit1-3  = SOC initialization source (0 = default/guess,
-     *                 1 = OCV reset, 2 = NVM restore)
+     *                 1 = OCV reset, 2 = NVM restore, 3 = pending, waiting
+     *                 for the first valid cell-voltage set)
      * Byte2 bit4-7  = reserved
      */
     if (socData->Valid == TRUE)

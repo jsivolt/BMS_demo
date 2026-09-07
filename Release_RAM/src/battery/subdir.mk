@@ -7,18 +7,21 @@ C_SRCS += \
 ../src/battery/Battery_Monitor.c \
 ../src/battery/Bms_Afe.c \
 ../src/battery/Bms_Ntc.c \
+../src/battery/Bms_SleepTime.c \
 ../src/battery/Bms_Soc.c 
 
 OBJS += \
 ./src/battery/Battery_Monitor.o \
 ./src/battery/Bms_Afe.o \
 ./src/battery/Bms_Ntc.o \
+./src/battery/Bms_SleepTime.o \
 ./src/battery/Bms_Soc.o 
 
 C_DEPS += \
 ./src/battery/Battery_Monitor.d \
 ./src/battery/Bms_Afe.d \
 ./src/battery/Bms_Ntc.d \
+./src/battery/Bms_SleepTime.d \
 ./src/battery/Bms_Soc.d 
 
 

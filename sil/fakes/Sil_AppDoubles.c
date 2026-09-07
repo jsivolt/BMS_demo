@@ -15,6 +15,7 @@
 
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
+#include "Bms_SleepTime.h"
 
 /* ================================================================================================
  * Backing values, driven from Python
@@ -26,6 +27,14 @@ static boolean g_PackValid   = FALSE;
 
 static sint16  g_Ntc_dC[3]   = { 250, 250, 250 };   /* 25.0 degC */
 static boolean g_NtcValid[3] = { TRUE, TRUE, TRUE };
+
+/*
+ * Sleep-time provider. Defaults mirror the production placeholder in
+ * Bms_SleepTime.c - ready immediately, zero elapsed - so a test that does not
+ * care about the OCV path sees exactly the target's behaviour.
+ */
+static uint32  g_SleepElapsed_s = 0U;
+static boolean g_SleepReady     = TRUE;
 
 /* ================================================================================================
  * Bms_Adc — only the entry points Battery_Monitor actually calls
@@ -71,8 +80,28 @@ boolean Bms_Ntc_IsValid(Bms_NtcChannelType channel)
 }
 
 /* ================================================================================================
+ * Bms_SleepTime — elapsed power-off time provider
+ * ============================================================================================== */
+
+boolean Bms_SleepTime_IsReady(void)
+{
+    return g_SleepReady;
+}
+
+uint32 Bms_SleepTime_GetElapsed_s(void)
+{
+    return g_SleepElapsed_s;
+}
+
+/* ================================================================================================
  * SIL control surface
  * ============================================================================================== */
+
+void Sil_SetSleepTime(uint32 elapsed_s, boolean ready)
+{
+    g_SleepElapsed_s = elapsed_s;
+    g_SleepReady     = ready;
+}
 
 void Sil_SetAdcPackVoltages(uint16 v2_mV, uint16 v3_mV, boolean valid)
 {
@@ -96,4 +125,5 @@ void Sil_ResetAppDoubles(void)
 {
     Sil_SetAdcPackVoltages(0U, 0U, FALSE);
     Sil_SetNtc(250, 250, 250, TRUE);
+    Sil_SetSleepTime(0U, TRUE);
 }

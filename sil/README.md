@@ -26,7 +26,7 @@ replaced.
 | `Bms_Soc` | `C40_Ip` — Data Flash model |
 | `Battery_Monitor` | `Bms_Adc` — settable raw values |
 | `Bms_Vafe`, `Bms_Vpack` | `Bms_Ntc` — settable temperatures |
-| `Bms_Nvm` | |
+| `Bms_Nvm` | `Bms_SleepTime` — settable elapsed power-off time + readiness |
 | `Fault_Manager` | |
 | `Lib_Interp` | |
 
@@ -125,8 +125,9 @@ reached.
 
 ## Known gaps
 
-- **IT-04 is skipped.** The OCV reset tier is unreachable — see
-  `SOC_DESIGN.md` 5.2.
+- **The OCV reset tier is covered in SIL only.** IT-04 and IT-09..IT-14 reach it
+  by driving the `Bms_SleepTime` double. On target the tier still cannot fire,
+  because no real sleep-time source exists yet — see `SOC_DESIGN.md` 5.2.
 - **The blend is only covered degenerately.** `Min`/`Max`/`Avg` cannot be made
   to differ through any reachable API (`SOC_DESIGN.md` 5.1), so the
   non-degenerate blend is checked against a Python mirror of the formula rather

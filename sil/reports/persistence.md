@@ -10,17 +10,17 @@ Source: `sil/tests/test_persistence.py`  ·  Index: [../TEST_REPORT.md](../TEST_
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-06 02:34:33 |
-| Host | Windows 10 (AMD64) |
-| Host compiler | gcc.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.10.11 |
+| Executed (UTC) | 2026-09-06 23:52:47 |
+| Host | Windows 11 (AMD64) |
+| Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
+| Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 124821 bytes, built 2026-09-05 22:59:27 UTC |
-| Repo commit | 4cac175 |
+| SIL library | bms_sil.dll, 128168 bytes, built 2026-09-06 23:52:46 UTC |
+| Repo commit | 3a1992e (working tree has uncommitted changes) |
 
 ## Summary
 
-**6 test cases** (6 executions) in 0.89 s.
+**6 test cases** (6 executions) in 0.29 s.
 
 | Outcome | Count |
 |---|---|
@@ -48,7 +48,7 @@ Source: `sil/tests/test_persistence.py`  ·  Index: [../TEST_REPORT.md](../TEST_
 | Case ID | PS-01 |
 | Requirement | SOC-TR-03 |
 | Result | PASS |
-| Duration | 22.4 ms |
+| Duration | 7.8 ms |
 | Source | `sil/tests/test_persistence.py:20` |
 
 **Objective.** PS-01: with SOC unchanged, the delta gate suppresses flash writes.
@@ -70,7 +70,7 @@ assert bms.flash_writes == writes_before, "static SOC must not wear the flash"
 | Case ID | PS-02 |
 | Requirement | SOC-TR-03 |
 | Result | PASS |
-| Duration | 9.9 ms |
+| Duration | 4.0 ms |
 | Source | `sil/tests/test_persistence.py:29` |
 
 **Objective.** PS-02: under load the rate limit yields one write per 60 s, not more.
@@ -95,7 +95,7 @@ assert 4 <= written <= 6, f"expected ~5 writes in 5 minutes, got {written}"
 | Case ID | PS-03 |
 | Requirement | SOC-FR-09 |
 | Result | PASS |
-| Duration | 2.2 ms |
+| Duration | 0.9 ms |
 | Source | `sil/tests/test_persistence.py:41` |
 
 **Objective.** PS-03: values restored after a power cycle match what was saved.
@@ -120,7 +120,7 @@ assert (bms.soc_min, bms.soc_max, bms.soc_avg) == saved
 | Case ID | PS-05 |
 | Requirement | SOC-FR-09 |
 | Result | PASS |
-| Duration | 4.2 ms |
+| Duration | 1.7 ms |
 | Source | `sil/tests/test_persistence.py:53` |
 
 **Objective.** PS-05: a failed program leaves the record count unchanged and recovers.
@@ -149,7 +149,7 @@ assert bms.nvm_records > records_after_failure
 | Case ID | PS-06 |
 | Requirement | SOC-FR-09 |
 | Result | PASS |
-| Duration | 2.2 ms |
+| Duration | 0.9 ms |
 | Source | `sil/tests/test_persistence.py:69` |
 
 **Objective.** PS-06: losing supply mid-program must not produce a record that reads back valid.
@@ -182,7 +182,7 @@ assert restored in (good, None), f"torn record accepted as valid: {restored}"
 | Case ID | PS-04 |
 | Requirement | SOC-FR-10 |
 | Result | PASS |
-| Duration | 851.8 ms |
+| Duration | 272.4 ms |
 | Source | `sil/tests/test_persistence.py:90` |
 
 **Objective.** PS-04: after a full sector of records the sector erases and wraps.
@@ -211,4 +211,4 @@ bms.power_cycle()
 assert bms.soc_valid is True, "post-wrap record must survive a power cycle"
 ```
 
-<!-- sil-report slug='persistence' title='Persistence — Bms_Nvm and the Data Flash record log' cases='6' duration='0.893' verdict='PASS' executed='2026-09-06 02:34:33' passed='6' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='persistence' title='Persistence — Bms_Nvm and the Data Flash record log' cases='6' duration='0.288' verdict='PASS' executed='2026-09-06 23:52:47' passed='6' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->

@@ -30,12 +30,14 @@ MAX_PCT_X10 = 1000
 SAVE_PERIOD_MS = 60_000          # BMS_SOC_SAVE_PERIOD_MS
 SAVE_DELTA_X10 = 1               # BMS_SOC_SAVE_DELTA_X10 (0.1 %)
 OCV_SLEEP_THRESHOLD_S = 28_800   # BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S
+OCV_WAIT_TIMEOUT_MS = 500        # BMS_SOC_OCV_WAIT_TIMEOUT_MS
 
 # Bms_Soc_InitSourceType, mirrored from Bms_Soc.h. Published on CAN 0x308
 # byte 2 bits 1-3 as Pack1SOCInitSource.
 INIT_SOURCE_DEFAULT = 0
 INIT_SOURCE_OCV = 1
 INIT_SOURCE_NVM = 2
+INIT_SOURCE_PENDING = 3
 
 # A healthy mid-range cell voltage, used as the default stimulus in tests that
 # are not about cell voltage itself.
@@ -62,6 +64,8 @@ f32, bl = ctypes.c_float, ctypes.c_bool
 _SIGNATURES = {
     "Sil_FlashWipe": (None, []),
     "Sil_PowerOn": (None, []),
+    "Sil_PowerOnWithSleepTime": (None, [u32, bl]),
+    "Sil_SetSleepTime": (None, [u32, bl]),
     "Sil_Run100ms": (None, []),
     "Sil_Run1000ms": (None, []),
     "Sil_AdvanceMs": (None, [u32]),
@@ -142,13 +146,31 @@ class Bms:
         """Erase simulated Data Flash. Models a virgin/reflashed device."""
         self.lib.Sil_FlashWipe()
 
-    def power_on(self) -> None:
-        """Cold boot. Flash contents persist, so this models a power cycle."""
-        self.lib.Sil_PowerOn()
+    def power_on(
+        self,
+        *,
+        sleep_s: int | None = None,
+        sleep_ready: bool = True,
+    ) -> None:
+        """Cold boot. Flash contents persist, so this models a power cycle.
+
+        `sleep_s` / `sleep_ready` drive the Bms_SleepTime provider *before* the
+        module inits run, which is what Bms_Soc_Init() reads to decide whether a
+        tier 1 OCV reset is eligible. Left at their defaults the provider
+        mirrors the production placeholder (ready, zero elapsed).
+        """
+        if sleep_s is None and sleep_ready:
+            self.lib.Sil_PowerOn()
+        else:
+            self.lib.Sil_PowerOnWithSleepTime(int(sleep_s or 0), bool(sleep_ready))
         self._ms = 0
 
-    def power_cycle(self) -> None:
-        self.power_on()
+    def power_cycle(self, **kwargs) -> None:
+        self.power_on(**kwargs)
+
+    def set_sleep_time(self, elapsed_s: int, ready: bool = True) -> None:
+        """Drive the sleep-time provider mid-run (e.g. a late-arriving RTC)."""
+        self.lib.Sil_SetSleepTime(int(elapsed_s), bool(ready))
 
     # -- time / stimulus ---------------------------------------------------
 

@@ -44,7 +44,24 @@ void Sil_FlashWipe(void)
     Sil_C40_Wipe();
 }
 
-void Sil_PowerOn(void)
+/**
+ * @brief Module init sequence, in main.c order, restricted to the SOC slice.
+ *
+ * Split out of Sil_PowerOn() so a test can establish boot-time inputs - the
+ * sleep-time provider in particular - between resetting the doubles and running
+ * the inits that read them.
+ */
+static void Sil_BootModules(void)
+{
+    FaultManager_Init();
+    Bms_Vafe_Init();
+    Bms_Vpack_Init();
+    BatteryMonitor_Init();
+    Bms_Nvm_Init();
+    Bms_Soc_Init();
+}
+
+static void Sil_ResetHarnessState(void)
 {
     g_ElapsedMs     = 0U;
     g_MsInSecond    = 0U;
@@ -53,14 +70,27 @@ void Sil_PowerOn(void)
     g_FreezeAlive   = FALSE;
 
     Sil_ResetAppDoubles();
+}
 
-    /* Same order as main.c, restricted to the modules in the SOC slice. */
-    FaultManager_Init();
-    Bms_Vafe_Init();
-    Bms_Vpack_Init();
-    BatteryMonitor_Init();
-    Bms_Nvm_Init();
-    Bms_Soc_Init();
+void Sil_PowerOn(void)
+{
+    Sil_ResetHarnessState();
+
+    Sil_BootModules();
+}
+
+void Sil_PowerOnWithSleepTime(uint32 elapsed_s, boolean ready)
+{
+    Sil_ResetHarnessState();
+
+    /*
+     * Must be applied after Sil_ResetAppDoubles() (which restores the provider
+     * defaults) and before Bms_Soc_Init(), which reads it to decide whether an
+     * OCV reset is eligible and therefore whether to defer initialization.
+     */
+    Sil_SetSleepTime(elapsed_s, ready);
+
+    Sil_BootModules();
 }
 
 /* ================================================================================================

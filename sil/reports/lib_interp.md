@@ -10,13 +10,13 @@ Source: `sil/tests/test_lib_interp.py`  ·  Index: [../TEST_REPORT.md](../TEST_R
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-06 02:34:33 |
-| Host | Windows 10 (AMD64) |
-| Host compiler | gcc.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.10.11 |
+| Executed (UTC) | 2026-09-06 23:52:47 |
+| Host | Windows 11 (AMD64) |
+| Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
+| Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 124821 bytes, built 2026-09-05 22:59:27 UTC |
-| Repo commit | 4cac175 |
+| SIL library | bms_sil.dll, 128168 bytes, built 2026-09-06 23:52:46 UTC |
+| Repo commit | 3a1992e (working tree has uncommitted changes) |
 
 ## Summary
 
@@ -69,7 +69,7 @@ assert bms.interp(OCV_TABLE, 0) == OCV_TABLE[0][1]
 | Case ID | LI-02 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.8 ms |
+| Duration | 0.2 ms |
 | Source | `sil/tests/test_lib_interp.py:25` |
 
 **Objective.** LI-02: x above the last breakpoint returns the last row's Y.
@@ -88,7 +88,7 @@ assert bms.interp(OCV_TABLE, 65535) == OCV_TABLE[-1][1]
 | Case ID | LI-03 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 2.0 ms over 6 variants |
+| Duration | 0.4 ms over 6 variants |
 | Source | `sil/tests/test_lib_interp.py:31` |
 
 **Objective.** LI-03: x exactly on a breakpoint returns that row's Y exactly.
@@ -106,7 +106,7 @@ assert bms.interp(OCV_TABLE, x) == y
 | Case ID | LI-04 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:37` |
 
 **Objective.** LI-04: linear interpolation between two rows, with correct rounding.
@@ -127,7 +127,7 @@ assert bms.interp(OCV_TABLE, 3350) == 300
 | Case ID | LI-05 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.4 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:45` |
 
 **Objective.** LI-05: Y decreasing with X (derating / NTC curve) interpolates downward.
@@ -152,7 +152,7 @@ assert bms.interp(table, 200) == 0
 | Case ID | LI-06 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:58` |
 
 **Objective.** LI-06: a one-row table returns that row's Y for any x.
@@ -172,7 +172,7 @@ for x in (0, 1234, 65535):
 | Case ID | LI-07 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:65` |
 
 **Objective.** LI-07: NULL table or zero size returns 0 rather than faulting.
@@ -191,7 +191,7 @@ assert bms.interp_raw([10, 20], 0, 100) == 0
 | Case ID | LI-08 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:71` |
 
 **Objective.** LI-08: full-range table does not overflow the uint32 intermediate.
@@ -209,4 +209,4 @@ mid = bms.interp(table, 32768)
 assert abs(mid - 32768) <= 1
 ```
 
-<!-- sil-report slug='lib_interp' title='Lib_Interp — generic 1-D table interpolation' cases='8' duration='0.005' verdict='PASS' executed='2026-09-06 02:34:33' passed='8' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='lib_interp' title='Lib_Interp — generic 1-D table interpolation' cases='8' duration='0.001' verdict='PASS' executed='2026-09-06 23:52:47' passed='8' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->

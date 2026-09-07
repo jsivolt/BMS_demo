@@ -26,12 +26,23 @@ from bms_sil import (
     INITIAL_PCT_X10,
     INIT_SOURCE_DEFAULT,
     INIT_SOURCE_NVM,
+    INIT_SOURCE_OCV,
+    INIT_SOURCE_PENDING,
     MAX_PCT_X10,
     NOMINAL_CELL_MV,
+    OCV_SLEEP_THRESHOLD_S,
+    OCV_WAIT_TIMEOUT_MS,
     PACK_CAPACITY_MAH,
     charge_mAh,
     expected_blend,
 )
+
+# A cell voltage sitting exactly on an OCV table breakpoint, so the expected
+# SOC after a tier 1 reset is unambiguous (3450 mV -> 50.0 %).
+OCV_BREAKPOINT_MV = 3450
+
+# Long enough that the cells count as relaxed.
+RELAXED_SLEEP_S = OCV_SLEEP_THRESHOLD_S
 
 
 # =========================================================================
@@ -231,13 +242,155 @@ def test_IT_06_invalid_start_is_never_persisted(bms):
     assert bms.nvm_records == 0
 
 
-@pytest.mark.skip(
-    reason="Tier 1 (OCV reset) is unreachable: Bms_Soc_GetElapsedSleepTime_s() "
-           "is hardcoded to 0 and CellVoltageValid is FALSE at init. "
-           "See SOC_DESIGN.md 5.2."
-)
-def test_IT_04_ocv_reset_tier(bms):
-    """IT-04: OCV reset path. Blocked on a real sleep-time source."""
+def test_IT_04_ocv_reset_tier(bms_dirty):
+    """IT-04: tier 1 seeds all three estimators from the OCV table.
+
+    Reachable in SIL because the Bms_SleepTime double reports a relaxed pack.
+    On target the provider is still hardcoded to 0 s (SOC_DESIGN.md 5.2), so
+    this exercises the path the production stub currently disables - not
+    something the target does today.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=True)
+
+    # Cell voltages cannot exist yet, so init must be deferred rather than
+    # silently falling through to a lower tier.
+    assert bms.init_source == INIT_SOURCE_PENDING
+
+    bms.run_ms(100, cells_mV=OCV_BREAKPOINT_MV)
+
+    assert bms.init_source == INIT_SOURCE_OCV
+    assert bms.soc == bms.ocv_to_soc(OCV_BREAKPOINT_MV)
+    assert bms.soc_min == bms.soc_max == bms.soc_avg == bms.soc
+
+
+def test_IT_09_deferred_init_holds_estimates_invalid(bms_dirty):
+    """IT-09: while the OCV wait is pending, SOC is reported as unusable.
+
+    A consumer must be able to tell "not seeded yet" from a real anchor, so the
+    provenance reads PENDING and the estimates stay invalid rather than showing
+    a plausible number that is about to be replaced.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=True)
+
+    assert bms.init_source == INIT_SOURCE_PENDING
+    assert bms.soc_valid is False
+
+    # Starve the wait: no vAFE frames, so CellVoltageValid never goes TRUE.
+    bms.run_ms(OCV_WAIT_TIMEOUT_MS - 100)
+
+    assert bms.init_source == INIT_SOURCE_PENDING, "wait must not resolve early"
+
+
+def test_IT_10_stage2_timeout_falls_back_to_nvm(bms):
+    """IT-10: cell voltages never arriving times out into tier 2, not tier 1.
+
+    The OCV branch must fail closed: without a cell-voltage reference it has
+    nothing to seed from, so the persisted SOC has to win.
+    """
+    bms.set_soc(700)
+    bms.run_normal(61_000, current_mA=0, cell_mV=NOMINAL_CELL_MV)
+
+    # Reboot as a relaxed pack, but never deliver a vAFE cycle.
+    bms.power_cycle(sleep_s=RELAXED_SLEEP_S, sleep_ready=True)
+    assert bms.init_source == INIT_SOURCE_PENDING
+
+    bms.run_ms(OCV_WAIT_TIMEOUT_MS)
+
+    assert bms.init_source == INIT_SOURCE_NVM
+    assert bms.soc == 700
+
+
+def test_IT_11_stage1_timeout_when_sleep_time_never_ready(bms_dirty):
+    """IT-11: an unready sleep-time source gates the wait even if cells are fine.
+
+    Stage 1 is the gate: with no readable sleep time there is no way to know the
+    cells are relaxed, so a cell-voltage set alone must not trigger an OCV reset.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=False)
+
+    # Cells are healthy the whole time - only readiness is missing.
+    bms.run_ms(OCV_WAIT_TIMEOUT_MS - 100, cells_mV=OCV_BREAKPOINT_MV)
+    assert bms.init_source == INIT_SOURCE_PENDING
+
+    bms.run_ms(100, cells_mV=OCV_BREAKPOINT_MV)
+
+    assert bms.init_source != INIT_SOURCE_OCV, "unreadable sleep time must not seed OCV"
+    assert bms.init_source == INIT_SOURCE_DEFAULT      # virgin flash, so tier 3
+    assert bms.soc == INITIAL_PCT_X10
+
+
+def test_IT_12_late_sleep_time_within_budget_still_reaches_ocv(bms_dirty):
+    """IT-12: a timekeeping source that arrives late, but in time, still wins tier 1.
+
+    This is the case the readiness flag exists for - the wait must survive
+    stage 1 taking a few cycles rather than giving up on the first look.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=False)
+
+    bms.run_ms(200, cells_mV=OCV_BREAKPOINT_MV)
+    assert bms.init_source == INIT_SOURCE_PENDING
+
+    # RTC finishes acquiring, still inside the 500 ms budget.
+    bms.set_sleep_time(RELAXED_SLEEP_S, ready=True)
+    bms.run_ms(100, cells_mV=OCV_BREAKPOINT_MV)
+
+    assert bms.init_source == INIT_SOURCE_OCV
+    assert bms.soc == bms.ocv_to_soc(OCV_BREAKPOINT_MV)
+
+
+def test_IT_13_short_sleep_resolves_without_waiting_for_cells(bms_dirty):
+    """IT-13: once the sleep time reads short, the wait ends immediately.
+
+    A pack that was only briefly off can never OCV-reset, so there is nothing to
+    wait for - blocking on cell voltages would delay initialization for no gain.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=0, sleep_ready=False)
+    assert bms.init_source == INIT_SOURCE_PENDING
+
+    bms.set_sleep_time(0, ready=True)
+
+    # One tick, no vAFE frames at all.
+    bms.run_ms(100)
+
+    assert bms.init_source == INIT_SOURCE_DEFAULT
+    assert bms.elapsed_ms < OCV_WAIT_TIMEOUT_MS, "must not burn the full budget"
+
+
+def test_IT_14_no_integration_while_init_is_pending(bms_dirty):
+    """IT-14: current is not integrated onto an unseeded anchor.
+
+    The estimators hold no reference during the wait, so accumulating charge
+    into them would produce a SOC derived from an arbitrary zero.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=False)
+
+    # A fully healthy chain apart from readiness, so the only reason not to
+    # integrate is the pending init. Charge current specifically: the unseeded
+    # anchor sits at 0 mAh and a discharge would clamp there, hiding the bug.
+    stimulus = dict(
+        current_mA=+50_000,
+        pack_mV=NOMINAL_CELL_MV * 16,
+        bus_mV=NOMINAL_CELL_MV * 16,
+        cells_mV=NOMINAL_CELL_MV,
+    )
+    bms.run_ms(OCV_WAIT_TIMEOUT_MS - 100, **stimulus)
+
+    assert bms.init_source == INIT_SOURCE_PENDING
+    assert bms.pack_current_valid is True, "precondition: current must be flowing"
+    assert bms.capacity_avg_mAh == 0.0, "no charge may accumulate before seeding"
+    assert bms.soc_valid is False, "an unseeded estimate must never report valid"
+
+    # On timeout the anchor is established from tier 3, unpolluted by the above.
+    bms.run_ms(100, **stimulus)
+
+    assert bms.init_source == INIT_SOURCE_DEFAULT
+    assert bms.soc == INITIAL_PCT_X10
 
 
 def test_IT_07_init_source_is_latched_not_recomputed(bms):

@@ -10,23 +10,22 @@ Source: `sil/tests/test_soc.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-06 02:34:33 |
-| Host | Windows 10 (AMD64) |
-| Host compiler | gcc.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.10.11 |
+| Executed (UTC) | 2026-09-06 23:52:47 |
+| Host | Windows 11 (AMD64) |
+| Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
+| Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 124821 bytes, built 2026-09-05 22:59:27 UTC |
-| Repo commit | 4cac175 |
+| SIL library | bms_sil.dll, 128168 bytes, built 2026-09-06 23:52:46 UTC |
+| Repo commit | 3a1992e (working tree has uncommitted changes) |
 
 ## Summary
 
-**21 test cases** (24 executions) in 0.59 s.
+**27 test cases** (30 executions) in 0.10 s.
 
 | Outcome | Count |
 |---|---|
-| PASS | 19 |
+| PASS | 26 |
 | XFAIL (known defect) | 1 |
-| SKIPPED | 1 |
 
 **Feature verdict: PASS**
 
@@ -48,7 +47,13 @@ Source: `sil/tests/test_soc.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 | IT-03 | [test_IT_03_stale_soc1_records_fall_back_to_default](#test-it-03-stale-soc1-records-fall-back-to-default) | SOC-FR-06, SOC-FR-07 | PASS |
 | IT-05 | [test_IT_05_invalid_start_becomes_valid_once_integrating](#test-it-05-invalid-start-becomes-valid-once-integrating) | SOC-FR-06, SOC-FR-07 | PASS |
 | IT-06 | [test_IT_06_invalid_start_is_never_persisted](#test-it-06-invalid-start-is-never-persisted) | SOC-FR-06, SOC-FR-07 | PASS |
-| IT-04 | [test_IT_04_ocv_reset_tier](#test-it-04-ocv-reset-tier) | SOC-FR-06, SOC-FR-07 | SKIPPED |
+| IT-04 | [test_IT_04_ocv_reset_tier](#test-it-04-ocv-reset-tier) | SOC-FR-06, SOC-FR-07 | PASS |
+| IT-09 | [test_IT_09_deferred_init_holds_estimates_invalid](#test-it-09-deferred-init-holds-estimates-invalid) | SOC-FR-06, SOC-FR-07 | PASS |
+| IT-10 | [test_IT_10_stage2_timeout_falls_back_to_nvm](#test-it-10-stage2-timeout-falls-back-to-nvm) | SOC-FR-06, SOC-FR-07 | PASS |
+| IT-11 | [test_IT_11_stage1_timeout_when_sleep_time_never_ready](#test-it-11-stage1-timeout-when-sleep-time-never-ready) | SOC-FR-06, SOC-FR-07 | PASS |
+| IT-12 | [test_IT_12_late_sleep_time_within_budget_still_reaches_ocv](#test-it-12-late-sleep-time-within-budget-still-reaches-ocv) | SOC-FR-06, SOC-FR-07 | PASS |
+| IT-13 | [test_IT_13_short_sleep_resolves_without_waiting_for_cells](#test-it-13-short-sleep-resolves-without-waiting-for-cells) | SOC-FR-06, SOC-FR-07 | PASS |
+| IT-14 | [test_IT_14_no_integration_while_init_is_pending](#test-it-14-no-integration-while-init-is-pending) | SOC-FR-06, SOC-FR-07 | PASS |
 | IT-07 | [test_IT_07_init_source_is_latched_not_recomputed](#test-it-07-init-source-is-latched-not-recomputed) | SOC-FR-06, SOC-FR-07 | PASS |
 | IT-08 | [test_IT_08_init_source_fits_the_can_signal_width](#test-it-08-init-source-fits-the-can-signal-width) | SOC-FR-06, SOC-FR-07 | PASS |
 | CH-01 | [test_CH_01_current_dropout_invalidates_but_holds_soc](#test-ch-01-current-dropout-invalidates-but-holds-soc) | SOC-FR-12 | PASS |
@@ -65,8 +70,8 @@ Source: `sil/tests/test_soc.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 | Case ID | SA-03 |
 | Requirement | SOC-FR-03, SOC-FR-04 |
 | Result | PASS |
-| Duration | 0.6 ms |
-| Source | `sil/tests/test_soc.py:42` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:53` |
 
 **Objective.** SA-03 (partial): the blend reduces to the common value when all three agree.
 
@@ -93,8 +98,8 @@ for target in (0, 123, 500, 999, MAX_PCT_X10):
 | Case ID | — |
 | Requirement | SOC-FR-03, SOC-FR-04 |
 | Result | PASS |
-| Duration | 1.6 ms over 4 variants |
-| Source | `sil/tests/test_soc.py:58` |
+| Duration | 0.3 ms over 4 variants |
+| Source | `sil/tests/test_soc.py:69` |
 
 **Objective.** SA-01/02/03/04: the documented blend formula, checked as arithmetic.
 
@@ -115,8 +120,8 @@ assert expected_blend(soc_min, soc_max, soc_avg) == expected
 | Case ID | — |
 | Requirement | SOC-FR-02 |
 | Result | PASS |
-| Duration | 1.9 ms |
-| Source | `sil/tests/test_soc.py:77` |
+| Duration | 0.2 ms |
+| Source | `sil/tests/test_soc.py:88` |
 
 **Objective.** Documents SOC_DESIGN.md 5.1 empirically rather than by assertion of prose.
 
@@ -143,8 +148,8 @@ assert bms.soc_min == bms.soc_max == bms.soc_avg
 | Case ID | SA-05 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 9.4 ms |
-| Source | `sil/tests/test_soc.py:93` |
+| Duration | 2.5 ms |
+| Source | `sil/tests/test_soc.py:104` |
 
 **Objective.** SA-05: sustained discharge saturates at 0 % and does not wrap.
 
@@ -167,8 +172,8 @@ assert bms.capacity_avg_mAh == pytest.approx(0.0, abs=1e-3)
 | Case ID | SA-06 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 13.2 ms |
-| Source | `sil/tests/test_soc.py:104` |
+| Duration | 2.4 ms |
+| Source | `sil/tests/test_soc.py:115` |
 
 **Objective.** SA-06: sustained charge saturates at 100 %.
 
@@ -190,8 +195,8 @@ assert bms.capacity_avg_mAh == pytest.approx(float(PACK_CAPACITY_MAH), rel=1e-6)
 | Case ID | SA-07 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 0.6 ms |
-| Source | `sil/tests/test_soc.py:114` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:125` |
 
 **Objective.** SA-07: Bms_Soc_SetSoc_pct_x10 clamps an out-of-range request to 100 %.
 
@@ -210,8 +215,8 @@ assert bms.soc_avg == MAX_PCT_X10
 | Case ID | SA-08 |
 | Requirement | SOC-FR-01, SOC-IR-01 |
 | Result | PASS |
-| Duration | 76.9 ms |
-| Source | `sil/tests/test_soc.py:121` |
+| Duration | 16.2 ms |
+| Source | `sil/tests/test_soc.py:132` |
 
 **Objective.** SA-08: positive current charges, negative discharges.
 
@@ -238,8 +243,8 @@ assert bms.soc < 500, "negative current must lower SOC"
 | Case ID | SA-09 |
 | Requirement | SOC-FR-01, SOC-TR-01 |
 | Result | PASS |
-| Duration | 320.7 ms |
-| Source | `sil/tests/test_soc.py:137` |
+| Duration | 48.1 ms |
+| Source | `sil/tests/test_soc.py:148` |
 
 **Objective.** SA-09: a 1 C discharge for one hour takes a full pack from 100 % to ~0 %.
 
@@ -261,8 +266,8 @@ assert bms.soc == pytest.approx(0, abs=5)   # within 0.5 %
 | Case ID | — |
 | Requirement | SOC-FR-01 |
 | Result | PASS |
-| Duration | 69.7 ms |
-| Source | `sil/tests/test_soc.py:148` |
+| Duration | 7.9 ms |
+| Source | `sil/tests/test_soc.py:159` |
 
 **Objective.** The integrated charge matches mAh computed independently in Python.
 
@@ -287,8 +292,8 @@ assert bms.capacity_avg_mAh == pytest.approx(expected, rel=1e-3)
 | Case ID | IT-02 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_soc.py:166` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:177` |
 
 **Objective.** IT-02: no valid record -> tier 3, default SOC, estimates flagged invalid.
 
@@ -311,8 +316,8 @@ assert bms.init_source == INIT_SOURCE_DEFAULT
 | Case ID | IT-01 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 5.6 ms |
-| Source | `sil/tests/test_soc.py:177` |
+| Duration | 0.9 ms |
+| Source | `sil/tests/test_soc.py:188` |
 
 **Objective.** IT-01: a persisted record is restored into all three estimators, valid.
 
@@ -342,8 +347,8 @@ assert bms.init_source == INIT_SOURCE_NVM
 | Case ID | IT-03 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_soc.py:195` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:206` |
 
 **Objective.** IT-03: old 16-byte "SOC1" records are rejected -> one boot at tier 3.
 
@@ -375,8 +380,8 @@ assert bms.init_source == INIT_SOURCE_DEFAULT
 | Case ID | IT-05 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.7 ms |
-| Source | `sil/tests/test_soc.py:215` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:226` |
 
 **Objective.** IT-05: a tier-3 blind start flips to valid on the first good current tick.
 
@@ -397,8 +402,8 @@ assert bms.soc_valid is True
 | Case ID | IT-06 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 1.5 ms |
-| Source | `sil/tests/test_soc.py:225` |
+| Duration | 0.3 ms |
+| Source | `sil/tests/test_soc.py:236` |
 
 **Objective.** IT-06: while the estimate is a blind guess, nothing is written to flash.
 
@@ -418,22 +423,233 @@ assert bms.nvm_records == 0
 |---|---|
 | Case ID | IT-04 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
-| Result | SKIPPED |
-| Duration | 0.5 ms |
-| Source | `sil/tests/test_soc.py:234` |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:245` |
 
-**Objective.** IT-04: OCV reset path. Blocked on a real sleep-time source.
+**Objective.** IT-04: tier 1 seeds all three estimators from the OCV table.
+
+> Reachable in SIL because the Bms_SleepTime double reports a relaxed pack.
+> On target the provider is still hardcoded to 0 s (SOC_DESIGN.md 5.2), so
+> this exercises the path the production stub currently disables - not
+> something the target does today.
 
 **Procedure.**
 
 ```python
-"""IT-04: OCV reset path. Blocked on a real sleep-time source."""
+bms = bms_dirty
+bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=True)
+
+# Cell voltages cannot exist yet, so init must be deferred rather than
+# silently falling through to a lower tier.
+assert bms.init_source == INIT_SOURCE_PENDING
+
+bms.run_ms(100, cells_mV=OCV_BREAKPOINT_MV)
+
+assert bms.init_source == INIT_SOURCE_OCV
+assert bms.soc == bms.ocv_to_soc(OCV_BREAKPOINT_MV)
+assert bms.soc_min == bms.soc_max == bms.soc_avg == bms.soc
 ```
 
-**Reason.**
+### test_IT_09_deferred_init_holds_estimates_invalid
 
+| | |
+|---|---|
+| Case ID | IT-09 |
+| Requirement | SOC-FR-06, SOC-FR-07 |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:267` |
+
+**Objective.** IT-09: while the OCV wait is pending, SOC is reported as unusable.
+
+> A consumer must be able to tell "not seeded yet" from a real anchor, so the
+> provenance reads PENDING and the estimates stay invalid rather than showing
+> a plausible number that is about to be replaced.
+
+**Procedure.**
+
+```python
+bms = bms_dirty
+bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=True)
+
+assert bms.init_source == INIT_SOURCE_PENDING
+assert bms.soc_valid is False
+
+# Starve the wait: no vAFE frames, so CellVoltageValid never goes TRUE.
+bms.run_ms(OCV_WAIT_TIMEOUT_MS - 100)
+
+assert bms.init_source == INIT_SOURCE_PENDING, "wait must not resolve early"
 ```
-Skipped: Tier 1 (OCV reset) is unreachable: Bms_Soc_GetElapsedSleepTime_s() is hardcoded to 0 and CellVoltageValid is FALSE at init. See SOC_DESIGN.md 5.2.
+
+### test_IT_10_stage2_timeout_falls_back_to_nvm
+
+| | |
+|---|---|
+| Case ID | IT-10 |
+| Requirement | SOC-FR-06, SOC-FR-07 |
+| Result | PASS |
+| Duration | 0.9 ms |
+| Source | `sil/tests/test_soc.py:286` |
+
+**Objective.** IT-10: cell voltages never arriving times out into tier 2, not tier 1.
+
+> The OCV branch must fail closed: without a cell-voltage reference it has
+> nothing to seed from, so the persisted SOC has to win.
+
+**Procedure.**
+
+```python
+bms.set_soc(700)
+bms.run_normal(61_000, current_mA=0, cell_mV=NOMINAL_CELL_MV)
+
+# Reboot as a relaxed pack, but never deliver a vAFE cycle.
+bms.power_cycle(sleep_s=RELAXED_SLEEP_S, sleep_ready=True)
+assert bms.init_source == INIT_SOURCE_PENDING
+
+bms.run_ms(OCV_WAIT_TIMEOUT_MS)
+
+assert bms.init_source == INIT_SOURCE_NVM
+assert bms.soc == 700
+```
+
+### test_IT_11_stage1_timeout_when_sleep_time_never_ready
+
+| | |
+|---|---|
+| Case ID | IT-11 |
+| Requirement | SOC-FR-06, SOC-FR-07 |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:305` |
+
+**Objective.** IT-11: an unready sleep-time source gates the wait even if cells are fine.
+
+> Stage 1 is the gate: with no readable sleep time there is no way to know the
+> cells are relaxed, so a cell-voltage set alone must not trigger an OCV reset.
+
+**Procedure.**
+
+```python
+bms = bms_dirty
+bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=False)
+
+# Cells are healthy the whole time - only readiness is missing.
+bms.run_ms(OCV_WAIT_TIMEOUT_MS - 100, cells_mV=OCV_BREAKPOINT_MV)
+assert bms.init_source == INIT_SOURCE_PENDING
+
+bms.run_ms(100, cells_mV=OCV_BREAKPOINT_MV)
+
+assert bms.init_source != INIT_SOURCE_OCV, "unreadable sleep time must not seed OCV"
+assert bms.init_source == INIT_SOURCE_DEFAULT      # virgin flash, so tier 3
+assert bms.soc == INITIAL_PCT_X10
+```
+
+### test_IT_12_late_sleep_time_within_budget_still_reaches_ocv
+
+| | |
+|---|---|
+| Case ID | IT-12 |
+| Requirement | SOC-FR-06, SOC-FR-07 |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:325` |
+
+**Objective.** IT-12: a timekeeping source that arrives late, but in time, still wins tier 1.
+
+> This is the case the readiness flag exists for - the wait must survive
+> stage 1 taking a few cycles rather than giving up on the first look.
+
+**Procedure.**
+
+```python
+bms = bms_dirty
+bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=False)
+
+bms.run_ms(200, cells_mV=OCV_BREAKPOINT_MV)
+assert bms.init_source == INIT_SOURCE_PENDING
+
+# RTC finishes acquiring, still inside the 500 ms budget.
+bms.set_sleep_time(RELAXED_SLEEP_S, ready=True)
+bms.run_ms(100, cells_mV=OCV_BREAKPOINT_MV)
+
+assert bms.init_source == INIT_SOURCE_OCV
+assert bms.soc == bms.ocv_to_soc(OCV_BREAKPOINT_MV)
+```
+
+### test_IT_13_short_sleep_resolves_without_waiting_for_cells
+
+| | |
+|---|---|
+| Case ID | IT-13 |
+| Requirement | SOC-FR-06, SOC-FR-07 |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:345` |
+
+**Objective.** IT-13: once the sleep time reads short, the wait ends immediately.
+
+> A pack that was only briefly off can never OCV-reset, so there is nothing to
+> wait for - blocking on cell voltages would delay initialization for no gain.
+
+**Procedure.**
+
+```python
+bms = bms_dirty
+bms.power_on(sleep_s=0, sleep_ready=False)
+assert bms.init_source == INIT_SOURCE_PENDING
+
+bms.set_sleep_time(0, ready=True)
+
+# One tick, no vAFE frames at all.
+bms.run_ms(100)
+
+assert bms.init_source == INIT_SOURCE_DEFAULT
+assert bms.elapsed_ms < OCV_WAIT_TIMEOUT_MS, "must not burn the full budget"
+```
+
+### test_IT_14_no_integration_while_init_is_pending
+
+| | |
+|---|---|
+| Case ID | IT-14 |
+| Requirement | SOC-FR-06, SOC-FR-07 |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:364` |
+
+**Objective.** IT-14: current is not integrated onto an unseeded anchor.
+
+> The estimators hold no reference during the wait, so accumulating charge
+> into them would produce a SOC derived from an arbitrary zero.
+
+**Procedure.**
+
+```python
+bms = bms_dirty
+bms.power_on(sleep_s=RELAXED_SLEEP_S, sleep_ready=False)
+
+# A fully healthy chain apart from readiness, so the only reason not to
+# integrate is the pending init. Charge current specifically: the unseeded
+# anchor sits at 0 mAh and a discharge would clamp there, hiding the bug.
+stimulus = dict(
+    current_mA=+50_000,
+    pack_mV=NOMINAL_CELL_MV * 16,
+    bus_mV=NOMINAL_CELL_MV * 16,
+    cells_mV=NOMINAL_CELL_MV,
+)
+bms.run_ms(OCV_WAIT_TIMEOUT_MS - 100, **stimulus)
+
+assert bms.init_source == INIT_SOURCE_PENDING
+assert bms.pack_current_valid is True, "precondition: current must be flowing"
+assert bms.capacity_avg_mAh == 0.0, "no charge may accumulate before seeding"
+assert bms.soc_valid is False, "an unseeded estimate must never report valid"
+
+# On timeout the anchor is established from tier 3, unpolluted by the above.
+bms.run_ms(100, **stimulus)
+
+assert bms.init_source == INIT_SOURCE_DEFAULT
+assert bms.soc == INITIAL_PCT_X10
 ```
 
 ### test_IT_07_init_source_is_latched_not_recomputed
@@ -443,8 +659,8 @@ Skipped: Tier 1 (OCV reset) is unreachable: Bms_Soc_GetElapsedSleepTime_s() is h
 | Case ID | IT-07 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 57.0 ms |
-| Source | `sil/tests/test_soc.py:243` |
+| Duration | 8.7 ms |
+| Source | `sil/tests/test_soc.py:396` |
 
 **Objective.** IT-07: the init source reports how SOC was *seeded*, not its current state.
 
@@ -476,8 +692,8 @@ assert bms.init_source == source_at_boot
 | Case ID | IT-08 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_soc.py:264` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:417` |
 
 **Objective.** IT-08: every init-source value fits the 3-bit CAN field on 0x308.
 
@@ -497,8 +713,8 @@ assert 0 <= bms.init_source <= 7
 | Case ID | CH-01 |
 | Requirement | SOC-FR-12 |
 | Result | PASS |
-| Duration | 0.5 ms |
-| Source | `sil/tests/test_soc.py:278` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:431` |
 
 **Objective.** CH-01: losing pack current invalidates the estimate but holds the value.
 
@@ -527,8 +743,8 @@ assert bms.soc == held, "SOC value must be held, not zeroed"
 | Case ID | CH-03 |
 | Requirement | SOC-IR-02 |
 | Result | PASS |
-| Duration | 0.5 ms |
-| Source | `sil/tests/test_soc.py:296` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:449` |
 
 **Objective.** CH-03: the vAFE average equals the mean of the 16 injected cells.
 
@@ -556,8 +772,8 @@ assert bms.cell_avg_V == pytest.approx(expected_avg_mV / 1000.0, abs=1e-6)
 | Case ID | — |
 | Requirement | SOC-FR-12, SOC-IR-01 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_soc.py:313` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_soc.py:466` |
 
 **Objective.** A one-off alive-counter glitch costs one cycle of data and then resyncs.
 
@@ -584,8 +800,8 @@ assert bms.soc_valid is True
 | Case ID | — |
 | Requirement | SOC-FR-12, SOC-IR-01 |
 | Result | XFAIL (known defect) |
-| Duration | 32.0 ms |
-| Source | `sil/tests/test_soc.py:329` |
+| Duration | 8.0 ms |
+| Source | `sil/tests/test_soc.py:482` |
 
 **Objective.** A *sustained* alive-counter failure must invalidate pack current.
 
@@ -618,4 +834,4 @@ assert bms.soc == soc_before, "SOC must not drift on a frozen current value"
 DEFECT: Battery_Monitor.c:286 sets PackCurrentValid[0] from g_BmsVpackData.CurrentValid (frame arrival only), while the data copy is gated on g_BmsVpackData.Valid (which includes AliveValid). A stuck alive counter therefore freezes PackCurrent_mA at its last value while still reporting it valid, and SOC integrates the stale current forever.
 ```
 
-<!-- sil-report slug='soc' title='SOC — estimation, initialization and upstream signal chain' cases='21' duration='0.594' verdict='PASS' executed='2026-09-06 02:34:33' passed='19' xfailed='1' skipped='1' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='soc' title='SOC — estimation, initialization and upstream signal chain' cases='27' duration='0.098' verdict='PASS' executed='2026-09-06 23:52:47' passed='26' xfailed='1' skipped='0' xpassed='0' failed='0' error='0' -->

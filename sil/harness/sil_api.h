@@ -30,6 +30,17 @@ SIL_API void Sil_FlashWipe(void);
  */
 SIL_API void Sil_PowerOn(void);
 
+/**
+ * Cold boot with the elapsed power-off time established before the module
+ * inits run, so Bms_Soc_Init() sees it when judging OCV eligibility.
+ *
+ * @param elapsed_s  value Bms_SleepTime_GetElapsed_s() reports.
+ * @param ready      value Bms_SleepTime_IsReady() reports. FALSE models a
+ *                   timekeeping source that has not acquired yet, which holds
+ *                   the SOC deferred-init wait in stage 1.
+ */
+SIL_API void Sil_PowerOnWithSleepTime(uint32 elapsed_s, boolean ready);
+
 /* ================================================================================================
  * Time / task execution — deterministic, no wall clock
  * ============================================================================================== */
@@ -81,6 +92,13 @@ SIL_API void Sil_InjectVafeUniform(uint16 cell_mV);
 /** Drive the Bms_Adc / Bms_Ntc doubles. */
 SIL_API void Sil_SetAdcPackVoltages(uint16 v2_mV, uint16 v3_mV, boolean valid);
 SIL_API void Sil_SetNtc(sint16 t1_dC, sint16 t2_dC, sint16 t3_dC, boolean valid);
+
+/**
+ * Drive the Bms_SleepTime double mid-run — e.g. to let a timekeeping source
+ * become ready part-way through the SOC deferred-init wait. To set it for the
+ * boot itself, use Sil_PowerOnWithSleepTime().
+ */
+SIL_API void Sil_SetSleepTime(uint32 elapsed_s, boolean ready);
 
 /* ================================================================================================
  * Observation — SOC
