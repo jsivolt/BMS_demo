@@ -50,7 +50,7 @@ Out of scope:
 |---|---|---|
 | SOP-FR-01 | The module shall compute current limits in two operating modes: Discharge (not charging) and Charge. | A charger attached and a load drawing current do not share one safe current band. |
 | SOP-FR-02 | In Discharge mode the module shall produce a discharge limit and a regenerative braking limit. In Charge mode it shall produce a charge limit. | These are the three limits the consumer needs. |
-| SOP-FR-03 | The module shall publish all three limit fields in every mode. It shall force the fields that do not apply to the active mode to zero. It shall publish an explicit mode signal. | A consumer must never guess which fields are live from the mode. A zero is clear. A stale value is not. |
+| SOP-FR-03 | The module shall publish all three limit fields in every mode. It shall force the fields that do not apply to the active mode to zero. | A consumer must never guess which fields are live. A zero is clear. A stale value is not. |
 | SOP-FR-04 | The module shall compute each limit by two independent paths: a static lookup table and a dynamic equivalent-circuit-model prediction. The published limit shall be the smaller of the two magnitudes. | The table holds datasheet and validation limits the model does not know. The model catches fast conditions the table cannot hold. The module trusts neither one alone. |
 | SOP-FR-05 | The dynamic path shall use an equivalent circuit model with one series resistance and two parallel resistor-capacitor pairs. | Two pairs cover the fast charge-transfer response and the slow diffusion response over a horizon of several seconds. One pair reads the polarization too low and reads the limit too high. |
 | SOP-FR-06 | The dynamic path shall predict the terminal voltage at the end of a fixed prediction horizon. It shall solve for the current that just reaches the cell voltage limit at that horizon. | A limit means nothing without a stated duration. An instant-only limit lets through a current the cell cannot hold. |
@@ -63,6 +63,7 @@ Out of scope:
 | SOP-FR-13 | The module shall hold no battery characterization data of its own. All tables and constants shall come from `Bms_BattCfg`. | This is the reason the configuration module exists. |
 | SOP-FR-14 | The module shall publish limits as `uint16` magnitudes in units of 0.1 A. The values shall saturate at both ends. The field name shall imply the direction. | This removes sign confusion from the CAN interface. The sign convention lives once, inside the computation, not in the published signal. |
 | SOP-FR-15 | The module shall use no Kalman filter, no observer, and no online parameter identification. The ECM parameters shall be a fixed calibration. | This matches the complexity budget of `Bms_Soc` (SOC-FR-05). There is also no characterization data to identify against. |
+| SOP-FR-16 | The module shall take the operating mode as an input from a separate mode-provider component. It shall not derive the mode and shall not publish a mode signal of its own. | One component owns the mode. SOP is a consumer of it, like every other limit consumer. |
 
 ### 1.3 Requirements: `Bms_BattCfg`
 
@@ -85,7 +86,7 @@ Out of scope:
 | SOP-IR-04 | SOC comes from `Bms_Soc_GetPackData()`. `Min.Soc_pct_x10` seeds the discharge branch. `Max.Soc_pct_x10` seeds the charge branch. Each is gated by that estimator `Valid` flag. |
 | SOP-IR-05 | The module publishes the limits on a new CAN frame, `0x30C SOP_Limits`, through `Bms_Can_SendSopLimits()`, which reads `Bms_Sop_GetData()`. |
 | SOP-IR-06 | The module publishes calibration detail on an optional frame, `0x30D SOP_Debug`. That detail is the static limit, the dynamic limit, and the three derate factors, before the minimum and the rate limiter. See section 7.6. |
-| SOP-IR-07 | The operating mode is an input to this module. The module does not decide it. See section 7.1. No mode source exists in the firmware today. |
+| SOP-IR-07 | The operating mode comes from a separate mode-provider component. The module consumes it and does not decide it. That component does not exist yet. Until it does, the module uses the compile-time default `BMS_SOP_DEFAULT_MODE`. See section 7.1. |
 | CFG-IR-01 | `Bms_Soc` calls `Bms_BattCfg_GetOcvTable()` and `Bms_BattCfg_GetOcvTableSize()` inside `Bms_Soc_OcvToSoc()`. It calls `Bms_BattCfg_GetNominalCapacity_mAh()` wherever `BMS_SOC_PACK1_CAPACITY_MAH` is used today. |
 | CFG-IR-02 | The OCV lookup still runs through `Lib_Interp_Lookup_1D_uint16()`. Only the owner of the table changes. |
 
@@ -142,7 +143,7 @@ flowchart TD
     SOP -->|"Bms_Sop_GetData"| CANMOD["Bms_Can<br/>0x30C SOP_Limits<br/>0x30D SOP_Debug (optional)"]
     CANMOD -->|"CAN0"| HOST(["Host / HIL"])
 
-    MODE(["Operating mode<br/>SOURCE UNDECIDED - 7.1"]) -.->|"Discharge / Charge"| SOP
+    MODE(["Mode-provider SWC<br/>separate component<br/>not built yet - 7.1"]) -.->|"Discharge / Charge"| SOP
 
     classDef this fill:#e8f0fe,stroke:#3b6fd4,stroke-width:2px
     classDef newcfg fill:#fff4e5,stroke:#d48806,stroke-width:2px
@@ -170,7 +171,7 @@ flowchart TD
     SLEW["Rate Limiter and Publish<br/>asymmetric slew, validity<br/>detail: 3.9"]
 
     RCSTATE[("RC state<br/>V1, V2 per branch")]
-    OUT["Published outputs<br/>Discharge / Regen / Charge limit<br/>Mode + Valid + derate flags"]
+    OUT["Published outputs<br/>Discharge / Regen / Charge limit<br/>Valid + derate flags"]
 
     BM -->|"cell V extremes, max T, pack current"| STATIC
     BM -->|"pack current"| ECM
@@ -234,8 +235,8 @@ flowchart LR
 | `Bms_Soc` | `Bms_Sop` | `Min.Soc_pct_x10`, `Max.Soc_pct_x10` | each estimator `Valid` |
 | `Bms_BattCfg` | `Bms_Sop` | OCV curve, cell envelope, ECM tables, static SOP tables, topology | none (constant) |
 | `Bms_BattCfg` | `Bms_Soc` | OCV curve, nominal capacity | none (constant) |
-| `Bms_Sop` | `Bms_Can` | limits, mode, validity | `Bms_Sop_GetData()` |
-| undecided | `Bms_Sop` | operating mode | section 7.1 |
+| `Bms_Sop` | `Bms_Can` | limits, validity, derate flags | `Bms_Sop_GetData()` |
+| Mode-provider SWC (not built yet) | `Bms_Sop` | operating mode | section 7.1 |
 
 ### 2.5 Data ownership
 
@@ -249,6 +250,7 @@ flowchart LR
 | Derate windows | none | `Bms_BattCfg` (new) |
 | Resistor-capacitor polarization state | none | `Bms_Sop` (runtime state, not configuration) |
 | Published limits | none | `Bms_Sop` |
+| Operating mode | none | a separate mode-provider component (not built yet). `Bms_Sop` consumes it. |
 
 ---
 
@@ -303,7 +305,7 @@ typedef struct
     Bms_Sop_LimitType Regen;       /**< Active in Discharge mode, else forced to 0. */
     Bms_Sop_LimitType Charge;      /**< Active in Charge mode, else forced to 0. */
 
-    Bms_Sop_ModeType  Mode;
+    Bms_Sop_ModeType  Mode;        /**< The mode taken from the provider this cycle. Not published. */
     boolean           Valid;       /**< FALSE when any required input is invalid. */
 
     /** @brief Which feedback term is currently governing. Diagnostic. */
@@ -646,7 +648,7 @@ The init assumes a fully rested pack. That is wrong after a short reset. Section
 | `BMS_SOP_FALLBACK_DISCHARGE_DA` | 0 | Section 7.2. |
 | `BMS_SOP_FALLBACK_REGEN_DA` | 0 | Section 7.2. |
 | `BMS_SOP_FALLBACK_CHARGE_DA` | 0 | Section 7.2. |
-| `BMS_SOP_DEFAULT_MODE` | `DISCHARGE` | Section 7.1. |
+| `BMS_SOP_DEFAULT_MODE` | `DISCHARGE` | Used until the mode-provider component exists. Section 7.1. |
 
 ### 3.13 Published CAN signals
 
@@ -658,9 +660,11 @@ The init assumes a fully rested pack. That is wrong after a short reset. Section
 | 2-3 | `Pack1RegenLimit` | `uint16` LE, 0.1 A per bit, magnitude |
 | 4-5 | `Pack1ChargeLimit` | `uint16` LE, 0.1 A per bit, magnitude |
 | 6 bit 0 | `Pack1SOPValid` | 0 means invalid, fallback applied |
-| 6 bit 1 | `Pack1SOPMode` | 0 means Discharge, 1 means Charge |
-| 6 bits 2-5 | `Pack1SOPDerateActive` | one bit per factor: vLow, vHigh, tHigh, tLow |
+| 6 bits 1-4 | `Pack1SOPDerateActive` | one bit per factor: vLow, vHigh, tHigh, tLow |
+| 6 bits 5-7 | reserved | send as 0 |
 | 7 bits 0-3 | `SOPAliveCounter` | 4-bit rolling counter, same style as `0x308` and `0x30B` |
+
+The frame carries no mode signal. The mode-provider component publishes that. See SOP-IR-07.
 
 `0x30D SOP_Debug`. Optional. Calibration only. It carries the static value, the dynamic value, and the derate factor for one limit. A mode byte picks the limit. All three fit one 8-byte frame across successive frames. Section 7.6 asks whether it is worth the cost.
 
@@ -782,6 +786,7 @@ SOC has the same gap (`SOC_DESIGN.md` section 5.10). There is no requirement tha
 
 | Date | Change | Rationale |
 |---|---|---|
+| 2026-09-09 | The operating mode is now an input from a separate mode-provider component. SOP does not publish a mode signal. Removed `Pack1SOPMode` from `0x30C`. Added SOP-FR-16. | One component owns the mode. Every limit consumer, SOP included, reads it. |
 | 2026-09-08 | First draft. `Bms_Sop` runs the limit computation. `Bms_BattCfg` holds the shared battery data and takes the OCV table and capacity from `Bms_Soc`. | New feature. |
 
 ---
@@ -790,9 +795,9 @@ SOC has the same gap (`SOC_DESIGN.md` section 5.10). There is no requirement tha
 
 There are nine decisions this design cannot make on its own. They are numbered so you can answer by number.
 
-### 7.1 Where does the operating mode come from?
+### 7.1 How will the mode-provider component decide the mode?
 
-Discharge against Charge is an input (SOP-IR-07). No source for it exists in the firmware. Candidates:
+The operating mode is an input (SOP-IR-07). A separate component owns it. That component does not exist yet, which is fine for this design. `Bms_Sop` only consumes the result, so none of the options below change the SOP design. The open question is the decision rule for that component. Candidates:
 
 | Option | Note |
 |---|---|
@@ -801,7 +806,7 @@ Discharge against Charge is an input (SOP-IR-07). No source for it exists in the
 | Derive from `Bms_StateMachine`. | This needs a charging state that does not exist today. |
 | A dedicated charger-detect input. | This is the right answer on real hardware. No pin is assigned. |
 
-My suggestion: the CAN command, for the bench demo. It matches the existing control interface and keeps the mode explicit and easy to watch. It is your call. The answer changes section 3.2 and section 3.12.
+My suggestion: the CAN command, for the bench demo. It matches the existing control interface and keeps the mode explicit and easy to watch. It is your call, and it can be made later.
 
 ### 7.2 What must the invalid-input fallback be?
 
