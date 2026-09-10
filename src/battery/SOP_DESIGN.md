@@ -3,7 +3,7 @@
 Modules: `Bms_Sop` (Pack 1 state of power, meaning the current limits), `Bms_BattCfg` (shared battery data configuration).
 Target: NXP S32K344, bare metal, S32K3 RTD 7.0.1.
 Status: Draft for review. Not implemented yet. Nine decisions need your answer before coding starts. See section 7.
-Last updated: 2026-09-08.
+Last updated: 2026-09-10.
 
 State of power (SOP) is the largest current the pack can carry right now without breaking a cell limit.
 
@@ -140,14 +140,14 @@ flowchart TD
     SOP -->|"table lookups"| LIB["Lib_Interp<br/>1-D today, 2-D needed"]
     SOC -->|"OCV lookup"| LIB
 
-    SOP -->|"Bms_Sop_GetData"| CANMOD["Bms_Can<br/>0x30C SOP_Limits<br/>0x30D SOP_Debug (optional)"]
+    SOP -->|"Bms_Sop_GetData"| CANMOD["Bms_Can<br/>0x30C SOP_Limits<br/>0x30D SOP_Debug optional"]
     CANMOD -->|"CAN0"| HOST(["Host / HIL"])
 
     MODE(["Mode-provider SWC<br/>separate component<br/>not built yet - 7.1"]) -.->|"Discharge / Charge"| SOP
 
     classDef this fill:#e8f0fe,stroke:#3b6fd4,stroke-width:2px
     classDef newcfg fill:#fff4e5,stroke:#d48806,stroke-width:2px
-    classDef undecided fill:#fff1f0,stroke:#cf1322,stroke-width:2px,stroke-dasharray:4 3
+    classDef undecided fill:#fff1f0,stroke:#cf1322,stroke-width:2px,stroke-dasharray:5
     class SOP this
     class CFG newcfg
     class MODE undecided
@@ -220,7 +220,7 @@ flowchart LR
     ENV -.->|"follow-up, see 7.7"| BMM["Battery_Monitor<br/>fault thresholds"]
 
     classDef migrated fill:#fff4e5,stroke:#d48806,stroke-width:2px
-    classDef later fill:#f5f5f5,stroke:#999,stroke-dasharray:4 3
+    classDef later fill:#f5f5f5,stroke:#999,stroke-dasharray:5
     class CAP,OCV migrated
     class BMM later
 ```
@@ -436,7 +436,7 @@ Proposed breakpoints, as a calibration and not fixed by this design: SOC at 0, 1
 
 ```mermaid
 flowchart LR
-    OCVS(["OCV(SOC)"]) --- R0["R0<br/>ohmic"]
+    OCVS(["OCV vs SOC"]) --- R0["R0<br/>ohmic"]
     R0 --- RC1["R1 || C1<br/>fast: charge transfer"]
     RC1 --- RC2["R2 || C2<br/>slow: diffusion"]
     RC2 --- T(["Cell terminal"])
