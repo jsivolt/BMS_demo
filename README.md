@@ -81,6 +81,8 @@ src/
     Bms_Afe.*               Physical AFE stub (unused)
     vAFE/Bms_Vafe.*         Decodes 16 cell voltages from CAN1 frames 0x401-0x404
     vPACK/Bms_Vpack.*       Decodes pack current/voltage from CAN2 (virtual ADBMS2950) frames 0x410-0x411
+    SOP_DESIGN.md           Draft design for Bms_Sop (current-limit calc) + Bms_BattCfg (shared cell/pack
+                            config); not yet implemented, open questions pending review
   communication/
     Bms_Can.*               CAN0 (host) + CAN1 (vAFE) + CAN2 (vPACK): polled RX, blocking TX
     Bms_Can_Cfg.h           Instances, mailbox indices, all message IDs
