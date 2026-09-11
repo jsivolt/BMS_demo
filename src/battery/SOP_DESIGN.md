@@ -281,7 +281,6 @@ typedef struct
     boolean DerateActiveVLow;
     boolean DerateActiveVHigh;
     boolean DerateActiveTHigh;
-    boolean DerateActiveTLow;
 } Bms_Sop_DataType;
 ```
 
@@ -301,12 +300,10 @@ typedef struct
     uint16 DerateVLowStart_mV;       /**< Discharge derate begins here.      > CellVoltageMin_mV */
     uint16 DerateVLowEnd_mV;         /**< Derate floor reached here.         > CellVoltageMin_mV */
 
-    sint16 TemperatureMax_dC;
-    sint16 TemperatureMin_dC;
+    sint16 TemperatureMax_dC;         /**< Hard ceiling, for context. The fault path trips at this value. */
+    sint16 TemperatureMin_dC;         /**< Hard floor, for context. The fault path trips at this value. */
     sint16 DerateTHighStart_dC;
     sint16 DerateTHighEnd_dC;
-    sint16 DerateTLowStart_dC;
-    sint16 DerateTLowEnd_dC;
 
     uint16 DerateFloor;              /**< Lowest factor derating may reach, 0-1000. */
 } Bms_BattCfg_CellLimitsType;
@@ -468,8 +465,8 @@ The module starts at zero, not at a table value. This is on purpose. The first `
 | 0-1 | `Pack1DischargeLimit` | `uint16` LE, 0.1 A per bit, magnitude |
 | 2-3 | `Pack1RegenLimit` | `uint16` LE, 0.1 A per bit, magnitude |
 | 4-5 | `Pack1ChargeLimit` | `uint16` LE, 0.1 A per bit, magnitude |
-| 6 bits 0-3 | `Pack1SOPDerateActive` | one bit per factor: vLow, vHigh, tHigh, tLow |
-| 6 bits 4-7 | reserved | send as 0 |
+| 6 bits 0-2 | `Pack1SOPDerateActive` | one bit per factor: vLow, vHigh, tHigh |
+| 6 bits 3-7 | reserved | send as 0 |
 | 7 bits 0-3 | `SOPAliveCounter` | 4-bit rolling counter, same style as `0x308` and `0x30B` |
 
 The frame carries no mode signal and no validity signal. The mode-provider component publishes the mode, see SOP-IR-06. Nothing publishes validity, see section 5.6.
@@ -559,7 +556,7 @@ This was cut at your request, along with the rate limiter (old SOP-FR-08) and th
 
 | Date | Change | Rationale |
 |---|---|---|
-| 2026-09-10 | Removed `k_tLow`, the low-temperature derate factor, from section 3.6.2. Resolved and removed the open question about it (old section 7.3). | The static charge and regen tables are already indexed by temperature, so a cold breakpoint can roll the table limit down on its own. A separate feedback factor for the same condition was not needed. |
+| 2026-09-10 | Removed `k_tLow`, the low-temperature derate factor, from section 3.6.2. Also removed its remaining traces: the `DerateActiveTLow` flag, the `DerateTLowStart_dC`/`DerateTLowEnd_dC` fields, and the `tLow` bit on `0x30C`. Resolved and removed the open question about it (old section 7.3). | The static charge and regen tables are already indexed by temperature, so a cold breakpoint can roll the table limit down on its own. A separate feedback factor for the same condition was not needed. |
 | 2026-09-10 | Removed the rate limiter and the invalid-input fallback (old SOP-FR-08 and SOP-FR-09). The module now recomputes every field from scratch each cycle, with no state and no `Valid` flag. Dropped `Pack1SOPValid` from `0x30C`, the `FALL_RATE`/`RISE_RATE`/`FALLBACK_*` constants, the rate-limiting subsection, and the fallback-related test cases. Removed the fallback open question (old section 7.2). Added section 5.6 to record that invalid inputs are no longer handled at all. | Requested simplification, at your direction. |
 | 2026-09-10 | Removed the dynamic equivalent-circuit-model path. `Bms_Sop` now computes each limit from the static table alone, then applies the same feedback derate. Deleted the ECM data structures, the resistor-capacitor state, the arbitration step, and the horizon requirements. Removed the ECM tables and the topology accessors from `Bms_BattCfg`. Pack current is no longer a required input, because the static table needs only SOC and temperature. | Requested simplification: a static-table-only design, with the dynamic path cut entirely. |
 | 2026-09-09 | The operating mode is now an input from a separate mode-provider component. SOP does not publish a mode signal. Removed `Pack1SOPMode` from `0x30C`. Added a requirement for it. | One component owns the mode. Every limit consumer, SOP included, reads it. |
