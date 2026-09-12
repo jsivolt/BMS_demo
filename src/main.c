@@ -315,21 +315,11 @@ static void Bms_MainFunction_10ms(void)
                 Wkpu_Ip_ChannelConfig_PB[0].hwChannel
             );
 
-            /*
-             * Enter NORMAL Standby.
-             *
-             * Power mode:
-             * [0] = RUN
-             * [1] = STANDBY
-             */
-            Power_Ip_SetMode(
-                &Power_Ip_aModeConfigPB[1U]
-            );
+            /* TEMP TEST: do NOT enter Standby yet */
+            // Power_Ip_SetMode(
+            //     &Power_Ip_aModeConfigPB[1U]
+            // );
 
-            /*
-             * NORMAL wake-up should return here.
-             * Turn RED LED permanently ON so wake-up is obvious.
-             */
             Siul2_Dio_Ip_WritePin(
                 LED_RED_PORT,
                 LED_RED_PIN,
@@ -338,7 +328,7 @@ static void Bms_MainFunction_10ms(void)
 
             while (1)
             {
-                /* Wake-up reached this point successfully. */
+                /* Stay awake on FIRC 48 MHz */
             }
         }
     }
