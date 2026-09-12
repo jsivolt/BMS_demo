@@ -3,7 +3,7 @@
 **Module:** `Bms_Soc` (Pack 1 State-of-Charge estimation)
 **Target:** NXP S32K344, bare-metal, S32K3 RTD 7.0.1
 **Status:** Implemented; validated in SIL (see §4). One open defect: §5.11
-**Last updated:** 2026-09-05
+**Last updated:** 2026-09-11
 
 ---
 
@@ -88,6 +88,8 @@ flowchart TD
         SOC["InitPack — once at startup<br/>MainFunctionPack — 100 ms<br/>1sFunction — 1000 ms"]
     end
 
+    CFG["Bms_BattCfg<br/>OCV curve, nominal capacity"] -->|"const table + capacity"| SOC
+
     SOC -->|"Bms_Soc_OcvToSoc"| LIB["Lib_Interp<br/>generic 1-D table lookup"]
     SOC -->|"Bms_Soc_GetData<br/>Bms_Soc_GetPackData"| CANMOD["Bms_Can<br/>0x308 SOC_Status (blend + init source)<br/>0x30B SOC_CellBased (min / max / avg)"]
     SOC <-->|"LoadSoc / SaveSoc"| NVM["Bms_Nvm<br/>append-only record log"]
@@ -169,6 +171,8 @@ All four blocks reach the estimator state through a single commit function; that
 | `BatteryMonitor_GetData()` | `Battery_Monitor` | pack current + validity, cell-voltage statistics + validity |
 | `Bms_Nvm_LoadSoc()` / `Bms_Nvm_SaveSoc()` | `Bms_Nvm` | persistence of the three SOCs |
 | `Lib_Interp_Lookup_1D_uint16()` | `Lib_Interp` | OCV table interpolation |
+| `Bms_BattCfg_GetOcvTable()` / `Bms_BattCfg_GetOcvTableSize()` | `Bms_BattCfg` | the OCV curve and its row count |
+| `Bms_BattCfg_GetNominalCapacity_mAh()` | `Bms_BattCfg` | total pack capacity the SOC percentage is derived against |
 
 ### 2.4 Data ownership
 
@@ -178,6 +182,8 @@ All four blocks reach the estimator state through a single commit function; that
 | `MinCellVoltage`, `MaxCellVoltage`, `AverageCellVoltage` (volts) | `Battery_Monitor` | Copied from `g_BmsVafeData` under `DataValid`; unit-converted mV → V. |
 | `PackCurrent_mA[0]` | `Battery_Monitor` | Copied from `g_BmsVpackData` under `Valid`. |
 | `g_BmsSocPack` (Min/Max/Avg + blend) | `Bms_Soc` | Only mutated through `Bms_Soc_SetEstimatorCapacity()`. |
+| OCV curve | `Bms_BattCfg` | Moved out of `Bms_Soc.c` on 2026-09-11; values unchanged. Read through `Bms_BattCfg_GetOcvTable()`. |
+| Nominal pack capacity | `Bms_BattCfg` | Moved out of `Bms_Soc.h` on 2026-09-11; value unchanged. Read through `Bms_BattCfg_GetNominalCapacity_mAh()`. |
 | Persisted SOC record | `Bms_Nvm` | Append-only log in one Data Flash sector. |
 
 ---
@@ -219,7 +225,7 @@ All four blocks reach the estimator state through a single commit function; that
         Bms_Soc_InitSourceType InitSource; /* latched at init (3.8)    */
     } Bms_Soc_PackType;
 
-`RemainingCapacity_mAh` is the integrated state; total pack capacity is the fixed constant `BMS_SOC_PACK1_CAPACITY_MAH`. `Soc_pct_x10` is always derived from capacity, never integrated directly.
+`RemainingCapacity_mAh` is the integrated state; total pack capacity is a fixed constant read from `Bms_BattCfg_GetNominalCapacity_mAh()`. `Soc_pct_x10` is always derived from capacity, never integrated directly.
 
 `InitSource` records which of the three initialization tiers (§3.8) seeded the estimators. It is set once, in `Bms_Soc_InitPack()`, and is deliberately not touched by the runtime path — it describes the provenance of the absolute anchor, not the current state. See §3.11 for how it is published and what `Valid == 1` combined with `InitSource == 0` means.
 
@@ -227,9 +233,10 @@ All four blocks reach the estimator state through a single commit function; that
 
 | Constant | Value | Meaning |
 |---|---|---|
-| `BMS_SOC_PACK1_CAPACITY_MAH` | 100000 | Nominal Pack 1 capacity (100 Ah). **Placeholder** — tune to cell spec. |
 | `BMS_SOC_SAMPLE_PERIOD_MS` | 100 | Integration period. Must match the scheduler slot. |
 | `BMS_SOC_INITIAL_PCT_X10` | 500 | Default SOC (50.0 %) when no reference exists. |
+
+Nominal pack capacity is no longer a `Bms_Soc` constant. It lives in `Bms_BattCfg` (100000 mAh, 100 Ah, still a **placeholder** to tune to the cell spec) and is read through `Bms_BattCfg_GetNominalCapacity_mAh()`.
 | `BMS_SOC_MIN_PCT_X10` / `MAX` | 0 / 1000 | SOC saturation limits. |
 | `BMS_SOC_SAVE_PERIOD_MS` | 60000 | Minimum interval between persistence writes. |
 | `BMS_SOC_SAVE_DELTA_X10` | 1 | Minimum SOC movement (0.1 %) to justify a write. |
@@ -243,13 +250,16 @@ The single point at which estimator state changes. Every other path — seeding 
         Bms_Soc_EstimatorType *est,
         float capacity_mAh)
     {
+        const float nominalCapacity_mAh =
+            (float)Bms_BattCfg_GetNominalCapacity_mAh();
+
         if (capacity_mAh < 0.0f)
         {
             capacity_mAh = 0.0f;
         }
-        else if (capacity_mAh > (float)BMS_SOC_PACK1_CAPACITY_MAH)
+        else if (capacity_mAh > nominalCapacity_mAh)
         {
-            capacity_mAh = (float)BMS_SOC_PACK1_CAPACITY_MAH;
+            capacity_mAh = nominalCapacity_mAh;
         }
         else
         {
@@ -259,7 +269,7 @@ The single point at which estimator state changes. Every other path — seeding 
         est->RemainingCapacity_mAh = capacity_mAh;
 
         est->Soc_pct_x10 = (uint16)(((capacity_mAh * 1000.0f)
-                                     / (float)BMS_SOC_PACK1_CAPACITY_MAH) + 0.5f);
+                                     / nominalCapacity_mAh) + 0.5f);
     }
 
 Deliberately does **not** touch `Valid` — validity is a caller-level decision (initialization outcome vs. current availability).
@@ -268,7 +278,8 @@ The inverse direction is a one-liner used at the three SOC-seeding call sites:
 
     static float Bms_Soc_SocX10ToCapacity_mAh(uint16 soc_pct_x10)
     {
-        return ((float)BMS_SOC_PACK1_CAPACITY_MAH * (float)soc_pct_x10) / 1000.0f;
+        return ((float)Bms_BattCfg_GetNominalCapacity_mAh()
+                * (float)soc_pct_x10) / 1000.0f;
     }
 
 ### 3.4 Subfunction: Coulomb counting (`Bms_Soc_MainFunctionPack`)
@@ -345,7 +356,10 @@ The same function derives pack validity (`Min && Max && Avg`) and refreshes `g_B
 
 The OCV curve is a plain 2-column `uint16` array — column 0 is cell voltage in mV, column 1 is SOC in 0.1 % units. No dedicated point type is defined.
 
-    static const uint16 g_BmsSocOcvTable[][2] =
+The curve itself is **not owned here**. It lives in `Bms_BattCfg` with the rest of the battery characterization data, and `Bms_Soc` reads it through two accessors. `Bms_Soc` holds no copy.
+
+    /* in Bms_BattCfg.c */
+    static const uint16 g_BmsBattCfgOcvTable[][2] =
     {
         { 3000U,    0U },
         { 3300U,  200U },
@@ -355,11 +369,12 @@ The OCV curve is a plain 2-column `uint16` array — column 0 is cell voltage in
         { 3900U, 1000U }
     };
 
+    /* in Bms_Soc.c */
     uint16 Bms_Soc_OcvToSoc(uint16 voltage_mV)
     {
         return Lib_Interp_Lookup_1D_uint16(
-            g_BmsSocOcvTable,
-            (uint16)BMS_SOC_OCV_TABLE_SIZE,
+            Bms_BattCfg_GetOcvTable(),
+            Bms_BattCfg_GetOcvTableSize(),
             voltage_mV);
     }
 
@@ -703,7 +718,7 @@ matters.
 
 ### 5.1 The three estimators cannot currently diverge
 
-**Limitation.** All three estimators integrate the *same* `PackCurrent_mA[0]` against the *same* `BMS_SOC_PACK1_CAPACITY_MAH`, so they receive identical increments. The only thing that can separate them is the OCV reset seeding them from different voltages at boot — and that path does not fire (§5.2). In the present configuration `soc_min == soc_avg == soc_max` at all times, and `PackSoc_pct_x10` equals the single value the pre-existing implementation produced.
+**Limitation.** All three estimators integrate the *same* `PackCurrent_mA[0]` against the *same* nominal capacity from `Bms_BattCfg`, so they receive identical increments. The only thing that can separate them is the OCV reset seeding them from different voltages at boot — and that path does not fire (§5.2). In the present configuration `soc_min == soc_avg == soc_max` at all times, and `PackSoc_pct_x10` equals the single value the pre-existing implementation produced.
 
 The runtime path deliberately does not read cell voltages at all, so imbalance developing *during* operation never reaches the estimators. Even with OCV enabled, the three would differ only by a constant offset frozen at boot.
 
@@ -730,7 +745,7 @@ The six-point curve in §3.6 is a placeholder. It is coarse where it matters mos
 
 ### 5.4 Pack capacity is a placeholder
 
-`BMS_SOC_PACK1_CAPACITY_MAH = 100000` (100 Ah) is a guess and directly scales every SOC number. It is also fixed — no capacity fade, no temperature or current derating.
+The nominal capacity in `Bms_BattCfg`, 100000 mAh (100 Ah), is a guess and directly scales every SOC number. It is also fixed — no capacity fade, no temperature or current derating.
 
 ### 5.5 Pack 1 only
 
@@ -818,6 +833,7 @@ so it flips to a failure the moment the defect is fixed.
 | 2026-09-05 | `Bms_Soc_InitPack()` restructured into a strict **3-tier priority chain** (OCV → NVM → default+invalid). | Replaces "seed from NVM, then override per-estimator with OCV"; makes the fallback order explicit and flags a blind start. |
 | 2026-09-05 | `Bms_Soc_ApplyOcvReset()` now **clamps** an out-of-range voltage instead of rejecting it; returns `void`. | A cell just past either end of the table is genuinely near 0 % / 100 %; clamping is the correct answer, not a reason to fall back. |
 | 2026-09-05 | Merged `Bms_Soc_SetEstimator_pct_x10()` and `Bms_Soc_UpdateEstimator()` into **`Bms_Soc_SetEstimatorCapacity()`**. | Both reduce to "commit a capacity value"; one commit point removes the duplicated clamp/derive logic. |
+| 2026-09-11 | The OCV curve and the nominal pack capacity moved out to the new **`Bms_BattCfg`** module. `Bms_Soc` now reads both through `Bms_BattCfg_GetOcvTable()`, `Bms_BattCfg_GetOcvTableSize()` and `Bms_BattCfg_GetNominalCapacity_mAh()`; `g_BmsSocOcvTable`, `BMS_SOC_OCV_TABLE_SIZE` and `BMS_SOC_PACK1_CAPACITY_MAH` are gone. Values unchanged, SOC results unchanged, SIL suite green with no test edits (48 pass / 1 xfail). | Both are battery characterization data, not estimator logic, and `Bms_Sop` needs the same constants. One number, one home. See `SOP_DESIGN.md` section 3.4. |
 | 2026-09-05 | `Lib_Interp` — dropped `Lib_Interp_PointType`; the table is now a built-in `const uint16 [][2]`. | Avoids putting a type in a public header for what a 2-column array expresses directly. |
 | 2026-09-05 | `Lib_Interp` — renamed `Bms_Interp_Lookup` → **`Lib_Interp_Lookup_1D_uint16`**. | House convention: `Lib` + function + dimension + datatype. |
 | 2026-09-05 | Created **`src/common/Lib_Interp`** as a shared module; wired into both build configurations. | The bracket-and-interpolate operation is generic (SOC-FR-13); it does not belong inside `Bms_Soc.c`. |

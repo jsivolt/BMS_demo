@@ -84,6 +84,7 @@
 "./src/app/Bms_StateMachine.o"
 "./src/battery/Battery_Monitor.o"
 "./src/battery/Bms_Afe.o"
+"./src/battery/Bms_BattCfg.o"
 "./src/battery/Bms_Ntc.o"
 "./src/battery/Bms_SleepTime.o"
 "./src/battery/Bms_Soc.o"

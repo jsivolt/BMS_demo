@@ -25,9 +25,6 @@ extern "C"{
 *                                       DEFINES
 ==================================================================================================*/
 
-/** @brief Nominal Pack 1 capacity. TODO: tune to actual cell/pack spec. */
-#define BMS_SOC_PACK1_CAPACITY_MAH      (100000UL)
-
 /** @brief Calling period of Bms_Soc_MainFunction. Must match the actual scheduler task period. */
 #define BMS_SOC_SAMPLE_PERIOD_MS        (100U)
 

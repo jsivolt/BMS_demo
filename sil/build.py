@@ -28,6 +28,7 @@ LIB_NAME = "bms_sil.dll" if os.name == "nt" else "libbms_sil.so"
 # Production sources in the SOC vertical slice. Compiled straight from src/,
 # with no SIL-specific modification.
 PRODUCTION_SOURCES = [
+    "src/battery/Bms_BattCfg.c",
     "src/battery/Bms_Soc.c",
     "src/battery/Battery_Monitor.c",
     "src/battery/vAFE/Bms_Vafe.c",
