@@ -161,9 +161,53 @@ static const Power_Ip_MC_ME_CoreConfigType Power_Ip_MC_ME_aPartition0CoreConfigP
 
 };
 
+static const Power_Ip_MC_ME_CoreConfigType Power_Ip_MC_ME_aPartition0CoreConfigPB_1[1U] =
+{
+    /* The configuration structure for Partition 0 Core 0. */
+    {
+        /* Specifies whether the given core is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the core within the partition. */
+        (uint8)0U,
+
+        /* The boot address of the core. */
+        (uint32 *)0x0U,
+
+        /* The process configuration register value of the core. */
+        MC_ME_PRTN0_CORE0_PCONF_CCE
+        (
+            MC_ME_PRTNX_COREX_PCONF_CCE_DIS_U32
+        )
+    },
+
+};
+
 
 
 static const Power_Ip_MC_ME_CofbConfigType Power_Ip_MC_ME_aPartition0CofbConfigPB_0[1U] = 
+{
+    /* The configuration structure for Partition 0 COFB 1. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)1U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN0_COFB1_CLKEN
+        (
+            ((uint32)0x00000000U) | MC_ME_PRTN0_COFB1_CLKEN_REQ44_MASK
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN0_COFB1_CLKEN_RWBITS_MASK
+    }
+
+};
+
+static const Power_Ip_MC_ME_CofbConfigType Power_Ip_MC_ME_aPartition0CofbConfigPB_1[1U] = 
 {
     /* The configuration structure for Partition 0 COFB 1. */
     {
@@ -261,7 +305,123 @@ static const Power_Ip_MC_ME_CofbConfigType Power_Ip_MC_ME_aPartition1CofbConfigP
 
 };
 
+static const Power_Ip_MC_ME_CofbConfigType Power_Ip_MC_ME_aPartition1CofbConfigPB_1[4U] = 
+{
+    /* The configuration structure for Partition 1 COFB 0. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)0U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN1_COFB0_CLKEN
+        (
+            ((uint32)0x00000000U) | MC_ME_PRTN1_COFB0_CLKEN_REQ21_MASK | MC_ME_PRTN1_COFB0_CLKEN_REQ24_MASK | MC_ME_PRTN1_COFB0_CLKEN_REQ28_MASK
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN1_COFB0_CLKEN_RWBITS_MASK
+    },
+
+    /* The configuration structure for Partition 1 COFB 1. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)1U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN1_COFB1_CLKEN
+        (
+            ((uint32)0x00000000U) | MC_ME_PRTN1_COFB1_CLKEN_REQ34_MASK | MC_ME_PRTN1_COFB1_CLKEN_REQ42_MASK | MC_ME_PRTN1_COFB1_CLKEN_REQ45_MASK | MC_ME_PRTN1_COFB1_CLKEN_REQ49_MASK | MC_ME_PRTN1_COFB1_CLKEN_REQ51_MASK | MC_ME_PRTN1_COFB1_CLKEN_REQ53_MASK
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN1_COFB1_CLKEN_RWBITS_MASK
+    },
+
+    /* The configuration structure for Partition 1 COFB 2. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)2U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN1_COFB2_CLKEN
+        (
+            ((uint32)0x00000000U) | MC_ME_PRTN1_COFB2_CLKEN_REQ92_MASK | MC_ME_PRTN1_COFB2_CLKEN_REQ93_MASK
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN1_COFB2_CLKEN_RWBITS_MASK
+    },
+
+    /* The configuration structure for Partition 1 COFB 3. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)3U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN1_COFB3_CLKEN
+        (
+            ((uint32)0x00000000U) | MC_ME_PRTN1_COFB3_CLKEN_REQ104_MASK
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN1_COFB3_CLKEN_RWBITS_MASK
+    }
+
+};
+
 static const Power_Ip_MC_ME_CofbConfigType Power_Ip_MC_ME_aPartition2CofbConfigPB_0[2U] = 
+{
+    /* The configuration structure for Partition 2 COFB 0. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)0U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN2_COFB0_CLKEN
+        (
+            ((uint32)0x00000000U)
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN2_COFB0_CLKEN_RWBITS_MASK
+    },
+
+    /* The configuration structure for Partition 2 COFB 1. */
+    {
+        /* Specifies whether the given COFB set is under MCU control. */
+        (boolean)TRUE,
+
+        /* The index of the COFB set within the partition. */
+        (uint8)1U,
+
+        /* The clock enable register value of the COFB set. */
+        MC_ME_PRTN2_COFB1_CLKEN
+        (
+            ((uint32)0x00000000U) | MC_ME_PRTN2_COFB1_CLKEN_REQ58_MASK
+        ),
+
+        /* Mask containing the COFB blocks to be updated. */
+        MC_ME_PRTN2_COFB1_CLKEN_RWBITS_MASK
+    }
+
+};
+
+static const Power_Ip_MC_ME_CofbConfigType Power_Ip_MC_ME_aPartition2CofbConfigPB_1[2U] = 
 {
     /* The configuration structure for Partition 2 COFB 0. */
     {
@@ -396,6 +556,99 @@ static const Power_Ip_MC_ME_PartitionConfigType Power_Ip_MC_ME_aPartitionConfigP
     },
 
 };
+static const Power_Ip_MC_ME_PartitionConfigType Power_Ip_MC_ME_aPartitionConfigPB_1[3U] = 
+{
+    /* The configuration structure for Partition 0. */
+    {
+        /* Specifies whether the given partition is under MCU control. */
+        (boolean)TRUE,
+
+        /* Specifies whether the given partition's power management is under MCU control. */
+        (boolean)TRUE,
+
+        /* Partition Index */
+        (uint8)0U,
+
+        /* The process configuration register value of the partition. */
+        (
+            MC_ME_PRTNX_PCONF_PCE_EN_U32 
+        ),
+
+        /* Mask containing the Partition triggers (PCE/OSSE/etc) to be updated. */
+        MC_ME_PRTN0_PUPD_RWBITS_MASK,
+
+        /* Number of COFBs within Partition 0 */
+        (uint8)1U,
+        /* Configuration for the COFBs within Partition 0. */
+        &Power_Ip_MC_ME_aPartition0CofbConfigPB_1,
+
+        /* Number of Cores within Partition 0 */
+        (uint8)1U,
+        /* Configuration for the Cores within Partition 0. */
+        &Power_Ip_MC_ME_aPartition0CoreConfigPB_1
+    },
+
+    /* The configuration structure for Partition 1. */
+    {
+        /* Specifies whether the given partition is under MCU control. */
+        (boolean)TRUE,
+
+        /* Specifies whether the given partition's power management is under MCU control. */
+        (boolean)TRUE,
+
+        /* Partition Index */
+        (uint8)1U,
+
+        /* The process configuration register value of the partition. */
+        (
+            MC_ME_PRTNX_PCONF_PCE_EN_U32 
+        ),
+
+        /* Mask containing the Partition triggers (PCE/OSSE/etc) to be updated. */
+        MC_ME_PRTN1_PUPD_RWBITS_MASK,
+
+        /* Number of COFBs within Partition 1 */
+        (uint8)4U,
+        /* Configuration for the COFBs within Partition 1. */
+        &Power_Ip_MC_ME_aPartition1CofbConfigPB_1,
+
+        /* Number of Cores within Partition 1 */
+        (uint8)0U,
+        /* Configuration for the Cores within Partition 1. */
+        (NULL_PTR)
+    },
+
+    /* The configuration structure for Partition 2. */
+    {
+        /* Specifies whether the given partition is under MCU control. */
+        (boolean)TRUE,
+
+        /* Specifies whether the given partition's power management is under MCU control. */
+        (boolean)TRUE,
+
+        /* Partition Index */
+        (uint8)2U,
+
+        /* The process configuration register value of the partition. */
+        (
+            MC_ME_PRTNX_PCONF_PCE_EN_U32 
+        ),
+
+        /* Mask containing the Partition triggers (PCE/OSSE/etc) to be updated. */
+        MC_ME_PRTN2_PUPD_RWBITS_MASK,
+
+        /* Number of COFBs within Partition 2 */
+        (uint8)2U,
+        /* Configuration for the COFBs within Partition 2. */
+        &Power_Ip_MC_ME_aPartition2CofbConfigPB_1,
+
+        /* Number of Cores within Partition 2 */
+        (uint8)0U,
+        /* Configuration for the Cores within Partition 2. */
+        (NULL_PTR)
+    },
+
+};
 
 
 /**
@@ -418,6 +671,28 @@ static const Power_Ip_MC_ME_ModeConfigType Power_Ip_MC_ME_ModeConfigPB_0 =
 #endif /* (POWER_IP_LOCKSTEP_CTRL_SUPPORT == STD_ON) */
     /* MC_ME Mode Partition Settings. */
     &Power_Ip_MC_ME_aPartitionConfigPB_0
+};
+/**
+* @brief            Definition of a MCU mode section in the configuration structure.
+* @details          Specifies the system behaviour during the selected target mode.
+*                   Data set and configured by Mcu_SetMode call.
+*/
+static const Power_Ip_MC_ME_ModeConfigType Power_Ip_MC_ME_ModeConfigPB_1 =
+{
+#if (defined(POWER_IP_ENTER_LOW_POWER_MODE) && (POWER_IP_ENTER_LOW_POWER_MODE == STD_ON))
+    /* MC_ME Main Core ID register */
+    MC_ME_MAIN_COREID_U32
+    (
+        MC_ME_MAIN_COREID_PIDX_CM7_0_U32 |
+        MC_ME_MAIN_COREID_CIDX_CM7_0_U32 
+    ),
+#endif /* (POWER_IP_ENTER_LOW_POWER_MODE == STD_ON) */
+#if (defined(POWER_IP_LOCKSTEP_CTRL_SUPPORT) && (POWER_IP_LOCKSTEP_CTRL_SUPPORT == STD_ON))
+    /* MC_ME Core Lockstep register */
+        (boolean)FALSE,
+#endif /* (POWER_IP_LOCKSTEP_CTRL_SUPPORT == STD_ON) */
+    /* MC_ME Mode Partition Settings. */
+    &Power_Ip_MC_ME_aPartitionConfigPB_1
 };
 
 /**
@@ -443,13 +718,36 @@ static const Power_Ip_DCM_GPR_ConfigType Power_Ip_DCM_GPR_ConfigPB_0 =
      /* Global Padkeeping configuration. */
     (boolean)FALSE 
 };
+/**
+* @brief            Initialization data for DCM_GPR hw IP.
+* @details          Data set and configured by Mcu_SetMode call.
+*/
+static const Power_Ip_DCM_GPR_ConfigType Power_Ip_DCM_GPR_ConfigPB_1 =
+{
+     /* Specifies whether the given domain is under MCU control. */
+     (boolean)FALSE,
+     /* Boot Mode */
+     (
+         (uint8)0U
+     ),
+     /* Cortex-M7_0 base address of vector table. */
+     (
+         ((uint32)0x0U)
+     ),
+     /* DCM_GPR Configuration Register (DCMRWF2). */
+     (
+         ((uint32)0x00000000U)
+     ),
+     /* Global Padkeeping configuration. */
+    (boolean)FALSE 
+};
 
 /**
 * @brief          Initialization mode data.
 * @details        Static configuration realized by calling Mcu_SetMode() API.
 *
 */
-const Power_Ip_ModeConfigType Power_Ip_aModeConfigPB[1U] =
+const Power_Ip_ModeConfigType Power_Ip_aModeConfigPB[2U] =
 {
 
     /* Start of Mcu_aModeConfig[0] */
@@ -470,6 +768,25 @@ const Power_Ip_ModeConfigType Power_Ip_aModeConfigPB[1U] =
         &Power_Ip_MC_ME_ModeConfigPB_0,
         /* Configuration for DCM_GPR (Device Configuration Module General-Purpose Registers) hardware IP. */
         &Power_Ip_DCM_GPR_ConfigPB_0
+    },
+    /* Start of Mcu_aModeConfig[1] */
+    {
+#if (POWER_IP_MULTIPARTITION_SUPPORT == STD_ON)
+        /* The ID for Partition. */
+        (uint8)POWER_IP_PARTITION_0,
+#endif
+        /* Mode Configuration ID. */
+        (Power_Ip_ModeType)1U,
+
+        /* The Power Mode name (code). */
+        POWER_IP_STANDBY_MODE,
+
+        /* The Sleep On Exit configuration. */
+        (boolean)FALSE,
+        /* MC_ME IP Mode settings. */
+        &Power_Ip_MC_ME_ModeConfigPB_1,
+        /* Configuration for DCM_GPR (Device Configuration Module General-Purpose Registers) hardware IP. */
+        &Power_Ip_DCM_GPR_ConfigPB_1
     } /* End of Mcu_aModeConfig[0] */
 };
 

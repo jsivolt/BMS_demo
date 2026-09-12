@@ -47,6 +47,9 @@
 #include "Wkpu_Ip.h"
 #include "Wkpu_Ip_Cfg.h"
 
+#include "Power_Ip.h"
+#include "Power_Ip_Cfg.h"
+
 #include "Bms_Scheduler.h"
 #include "Bms_App.h"
 #include "Battery_Monitor.h"
@@ -131,6 +134,10 @@
 static uint32 g_LedCounter = 0U;
 
 static boolean g_LedOn = FALSE;
+
+/* Temporary standby test */
+static uint32 g_StandbyDelayTicks = 0U;
+static boolean g_StandbyEntered = FALSE;
 
 /* Fault registers captured by HardFault_Handler for post-mortem debugging */
 volatile uint32 g_HardFault_HFSR  = 0U;
@@ -248,6 +255,93 @@ static void Bms_MainFunction_10ms(void)
             g_LedOn = FALSE;
         }
     }
+
+    /* ============================================================================================
+     * Temporary STANDBY test
+     *
+     * Wait 5 seconds after scheduler starts:
+     * 500 x 10 ms = 5 seconds
+     *
+     * Then stop PIT and enter STANDBY.
+     * KEY1 / PTB26 / WKPU[41] should wake the MCU.
+     * ========================================================================================== */
+
+    if (g_StandbyEntered == FALSE)
+    {
+        g_StandbyDelayTicks++;
+
+        if (g_StandbyDelayTicks >= 500U)
+        {
+            g_StandbyEntered = TRUE;
+
+            /*
+             * Stop PIT before changing the clock and entering Standby.
+             */
+            Pit_Ip_StopChannel(
+                PIT_INSTANCE,
+                PIT_CHANNEL
+            );
+
+            /*
+             * Switch from normal PLL clock configuration
+             * to the FIRC 48 MHz configuration.
+             *
+             * ClockConfig1:
+             * CORE_CLK      = 48 MHz
+             * AIPS_PLAT_CLK = 48 MHz
+             * AIPS_SLOW_CLK = 24 MHz
+             * PLL           = OFF
+             */
+            (void)Clock_Ip_Init(
+                &Clock_Ip_aClockConfig[1U]
+            );
+
+            /*
+             * Configure WKPU again immediately before Standby.
+             *
+             * Your generated configuration uses:
+             * PTB26 -> WKPU[41] -> HW channel 45
+             */
+            (void)Wkpu_Ip_Init(
+                0U,
+                &Wkpu_Ip_Config_PB
+            );
+
+            /*
+             * Arm the configured WKPU channel as wake-up source.
+             */
+            Wkpu_Ip_EnableInterrupt(
+                0U,
+                Wkpu_Ip_ChannelConfig_PB[0].hwChannel
+            );
+
+            /*
+             * Enter NORMAL Standby.
+             *
+             * Power mode:
+             * [0] = RUN
+             * [1] = STANDBY
+             */
+            Power_Ip_SetMode(
+                &Power_Ip_aModeConfigPB[1U]
+            );
+
+            /*
+             * NORMAL wake-up should return here.
+             * Turn RED LED permanently ON so wake-up is obvious.
+             */
+            Siul2_Dio_Ip_WritePin(
+                LED_RED_PORT,
+                LED_RED_PIN,
+                0U
+            );
+
+            while (1)
+            {
+                /* Wake-up reached this point successfully. */
+            }
+        }
+    }
 }
 
 
@@ -342,16 +436,33 @@ int main(void)
     Pit_Ip_StatusType pitStatus;
 
     /* ============================================================================================
-     * 1. Initialize clocks
+     * 1. Initialize normal RUN clock configuration
      * ========================================================================================== */
 
-    Clock_Ip_Init(&Clock_Ip_aClockConfig[0]);
-
+    (void)Clock_Ip_Init(
+        &Clock_Ip_aClockConfig[0U]
+    );
 
     /* ============================================================================================
-     * 2. Initialize pins
+     * 2. Initialize Power driver
+     * ========================================================================================== */
+
+    Power_Ip_Init(
+        &Power_Ip_HwIPsConfigPB
+    );
+
+    /* ============================================================================================
+     * 3. Enter configured RUN mode
      *
-     * These are the generated Port settings.
+     * Must be done before accessing normal peripherals.
+     * ========================================================================================== */
+
+    Power_Ip_SetMode(
+        &Power_Ip_aModeConfigPB[0U]
+    );
+
+    /* ============================================================================================
+     * 4. Initialize pins
      * ========================================================================================== */
 
     Siul2_Port_Ip_Init(
@@ -359,41 +470,28 @@ int main(void)
         g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals
     );
 
-
-    /* ============================================================================================
-     * 3. Initial LED state = OFF
-     *
-     * LED is active-low.
-     * ========================================================================================== */
-
+    /* Initial LED state = OFF */
     Siul2_Dio_Ip_WritePin(
         LED_RED_PORT,
         LED_RED_PIN,
         1U
     );
 
-
     /* ============================================================================================
-     * 4. Initialize interrupt controller
-     *
-     * Generated configuration:
-     *
-     * PIT0_IRQn
-     * Enable = TRUE
-     * Priority = 10
-     * Handler = PIT_0_ISR
+     * 5. Initialize interrupt controller
      * ========================================================================================== */
 
-    IntCtrl_Ip_Init(&IntCtrlConfig_0);
+    IntCtrl_Ip_Init(
+        &IntCtrlConfig_0
+    );
 
-    /* Initialize WKPU
+    /* ============================================================================================
+     * 6. Initialize WKPU
      *
-     * KEY1:
-     * PTB26 -> external WKPU[41]
-     * RTD hardware channel = 45
-     * Rising edge
-     */
-    Wkpu_Ip_Init(
+     * PTB26 -> WKPU[41] -> RTD HW channel 45
+     * ========================================================================================== */
+
+    (void)Wkpu_Ip_Init(
         0U,
         &Wkpu_Ip_Config_PB
     );
