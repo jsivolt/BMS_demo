@@ -346,3 +346,10 @@ uint16 Sil_InterpLookup(const uint16 *flatTable, uint16 rows, uint16 x)
 {
     return Lib_Interp_Lookup_1D_uint16((const uint16 (*)[2])flatTable, rows, x);
 }
+
+uint16 Sil_InterpLookup2D(const sint32 *xAxis, uint16 xCount,
+                          const sint32 *yAxis, uint16 yCount,
+                          const uint16 *values, sint32 x, sint32 y)
+{
+    return Lib_Interp_Lookup_2D_uint16(xAxis, xCount, yAxis, yCount, values, x, y);
+}

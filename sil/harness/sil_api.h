@@ -169,4 +169,9 @@ SIL_API boolean Sil_NvmLoad(uint16 *socMin, uint16 *socMax, uint16 *socAvg);
 /** flatTable holds rows*2 uint16 values laid out as X,Y,X,Y,... */
 SIL_API uint16 Sil_InterpLookup(const uint16 *flatTable, uint16 rows, uint16 x);
 
+/** values holds xCount*yCount entries, row-major by Y. See Lib_Interp.h. */
+SIL_API uint16 Sil_InterpLookup2D(const sint32 *xAxis, uint16 xCount,
+                                  const sint32 *yAxis, uint16 yCount,
+                                  const uint16 *values, sint32 x, sint32 y);
+
 #endif /* SIL_API_H */

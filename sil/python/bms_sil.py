@@ -112,6 +112,11 @@ _SIGNATURES = {
     "Sil_NvmRecordCount": (u32, []),
     "Sil_NvmLoad": (bl, [ctypes.POINTER(u16)] * 3),
     "Sil_InterpLookup": (u16, [ctypes.POINTER(u16), u16, u16]),
+    "Sil_InterpLookup2D": (
+        u16,
+        [ctypes.POINTER(s32), u16, ctypes.POINTER(s32), u16,
+         ctypes.POINTER(u16), s32, s32],
+    ),
 }
 
 
@@ -367,6 +372,30 @@ class Bms:
         """Escape hatch for malformed-table cases (rows deliberately wrong)."""
         arr = (u16 * max(len(flat), 1))(*flat) if flat else None
         return self.lib.Sil_InterpLookup(arr, rows, x)
+
+    def interp2d(
+        self,
+        x_axis: list[int],
+        y_axis: list[int],
+        values: list[list[int]],
+        x: int,
+        y: int,
+    ) -> int:
+        """values[iy][ix] - one inner list per Y breakpoint, X along it."""
+        flat = [v for row in values for v in row]
+        xs = (s32 * len(x_axis))(*x_axis)
+        ys = (s32 * len(y_axis))(*y_axis)
+        vs = (u16 * len(flat))(*flat)
+        return self.lib.Sil_InterpLookup2D(
+            xs, len(x_axis), ys, len(y_axis), vs, x, y
+        )
+
+    def interp2d_raw(self, x_axis, y_axis, flat, x_count, y_count, x, y) -> int:
+        """Escape hatch for malformed-map cases (counts deliberately wrong)."""
+        xs = (s32 * len(x_axis))(*x_axis) if x_axis else None
+        ys = (s32 * len(y_axis))(*y_axis) if y_axis else None
+        vs = (u16 * len(flat))(*flat) if flat else None
+        return self.lib.Sil_InterpLookup2D(xs, x_count, ys, y_count, vs, x, y)
 
 
 # ---------------------------------------------------------------------------
