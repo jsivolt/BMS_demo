@@ -44,6 +44,9 @@
 #include "Pit_Ip.h"
 #include "Pit_Ip_Cfg.h"
 
+#include "Wkpu_Ip.h"
+#include "Wkpu_Ip_Cfg.h"
+
 #include "Bms_Scheduler.h"
 #include "Bms_App.h"
 #include "Battery_Monitor.h"
@@ -382,6 +385,18 @@ int main(void)
      * ========================================================================================== */
 
     IntCtrl_Ip_Init(&IntCtrlConfig_0);
+
+    /* Initialize WKPU
+     *
+     * KEY1:
+     * PTB26 -> external WKPU[41]
+     * RTD hardware channel = 45
+     * Rising edge
+     */
+    Wkpu_Ip_Init(
+        0U,
+        &Wkpu_Ip_Config_PB
+    );
 
 
     /* ============================================================================================

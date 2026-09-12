@@ -14,7 +14,8 @@ C_SRCS += \
 ../generate/src/OsIf_Cfg.c \
 ../generate/src/Pit_Ip_SA_PBcfg.c \
 ../generate/src/Power_Ip_Cfg.c \
-../generate/src/Power_Ip_PBcfg.c 
+../generate/src/Power_Ip_PBcfg.c \
+../generate/src/Wkpu_Ip_SA_PBcfg.c 
 
 OBJS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.o \
@@ -27,7 +28,8 @@ OBJS += \
 ./generate/src/OsIf_Cfg.o \
 ./generate/src/Pit_Ip_SA_PBcfg.o \
 ./generate/src/Power_Ip_Cfg.o \
-./generate/src/Power_Ip_PBcfg.o 
+./generate/src/Power_Ip_PBcfg.o \
+./generate/src/Wkpu_Ip_SA_PBcfg.o 
 
 C_DEPS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.d \
@@ -40,7 +42,8 @@ C_DEPS += \
 ./generate/src/OsIf_Cfg.d \
 ./generate/src/Pit_Ip_SA_PBcfg.d \
 ./generate/src/Power_Ip_Cfg.d \
-./generate/src/Power_Ip_PBcfg.d 
+./generate/src/Power_Ip_PBcfg.d \
+./generate/src/Wkpu_Ip_SA_PBcfg.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -56,6 +56,7 @@ C_SRCS += \
 ../RTD/src/SchM_Can_43_FLEXCAN.c \
 ../RTD/src/SchM_Dio.c \
 ../RTD/src/SchM_Gpt.c \
+../RTD/src/SchM_Icu.c \
 ../RTD/src/SchM_Mcl.c \
 ../RTD/src/SchM_Mcu.c \
 ../RTD/src/SchM_Mem_43_INFLS.c \
@@ -63,7 +64,9 @@ C_SRCS += \
 ../RTD/src/SchM_Spi.c \
 ../RTD/src/Siul2_Dio_Ip.c \
 ../RTD/src/Siul2_Port_Ip.c \
-../RTD/src/Tspc_Port_Ip.c 
+../RTD/src/Tspc_Port_Ip.c \
+../RTD/src/Wkpu_Ip.c \
+../RTD/src/Wkpu_Ip_Irq.c 
 
 OBJS += \
 ./RTD/src/Adc_Sar_Ip.o \
@@ -118,6 +121,7 @@ OBJS += \
 ./RTD/src/SchM_Can_43_FLEXCAN.o \
 ./RTD/src/SchM_Dio.o \
 ./RTD/src/SchM_Gpt.o \
+./RTD/src/SchM_Icu.o \
 ./RTD/src/SchM_Mcl.o \
 ./RTD/src/SchM_Mcu.o \
 ./RTD/src/SchM_Mem_43_INFLS.o \
@@ -125,7 +129,9 @@ OBJS += \
 ./RTD/src/SchM_Spi.o \
 ./RTD/src/Siul2_Dio_Ip.o \
 ./RTD/src/Siul2_Port_Ip.o \
-./RTD/src/Tspc_Port_Ip.o 
+./RTD/src/Tspc_Port_Ip.o \
+./RTD/src/Wkpu_Ip.o \
+./RTD/src/Wkpu_Ip_Irq.o 
 
 C_DEPS += \
 ./RTD/src/Adc_Sar_Ip.d \
@@ -180,6 +186,7 @@ C_DEPS += \
 ./RTD/src/SchM_Can_43_FLEXCAN.d \
 ./RTD/src/SchM_Dio.d \
 ./RTD/src/SchM_Gpt.d \
+./RTD/src/SchM_Icu.d \
 ./RTD/src/SchM_Mcl.d \
 ./RTD/src/SchM_Mcu.d \
 ./RTD/src/SchM_Mem_43_INFLS.d \
@@ -187,7 +194,9 @@ C_DEPS += \
 ./RTD/src/SchM_Spi.d \
 ./RTD/src/Siul2_Dio_Ip.d \
 ./RTD/src/Siul2_Port_Ip.d \
-./RTD/src/Tspc_Port_Ip.d 
+./RTD/src/Tspc_Port_Ip.d \
+./RTD/src/Wkpu_Ip.d \
+./RTD/src/Wkpu_Ip_Irq.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

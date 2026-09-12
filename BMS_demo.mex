@@ -515,9 +515,14 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
-            <dependency resourceType="Tool" resourceId="Clocks" description="The Clocks tool is required by the Peripherals tool, but it is disabled." problem_level="2" source="Peripherals">
+            <dependency resourceType="SWComponent" resourceId="platform.driver.wkpu" description="Wkpu is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
                <feature name="enabled" evaluation="equal">
-                  <data>true</data>
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.wkpu" description="An unsupported version of the Wkpu in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
                </feature>
             </dependency>
          </dependencies>
@@ -547,6 +552,9 @@
             <file path="generate/include/Siul2_Dio_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/Siul2_Port_Ip_Defines.h" update_enabled="true"/>
             <file path="generate/include/Soc_Ips.h" update_enabled="true"/>
+            <file path="generate/include/Wkpu_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/Wkpu_Ip_Defines.h" update_enabled="true"/>
+            <file path="generate/include/Wkpu_Ip_SA_PBcfg.h" update_enabled="true"/>
             <file path="generate/include/modules.h" update_enabled="true"/>
             <file path="generate/src/Adc_Sar_Ip_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/C40_Ip_Cfg.c" update_enabled="true"/>
@@ -557,6 +565,7 @@
             <file path="generate/src/Pit_Ip_SA_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/Power_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/Power_Ip_PBcfg.c" update_enabled="true"/>
+            <file path="generate/src/Wkpu_Ip_SA_PBcfg.c" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
             <processor_version>0.0.0</processor_version>
@@ -2691,6 +2700,71 @@
                               <setting name="Name" value="McuCoreControlConfiguration"/>
                               <setting name="McuCoreBootAddressControl" value="false"/>
                            </struct>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="Wkpu" uuid="e3f06364-83fa-4e32-8e69-8e271a56f389" type="Wkpu" type_id="Wkpu" mode="ip" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="Wkpu">
+                        <setting name="Name" value="Wkpu"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-POST-BUILD"/>
+                        </struct>
+                        <struct name="IcuConfigSet">
+                           <setting name="Name" value="WkpuConfigSet"/>
+                           <setting name="IcuMaxChannel" value="1"/>
+                           <array name="IcuChannel">
+                              <struct name="0">
+                                 <setting name="Name" value="IcuChannel_0"/>
+                                 <setting name="IcuChannelId" value="0"/>
+                                 <setting name="IcuChannelRef" value="/Wkpu/Wkpu/WkpuConfigSet/IcuWkpu_0/IcuWkpuChannels_0"/>
+                                 <setting name="IcuDefaultStartEdge" value="ICU_RISING_EDGE"/>
+                                 <setting name="IcuMeasurementMode" value="ICU_MODE_SIGNAL_EDGE_DETECT"/>
+                                 <setting name="IcuOverflowNotification" value="NULL_PTR"/>
+                                 <array name="IcuSignalEdgeDetection">
+                                    <struct name="0">
+                                       <setting name="Name" value="IcuSignalEdgeDetection"/>
+                                       <array name="IcuSignalNotification"/>
+                                    </struct>
+                                 </array>
+                                 <array name="IcuSignalMeasurement"/>
+                                 <array name="IcuTimestampMeasurement"/>
+                              </struct>
+                           </array>
+                           <array name="IcuWkpu">
+                              <struct name="0">
+                                 <setting name="Name" value="IcuWkpu_0"/>
+                                 <setting name="IcuWkpuInstance" value="0"/>
+                                 <array name="IcuWkpuChannels">
+                                    <struct name="0">
+                                       <setting name="Name" value="IcuWkpuChannels_0"/>
+                                       <setting name="IcuWkpuChannel" value="45"/>
+                                       <setting name="Icu_EXT_ISR_WIFERDigitalFilter" value="false"/>
+                                    </struct>
+                                 </array>
+                                 <array name="IcuWkpuNMIConfiguration">
+                                    <struct name="0">
+                                       <setting name="Name" value="IcuWkpuNMIConfiguration_0"/>
+                                       <setting name="NMICoreSource" value="0"/>
+                                       <setting name="DestinationSourceSelect" value="NMI_NON_MASK_INT"/>
+                                       <setting name="WakeupRequestEnable" value="false"/>
+                                       <setting name="FilterEnable" value="false"/>
+                                       <setting name="NMIEdgeEvents" value="RISING_EDGE"/>
+                                       <setting name="LockRegister" value="false"/>
+                                    </struct>
+                                 </array>
+                              </struct>
+                           </array>
+                           <array name="IcuHwInterruptConfigList">
+                              <struct name="0">
+                                 <setting name="Name" value="IcuHwInterruptConfigList_0"/>
+                                 <setting name="IcuIsrHwId" value="WKPU_CH_45"/>
+                              </struct>
+                           </array>
+                        </struct>
+                        <struct name="IcuGeneral">
+                           <setting name="Name" value="WkupGeneral"/>
+                           <setting name="IcuDevErrorDetect" value="false"/>
                         </struct>
                      </config_set>
                   </instance>
