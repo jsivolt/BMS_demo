@@ -1,6 +1,6 @@
 -c
 -I../RTD/include
--I"../board"
+-I"C:/S32K344/workspace/BMS_demo/board"
 -x assembler-with-cpp
 -ggdb3
 -mcpu=cortex-m7

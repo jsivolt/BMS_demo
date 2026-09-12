@@ -12,7 +12,9 @@ C_SRCS += \
 ../generate/src/IntCtrl_Ip_Cfg.c \
 ../generate/src/Lpspi_Ip_Sa_PBcfg.c \
 ../generate/src/OsIf_Cfg.c \
-../generate/src/Pit_Ip_SA_PBcfg.c 
+../generate/src/Pit_Ip_SA_PBcfg.c \
+../generate/src/Power_Ip_Cfg.c \
+../generate/src/Power_Ip_PBcfg.c 
 
 OBJS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.o \
@@ -23,7 +25,9 @@ OBJS += \
 ./generate/src/IntCtrl_Ip_Cfg.o \
 ./generate/src/Lpspi_Ip_Sa_PBcfg.o \
 ./generate/src/OsIf_Cfg.o \
-./generate/src/Pit_Ip_SA_PBcfg.o 
+./generate/src/Pit_Ip_SA_PBcfg.o \
+./generate/src/Power_Ip_Cfg.o \
+./generate/src/Power_Ip_PBcfg.o 
 
 C_DEPS += \
 ./generate/src/Adc_Sar_Ip_PBcfg.d \
@@ -34,7 +38,9 @@ C_DEPS += \
 ./generate/src/IntCtrl_Ip_Cfg.d \
 ./generate/src/Lpspi_Ip_Sa_PBcfg.d \
 ./generate/src/OsIf_Cfg.d \
-./generate/src/Pit_Ip_SA_PBcfg.d 
+./generate/src/Pit_Ip_SA_PBcfg.d \
+./generate/src/Power_Ip_Cfg.d \
+./generate/src/Power_Ip_PBcfg.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
