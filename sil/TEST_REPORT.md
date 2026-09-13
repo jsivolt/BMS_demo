@@ -6,21 +6,21 @@
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-06 23:52:47 |
-| Host | Windows 11 (AMD64) |
+| Executed (UTC) | 2026-09-13 04:10:21 |
+| Host | Windows 10 (AMD64) |
 | Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.13.15 |
+| Python | 3.10.11 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 128168 bytes, built 2026-09-06 23:52:46 UTC |
-| Repo commit | 3a1992e (working tree has uncommitted changes) |
+| SIL library | bms_sil.dll, 149778 bytes, built 2026-09-13 02:35:52 UTC |
+| Repo commit | b777234 (working tree has uncommitted changes) |
 
 ## Overall
 
-**41 test cases** across 3 features in 0.39 s.
+**83 test cases** across 4 features in 1.10 s.
 
 | Outcome | Count |
 |---|---|
-| PASS | 40 |
+| PASS | 82 |
 | XFAIL (known defect) | 1 |
 
 **Overall: PASS** (pytest exit status 0)
@@ -29,7 +29,8 @@
 
 | Feature | Report | Cases | Result | Last executed (UTC) |
 |---|---|---|---|---|
-| Lib_Interp — generic 1-D table interpolation | [lib_interp.md](reports/lib_interp.md) | 8 | PASS — 8 passed | 2026-09-06 23:52:47 |
-| Persistence — Bms_Nvm and the Data Flash record log | [persistence.md](reports/persistence.md) | 6 | PASS — 6 passed | 2026-09-06 23:52:47 |
-| SOC — estimation, initialization and upstream signal chain | [soc.md](reports/soc.md) | 27 | PASS — 26 passed, 1 xfailed | 2026-09-06 23:52:47 |
+| Lib_Interp — generic 1-D and 2-D table interpolation | [lib_interp.md](reports/lib_interp.md) | 20 | PASS — 20 passed | 2026-09-13 04:10:21 |
+| Persistence — Bms_Nvm and the Data Flash record log | [persistence.md](reports/persistence.md) | 6 | PASS — 6 passed | 2026-09-13 04:10:21 |
+| SOC — estimation, initialization and upstream signal chain | [soc.md](reports/soc.md) | 27 | PASS — 26 passed, 1 xfailed | 2026-09-13 04:10:21 |
+| SOP — Pack 1 current limits | [sop.md](reports/sop.md) | 30 | PASS — 30 passed | 2026-09-13 04:10:21 |
 
