@@ -1,8 +1,9 @@
 """Bms_Sop — state of power, the published current limits.
 
 Covers the validation plan in SOP_DESIGN.md section 4: the static limit maps
-(SP-01, SP-02), the feedback derate (SP-03, SP-04), the mode gating (SP-05)
-and the static configuration check (SP-12).
+(SP-01, SP-02), the feedback derate (SP-03, SP-04), the mode gating (SP-05),
+the static configuration check (SP-12), the zero limit outside the envelope
+(SP-13) and the validity gate (SP-14).
 
 The limit maps under test are PLACEHOLDER calibration, not datasheet ratings,
 so these cases assert the arithmetic and the shape of the maps, never that a
@@ -16,6 +17,8 @@ from __future__ import annotations
 import pytest
 
 from bms_sil import (
+    INIT_SOURCE_PENDING,
+    OCV_SLEEP_THRESHOLD_S,
     SOP_DERATE_NONE,
     SOP_LIMIT_CHARGE,
     SOP_LIMIT_DISCHARGE,
@@ -369,6 +372,149 @@ def test_SP_05_limits_start_at_zero_before_the_first_update(bms):
 
 
 # ---------------------------------------------------------------------------
+# SP-13 — outside the envelope the limit is zero
+# ---------------------------------------------------------------------------
+
+
+def test_SP_13_discharge_is_zero_past_the_low_voltage_end(bms):
+    """SP-13: at and below the V-low End the discharge limit is 0, not a floor."""
+    limits = bms.cell_limits()
+
+    settle(bms, cell_mV=limits.DerateVLowEnd_mV - 50)
+    sop = bms.sop()
+
+    assert sop.DischargeDerate == 0
+    assert sop.DischargeFinal_dA == 0
+    assert sop.DischargeTable_dA > 0, "the calibration field keeps the map value"
+
+
+def test_SP_13_low_voltage_still_allows_charge(bms):
+    """SP-13: an empty cell zeroes discharge only, so the pack can be charged back."""
+    limits = bms.cell_limits()
+
+    settle(bms, cell_mV=limits.DerateVLowEnd_mV - 50)
+    bms.set_sop_mode(SOP_MODE_CHARGE)
+    bms.run_normal(100, cell_mV=limits.DerateVLowEnd_mV - 50)
+    sop = bms.sop()
+
+    assert sop.ChargeFinal_dA > 0
+
+
+def test_SP_13_charge_and_regen_are_zero_past_the_high_voltage_end(bms):
+    """SP-13: at and above the V-high End regen and charge are 0, discharge is not."""
+    limits = bms.cell_limits()
+    cell_mV = limits.DerateVHighEnd_mV + 20
+
+    settle(bms, cell_mV=cell_mV)
+    sop = bms.sop()
+    assert sop.RegenFinal_dA == 0
+    assert sop.DischargeFinal_dA > 0
+
+    bms.set_sop_mode(SOP_MODE_CHARGE)
+    bms.run_normal(100, cell_mV=cell_mV)
+    assert bms.sop().ChargeFinal_dA == 0
+
+
+def test_SP_13_every_limit_is_zero_past_the_high_temperature_end(bms):
+    """SP-13: past the T-high End all three published limits are 0."""
+    limits = bms.cell_limits()
+    temp_dC = limits.DerateTHighEnd_dC + 50
+
+    settle(bms, cell_mV=3600, temp_dC=temp_dC)
+    sop = bms.sop()
+    assert sop.DischargeFinal_dA == 0
+    assert sop.RegenFinal_dA == 0
+
+    bms.set_sop_mode(SOP_MODE_CHARGE)
+    bms.run_normal(100, cell_mV=3600)
+    assert bms.sop().ChargeFinal_dA == 0
+
+
+def test_SP_13_every_limit_is_zero_at_the_under_temperature_set_point(bms):
+    """SP-13: at the under-temperature fault set point every limit is 0."""
+    limits = bms.cell_limits()
+
+    settle(bms, cell_mV=3600, temp_dC=limits.TemperatureMin_dC)
+    sop = bms.sop()
+
+    assert sop.DerateActiveTLow
+    assert sop.DischargeDerate == sop.RegenDerate == sop.ChargeDerate == 0
+    assert sop.DischargeFinal_dA == sop.RegenFinal_dA == sop.ChargeFinal_dA == 0
+
+
+def test_SP_13_just_inside_the_cold_limit_discharge_is_allowed(bms):
+    """SP-13: one step warmer than the set point, the map value applies again."""
+    limits = bms.cell_limits()
+
+    settle(bms, cell_mV=3600, temp_dC=limits.TemperatureMin_dC + 10)
+    sop = bms.sop()
+
+    assert not sop.DerateActiveTLow
+    assert sop.DischargeFinal_dA > 0
+
+
+# ---------------------------------------------------------------------------
+# SP-14 — an input that is not valid publishes zero
+# ---------------------------------------------------------------------------
+
+
+def test_SP_14_healthy_inputs_are_reported_valid(bms):
+    """SP-14: the gate is open on a healthy signal chain."""
+    settle(bms)
+    sop = bms.sop()
+
+    assert sop.InputsValid
+    assert sop.DischargeFinal_dA > 0
+
+
+def test_SP_14_invalid_temperature_zeroes_every_limit(bms):
+    """SP-14: with no valid thermistor, nothing is published."""
+    settle(bms)
+    bms.set_ntc(T_ROOM, T_ROOM, T_ROOM, valid=False)
+    bms.run_normal(100)
+    sop = bms.sop()
+
+    assert not sop.InputsValid
+    assert sop.DischargeFinal_dA == sop.RegenFinal_dA == sop.ChargeFinal_dA == 0
+
+
+def test_SP_14_no_cell_voltages_yet_zeroes_every_limit(bms):
+    """SP-14: before the first vAFE cell set, the 0 mV cell voltages publish nothing.
+
+    This is the startup window the HIL test measured: without the gate, discharge
+    sat at the derate floor and regen was published with no voltage derate.
+    """
+    bms.set_ntc(T_ROOM, T_ROOM, T_ROOM)
+    # Current and pack voltage arrive, the cell voltage frames never do.
+    bms.run_ms(700, current_mA=0, pack_mV=3600 * 16, bus_mV=3600 * 16)
+
+    assert not bms.cell_valid, "precondition: no vAFE cycle has completed"
+    assert bms.init_source != INIT_SOURCE_PENDING, "precondition: only the cells are missing"
+    sop = bms.sop()
+    assert not sop.InputsValid
+    assert sop.DischargeFinal_dA == sop.RegenFinal_dA == sop.ChargeFinal_dA == 0
+
+
+def test_SP_14_pending_soc_init_publishes_no_charge_limit(bms_dirty):
+    """SP-14: a pending SOC reads 0 %, which the map turns into a full charge limit.
+
+    The gate must hold it at 0 until the SOC init resolves. This is the
+    over-permissive charge case that SOP_DESIGN.md section 5.6 described.
+    """
+    bms = bms_dirty
+    bms.power_on(sleep_s=OCV_SLEEP_THRESHOLD_S, sleep_ready=False)
+    bms.set_ntc(T_ROOM, T_ROOM, T_ROOM)
+    bms.set_sop_mode(SOP_MODE_CHARGE)
+    bms.run_normal(300)
+
+    assert bms.init_source == INIT_SOURCE_PENDING, "precondition: still inside the wait"
+    sop = bms.sop()
+    assert sop.ChargeTable_dA > 0, "the map would allow charging at 0 % SOC"
+    assert not sop.InputsValid
+    assert sop.ChargeFinal_dA == 0
+
+
+# ---------------------------------------------------------------------------
 # SP-12 — static configuration check
 # ---------------------------------------------------------------------------
 
@@ -394,11 +540,11 @@ def test_SP_12_derate_ramps_run_the_right_way(bms):
     assert c.DerateTHighStart_dC < c.DerateTHighEnd_dC
 
 
-def test_SP_12_derate_floor_is_a_valid_factor(bms):
-    """SP-12: the floor is a factor, so it cannot exceed 'no derate'."""
+def test_SP_12_every_derate_ramp_ends_at_zero(bms):
+    """SP-12: past its End a ramp cuts the limit to 0 (SOP-FR-06), so the floor is 0."""
     c = bms.cell_limits()
 
-    assert 0 <= c.DerateFloor <= SOP_DERATE_NONE
+    assert c.DerateFloor == 0
 
 
 @pytest.mark.parametrize(

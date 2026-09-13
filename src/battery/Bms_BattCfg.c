@@ -77,7 +77,7 @@ static const Bms_BattCfg_CellLimitsType g_BmsBattCfgCellLimits =
     .DerateVLowEnd_mV            = 2600U,      /* 2.600 V */
     .DerateTHighStart_dC         = 450,        /* 45.0 degC */
     .DerateTHighEnd_dC           = 600,        /* 60.0 degC */
-    .DerateFloor                 = 100U        /* 0.100 - never cut fully to zero */
+    .DerateFloor                 = 0U          /* 0.000 - each ramp ends at a zero limit */
 };
 
 /*==================================================================================================

@@ -106,6 +106,19 @@ typedef struct
     boolean DerateActiveVHigh;
     boolean DerateActiveTHigh;
 
+    /**
+     * @brief TRUE while the temperature is at or below the under-temperature
+     *        fault set point, which zeroes every limit. Diagnostic.
+     */
+    boolean DerateActiveTLow;
+
+    /**
+     * @brief TRUE when the cell voltages and the temperature are valid and the
+     *        SOC init is not pending. While FALSE every Final_dA is 0.
+     *        Table_dA and DerateFactor keep their computed values. Diagnostic.
+     */
+    boolean InputsValid;
+
 } Bms_Sop_DataType;
 
 #if (BMS_SOP_TEST_OVERRIDE == 1U)
@@ -156,6 +169,11 @@ extern volatile uint8 g_BmsSopMode;
  *
  * Enable is 0 at startup, so the module uses the measured inputs until a test
  * sets a bit. Bms_Sop_Init() does not clear it, the same as a calibration.
+ *
+ * An overridden input counts as valid: both cell bits make the cell voltages
+ * valid, the temperature bit makes the temperature valid, and both SOC bits
+ * clear a pending SOC init. That lets a test drive the limits on a bench
+ * where a measured input is not valid.
  */
 extern volatile Bms_Sop_TestOverrideType g_BmsSopTestOverride;
 #endif

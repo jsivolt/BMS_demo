@@ -94,6 +94,8 @@ class SopSnapshot(ctypes.Structure):
         ("DerateActiveVLow", bl),
         ("DerateActiveVHigh", bl),
         ("DerateActiveTHigh", bl),
+        ("DerateActiveTLow", bl),
+        ("InputsValid", bl),
     ]
 
 

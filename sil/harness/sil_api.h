@@ -195,6 +195,8 @@ typedef struct
     boolean DerateActiveVLow;
     boolean DerateActiveVHigh;
     boolean DerateActiveTHigh;
+    boolean DerateActiveTLow;
+    boolean InputsValid;
 } Sil_SopSnapshotType;
 
 /** Overwrite the calibratable operating mode. 0 = Discharge, 1 = Charge. */

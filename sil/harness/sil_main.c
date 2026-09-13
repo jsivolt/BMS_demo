@@ -391,6 +391,8 @@ void Sil_GetSopLimits(Sil_SopSnapshotType *out)
     out->DerateActiveVLow   = sop->DerateActiveVLow;
     out->DerateActiveVHigh  = sop->DerateActiveVHigh;
     out->DerateActiveTHigh  = sop->DerateActiveTHigh;
+    out->DerateActiveTLow   = sop->DerateActiveTLow;
+    out->InputsValid        = sop->InputsValid;
 }
 
 uint16 Sil_SopStaticLimit(uint8 limitId, uint16 soc_pct_x10, sint16 temp_dC)

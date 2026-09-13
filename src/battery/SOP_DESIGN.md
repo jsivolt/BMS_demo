@@ -2,8 +2,8 @@
 
 Modules: `Bms_Sop` (Pack 1 state of power, meaning the current limits), `Bms_BattCfg` (shared battery data configuration).
 Target: NXP S32K344, bare metal, S32K3 RTD 7.0.1.
-Status: **Implemented and published.** `Bms_Sop`, `Bms_BattCfg`, the shared 2-D lookup and CAN frame `0x30C` are all built, and 33 SIL cases cover the module. The limit maps are **placeholder calibration**, not datasheet ratings, so no published limit is trustworthy yet. One decision still open, section 7.6. See section 7.
-Last updated: 2026-09-12.
+Status: **Implemented and published.** `Bms_Sop`, `Bms_BattCfg`, the shared 2-D lookup and CAN frame `0x30C` are all built, 43 SIL cases and 21 HIL cases cover the module, and a HIL startup test covers the first 20 s after a reset. The limit maps are **placeholder calibration**, not datasheet ratings, so no published limit is trustworthy yet. One decision still open, section 7.6. See section 7.
+Last updated: 2026-09-13.
 
 State of power (SOP) is the largest current the pack can carry right now without breaking a cell limit.
 
@@ -44,7 +44,7 @@ Out of scope:
 - Any limit published in a unit other than current.
 - Any limit for Pack 2 or Pack 3.
 - A dynamic, model-based prediction of the limit. Section 6 records why this was cut.
-- Rate-limiting the output and checking whether the inputs are valid. Section 6 records why these were cut too.
+- Rate-limiting the output. Section 6 records why it was cut too.
 
 ### 1.2 Requirements: `Bms_Sop`
 
@@ -55,14 +55,16 @@ Out of scope:
 | SOP-FR-03 | The module shall publish all three limits in every mode. For a limit that does not apply to the active mode it shall force the published value (`Final_dA`) to zero. The calibration fields of that limit (`Table_dA`, `DerateFactor`) shall keep their computed values. | A consumer must never guess which limits are live. A zero is clear. A stale value is not. The calibration fields never reach `0x30C`, so forcing them buys the consumer nothing. Keeping them lets a calibrator see the inactive direction, over `0x30D` or over XCP, whichever section 7.3 settles on. |
 | SOP-FR-04 | The module shall compute each limit from one static lookup table indexed by SOC and temperature. The discharge table shall be indexed by the weakest cell's SOC. The regen and charge tables shall be indexed by the strongest cell's SOC. | The table holds datasheet, contactor, and fuse ratings. The weak cell reaches the low cutoff first under load. The strong cell reaches the high cutoff first under charge. The table must follow the cell that runs out first. |
 | SOP-FR-05 | A feedback derating layer shall sit on top of SOP-FR-04. It shall watch the minimum cell voltage, the maximum cell voltage, and the maximum temperature. It shall reduce the limits as any of those three approaches its safety threshold. Derating means cutting the limit by a factor below one. | The table is feed-forward and open loop. Without a term that reads the measured state, a stale calibration walks the cell into the fault trip instead of backing off first. |
-| SOP-FR-06 | Derating shall be continuous. It shall reach its floor at a threshold that sits inside the matching fault-trip threshold. | A step to zero at the trip point is a sudden loss of output and still trips the fault. Derating must finish before protection starts. |
+| SOP-FR-06 | Derating shall be continuous. Each ramp shall end at a factor of zero, so the limit it governs is zero at the ramp End. Every End shall sit inside the matching fault-trip threshold. A voltage ramp shall zero only the unsafe direction: low cell voltage zeroes discharge, high cell voltage zeroes regen and charge. The high-temperature ramp shall zero all three limits. | A cell outside its safe operating envelope must not carry current in the unsafe direction. The ramp makes the cut gradual, and the End inside the trip makes the limit zero before protection acts. The first build ramped to a floor of 0.100 instead, so current still flowed past the End. At startup that floor published 8.1 A of discharge from a cell voltage that read 0 mV. |
 | SOP-FR-07 | The derate factor for a limit shall be the minimum of the factors that apply to that limit direction. | Any one approaching limit governs. A product of two mildly active factors over-derates, so the factors must not multiply. |
 | SOP-FR-08 | The module shall hold no battery characterization data of its own. All tables and constants shall come from `Bms_BattCfg`. | This is the reason the configuration module exists. |
 | SOP-FR-09 | The module shall publish limits as `uint16` magnitudes in units of 0.1 A. The field name shall imply the direction. | This removes sign confusion from the CAN interface. The sign convention lives once, inside the computation, not in the published signal. |
 | SOP-FR-10 | The module shall use no Kalman filter, no observer, and no online parameter identification. The static tables shall be a fixed calibration. | Same complexity budget as `Bms_Soc` (SOC-FR-05). A lookup table is the entire model, so there is nothing left to identify online. |
 | SOP-FR-11 | The module shall take the operating mode as an input from a separate mode-provider component. It shall not derive the mode and shall not publish a mode signal of its own. | One component owns the mode. SOP is a consumer of it, like every other limit consumer. |
+| SOP-FR-12 | The module shall publish every limit as zero while `CellVoltageValid` or `TemperatureSummaryValid` is `FALSE`, or while the SOC init source is `PENDING`. Only `Final_dA` shall be forced. `Table_dA` and `DerateFactor` shall keep their computed values, as in SOP-FR-03. The module shall report the gate state in `InputsValid`. | A limit computed from a value nobody measured is not a limit. The HIL startup test showed the cost: with 0 mV cell voltages, regen was published with no voltage derate, and a pending SOC of 0 turns the charge map into a full charge allowance. |
+| SOP-FR-13 | The module shall publish every limit as zero while the temperature is at or below the under-temperature fault set point, `TemperatureMin_dC`. It shall report this in `DerateActiveTLow`. | Below the envelope the cell is outside its safe operating range in both directions. There is no cold ramp (section 3.6.2), so the envelope threshold is the point where the limits go to zero. The comparison matches the `Battery_Monitor` fault, which trips at or below the same value. |
 
-There is no requirement here for rate-limiting the output or for handling invalid inputs. Both were cut at your request. Section 5.6 records the cost of that.
+There is no requirement here for rate-limiting the output. It was cut at your request. SOP-FR-12 brings back a reduced form of the invalid-input handling that was cut with it. Section 5.6 records what the gate covers and what it does not.
 
 ### 1.3 Requirements: `Bms_BattCfg`
 
@@ -88,7 +90,7 @@ There is no requirement here for rate-limiting the output or for handling invali
 | CFG-IR-01 | `Bms_Soc` calls `Bms_BattCfg_GetOcvTable()` and `Bms_BattCfg_GetOcvTableSize()` inside `Bms_Soc_OcvToSoc()`. It calls `Bms_BattCfg_GetNominalCapacity_mAh()` wherever `BMS_SOC_PACK1_CAPACITY_MAH` is used today. |
 | CFG-IR-02 | The OCV lookup still runs through `Lib_Interp_Lookup_1D_uint16()`. Only the owner of the table changes. |
 
-Pack current is not an input to this module. The static table needs only SOC and temperature, and the derate layer needs only cell voltage and temperature. Section 5.5 explains what removing pack current is worth. The module also does not read the validity flag that comes with any of these inputs. Section 5.6 explains what that costs.
+Pack current is not an input to this module. The static table needs only SOC and temperature, and the derate layer needs only cell voltage and temperature. Section 5.5 explains what removing pack current is worth. For the SOP-FR-12 gate the module reads `CellVoltageValid` and `TemperatureSummaryValid` from `Battery_Monitor` and `InitSource` from `Bms_Soc`. It does not read `Min.Valid` or `Max.Valid`. Section 5.6 explains why.
 
 ### 1.5 Timing requirements
 
@@ -165,23 +167,28 @@ flowchart TD
     STATIC["Static Limit Lookup<br/>table vs SOC and temperature<br/>detail: 3.5"]
     DERATE["Feedback Derating<br/>V-low / V-high / T-high factors<br/>detail: 3.6"]
 
-    OUT["Published outputs<br/>Discharge / Regen / Charge limit<br/>derate flags"]
+    GATE["Envelope and validity gate<br/>cold cut-off, invalid input<br/>detail: 3.6.4"]
+
+    OUT["Published outputs<br/>Discharge / Regen / Charge limit<br/>derate flags, InputsValid"]
 
     BM -->|"max T"| STATIC
     BM -->|"cell V extremes, max T"| DERATE
+    BM -->|"validity bits"| GATE
+    SOC -->|"init source"| GATE
     SOC -->|"Min / Max SOC"| STATIC
     CFG -->|"static tables"| STATIC
     CFG -->|"derate windows"| DERATE
 
     STATIC --> DERATE
-    DERATE --> OUT
+    DERATE --> GATE
+    GATE --> OUT
     OUT --> CANM
 
     classDef ext fill:transparent,stroke:#9a9a9a,stroke-width:1.5px
     class BM,SOC,CFG,CANM ext
 ```
 
-This is a two-block pipeline with no held state of its own. An earlier draft of this design added a third block: a dynamic equivalent-circuit model with its own polarization state. That block ran in parallel with the static lookup and fed an arbitration step. A later draft also dropped a rate limiter and an explicit invalid-input fallback that once followed this pipeline. Section 6 records why both changes were made.
+This is a two-block pipeline with no held state of its own. An earlier draft of this design added a third block: a dynamic equivalent-circuit model with its own polarization state. That block ran in parallel with the static lookup and fed an arbitration step. A later draft also dropped a rate limiter and an explicit invalid-input fallback that once followed this pipeline. Section 6 records why both changes were made. On 2026-09-13 a stateless gate came back after the derate (SOP-FR-12 and SOP-FR-13). It forces published limits to zero and holds no memory between calls.
 
 ### 2.3 Internal decomposition: `Bms_BattCfg`
 
@@ -212,12 +219,12 @@ flowchart LR
 
 | Producer | Consumer | Data | Gate |
 |---|---|---|---|
-| `Battery_Monitor` | `Bms_Sop` | `MinCellVoltage`, `MaxCellVoltage` (V) | none, see section 5.6 |
-| `Battery_Monitor` | `Bms_Sop` | `MaxPackTemperature_dC` (0.1 degC) | none, see section 5.6 |
-| `Bms_Soc` | `Bms_Sop` | `Min.Soc_pct_x10`, `Max.Soc_pct_x10` | none, see section 5.6 |
+| `Battery_Monitor` | `Bms_Sop` | `MinCellVoltage`, `MaxCellVoltage` (V) | `CellVoltageValid` (SOP-FR-12) |
+| `Battery_Monitor` | `Bms_Sop` | `MaxPackTemperature_dC` (0.1 degC) | `TemperatureSummaryValid` (SOP-FR-12) |
+| `Bms_Soc` | `Bms_Sop` | `Min.Soc_pct_x10`, `Max.Soc_pct_x10` | `InitSource` not `PENDING` (SOP-FR-12). `Min.Valid` and `Max.Valid` are not read, see section 5.6. |
 | `Bms_BattCfg` | `Bms_Sop` | cell envelope, static SOP tables | none (constant) |
 | `Bms_BattCfg` | `Bms_Soc` | OCV curve, nominal capacity | none (constant) |
-| `Bms_Sop` | `Bms_Can` | limits, derate flags | `Bms_Sop_GetData()` |
+| `Bms_Sop` | `Bms_Can` | limits, derate flags. `InputsValid` and `DerateActiveTLow` are not on `0x30C`. | `Bms_Sop_GetData()` |
 | Mode-provider SWC (not built yet) | `Bms_Sop` | operating mode | section 7.1 |
 
 ### 2.5 Data ownership
@@ -281,6 +288,10 @@ typedef struct
     boolean DerateActiveVLow;
     boolean DerateActiveVHigh;
     boolean DerateActiveTHigh;
+    boolean DerateActiveTLow;      /**< At or below TemperatureMin_dC, SOP-FR-13. */
+
+    /** @brief FALSE forces every Final_dA to 0, SOP-FR-12. Diagnostic. */
+    boolean InputsValid;
 } Bms_Sop_DataType;
 ```
 
@@ -325,7 +336,7 @@ typedef struct
 } Bms_BattCfg_CellLimitsType;
 ```
 
-The derate windows landed with the module on 2026-09-12 (`104d24f`) and sit in the same struct: `DerateVHighStart/End_mV`, `DerateVLowStart/End_mV`, `DerateTHighStart/End_dC` and `DerateFloor`. As built they are 4100 to 4200 mV rising, 2900 to 2600 mV falling, 45.0 to 60.0 degC, floor 0.100. Every End sits on the safe side of its matching fault threshold, which is what SP-12 now checks. These are placeholder calibration too.
+The derate windows landed with the module on 2026-09-12 (`104d24f`) and sit in the same struct: `DerateVHighStart/End_mV`, `DerateVLowStart/End_mV`, `DerateTHighStart/End_dC` and `DerateFloor`. As built they are 4100 to 4200 mV rising, 2900 to 2600 mV falling, 45.0 to 60.0 degC. `DerateFloor` is 0, so each ramp ends at a zero limit (SOP-FR-06). It was 0.100 until 2026-09-13. Every End sits on the safe side of its matching fault threshold, which is what SP-12 now checks. These are placeholder calibration too.
 
 Read functions:
 
@@ -405,7 +416,7 @@ Each watched signal makes one factor in the range `DerateFloor` to 1000 by a str
 ```mermaid
 flowchart LR
     A["Signal in safe region<br/>factor = 1000"] --> B["Between Start and End<br/>linear ramp"]
-    B --> C["Past End<br/>factor = DerateFloor"]
+    B --> C["At and past End<br/>factor = DerateFloor = 0<br/>limit = 0"]
     C --> D["Fault threshold<br/>protection acts"]
 
     classDef ok fill:transparent,stroke:#52c41a
@@ -416,7 +427,7 @@ flowchart LR
     class D bad
 ```
 
-The ramp is `Lib_Interp_Lookup_1D_uint16()` over a two-point table. That is the existing one-dimensional function, so there is no new code. The SOP-FR-06 rule is that `End` sits inside the fault threshold. A reviewer can check that because both numbers live in `Bms_BattCfg` (CFG-FR-06).
+`DerateFloor` is 0 as calibrated, so the governed limit is already zero when the signal reaches End, before the fault threshold. The ramp is `Lib_Interp_Lookup_1D_uint16()` over a two-point table. That is the existing one-dimensional function, so there is no new code. The SOP-FR-06 rule is that `End` sits inside the fault threshold. A reviewer can check that because both numbers live in `Bms_BattCfg` (CFG-FR-06).
 
 #### 3.6.2 Which factor applies to which limit
 
@@ -425,16 +436,19 @@ The ramp is `Lib_Interp_Lookup_1D_uint16()` over a two-point table. That is the 
 | `k_vLow` | `MinCellVoltage` falling | Discharge |
 | `k_vHigh` | `MaxCellVoltage` rising | Regen, Charge |
 | `k_tHigh` | `MaxPackTemperature_dC` rising | All three |
+| `k_tLow` | `MaxPackTemperature_dC` at or below `TemperatureMin_dC` | All three. It is 0 or 1000, with no ramp (SOP-FR-13). |
 
 ```c
-discharge.DerateFactor = MIN(k_vLow,  k_tHigh);
-regen.DerateFactor     = MIN(k_vHigh, k_tHigh);
-charge.DerateFactor    = MIN(k_vHigh, k_tHigh);
+k_temp = MIN(k_tHigh, k_tLow);
+
+discharge.DerateFactor = MIN(k_vLow,  k_temp);
+regen.DerateFactor     = MIN(k_vHigh, k_temp);
+charge.DerateFactor    = MIN(k_vHigh, k_temp);
 ```
 
 The rule is minimum, not product (SOP-FR-07). Two factors of 0.8 multiply to 0.64. With two factors mildly active, the product over-derates, and neither input asked for that. The minimum applies whichever one constraint is tightest.
 
-There is no low-temperature factor here. Charging a lithium cell below about 0 degC plates metal lithium on the anode. That is a capacity loss and a safety problem, and it does not reverse. This design still guards against it. The static charge and regen tables in section 3.5 are already indexed by temperature. A breakpoint near 0 degC can roll the table limit down to a low value, or to zero, with no separate feedback factor needed. The feedback layer only needs to cover what the table cannot see coming, and cold is not one of those cases.
+There is no low-temperature ramp here, only the `k_tLow` cut-off at the envelope. Charging a lithium cell below about 0 degC plates metal lithium on the anode. That is a capacity loss and a safety problem, and it does not reverse. This design still guards against it. The static charge and regen tables in section 3.5 are already indexed by temperature. A breakpoint near 0 degC can roll the table limit down to a low value, or to zero, with no separate feedback factor needed. The feedback layer only needs to cover what the table cannot see coming, and cold is not one of those cases. Below the envelope, `k_tLow` sets every limit to zero, because the maps clamp at their coldest row and would still allow discharge there.
 
 #### 3.6.3 Application
 
@@ -442,7 +456,21 @@ There is no low-temperature factor here. Charging a lithium cell below about 0 d
 final_dA = (uint16)(((uint32)table_dA * derateFactor) / 1000U);
 ```
 
-`final_dA` is the value the module publishes. Nothing runs after it.
+`final_dA` is the value the module publishes, unless the mode (SOP-FR-03) or the gate in section 3.6.4 forces it to zero.
+
+#### 3.6.4 Validity gate
+
+The gate runs after the mode forcing. It opens only when all three conditions hold:
+
+- `Battery_Monitor` reports `CellVoltageValid` as `TRUE`.
+- `Battery_Monitor` reports `TemperatureSummaryValid` as `TRUE`.
+- `Bms_Soc` reports an `InitSource` other than `PENDING`.
+
+While the gate is closed, every `Final_dA` is 0 and `InputsValid` is `FALSE`. `Table_dA` and `DerateFactor` keep their computed values, the same rule as the mode forcing, so a calibrator can still see what the module would allow.
+
+`Min.Valid` and `Max.Valid` are not part of the gate. They report whether pack current is being integrated. An SOC restored from NVM is a usable anchor without that. Section 5.6 records the cost.
+
+When the bench-test override replaces an input, that input counts as valid. Both cell bits make the cell voltages valid, the temperature bit makes the temperature valid, and both SOC bits clear a pending init. That lets a HIL test drive the limits on a bench.
 
 ### 3.7 Flow: the 100 ms update
 
@@ -454,8 +482,11 @@ flowchart TD
     DER --> MODE{"Mode?"}
     MODE -->|"Discharge"| DISCH["Charge.Final_dA = 0"]
     MODE -->|"Charge"| CHG["Discharge.Final_dA = 0<br/>Regen.Final_dA = 0"]
-    DISCH --> PUB["Publish g_BmsSopData"]
-    CHG --> PUB
+    DISCH --> GATE{"Inputs valid?<br/>3.6.4"}
+    CHG --> GATE
+    GATE -->|"yes"| PUB["Publish g_BmsSopData"]
+    GATE -->|"no"| ZERO["All Final_dA = 0<br/>InputsValid = FALSE"]
+    ZERO --> PUB
     PUB --> DONE(["Return"])
 ```
 
@@ -495,7 +526,7 @@ There is no `BMS_SOP_SAMPLE_PERIOD_MS`. Nothing in this design uses a time step.
 | 6 bits 3-7 | reserved | send as 0 |
 | 7 bits 0-3 | `SOPAliveCounter` | 4-bit rolling counter, same style as `0x308` and `0x30B` |
 
-The frame carries no mode signal and no validity signal. The mode-provider component publishes the mode, see SOP-IR-06. Nothing publishes validity, see section 5.6.
+The frame carries no mode signal and no validity signal. The mode-provider component publishes the mode, see SOP-IR-06. While an input is not valid the consumer sees limits of 0 (SOP-FR-12), but it cannot tell that case apart from a real zero. `InputsValid` and `DerateActiveTLow` are in `g_BmsSopData` only.
 
 That last point matters more now than it did on paper. During the pending-init window `Bms_Soc` reports SOC as 0, and the charge map at SOC 0 returns its full value, so `0x30C` briefly publishes a healthy-looking charge limit computed from a guess. While nothing transmitted, that was theoretical. It is on the wire now. Byte 6 bits 3-7 are reserved and are where a validity flag would go if section 5.6 is ever closed.
 
@@ -509,7 +540,7 @@ Publishing takes the 100 ms task from 17 blocking sends to 18. That was the argu
 
 ## 4. Validation plan
 
-**Run as of 2026-09-12.** 33 cases in `sil/tests/test_sop.py` cover SP-01 to SP-05 and SP-12. The suite is 93 pass and 1 xfail overall. SP-06 to SP-09 are **not** written, and SP-10 and SP-11 were covered by the `Bms_BattCfg` move. Each case below says where it stands.
+**Run as of 2026-09-13.** 43 cases in `sil/tests/test_sop.py` cover SP-01 to SP-05 and SP-12 to SP-14. The suite is 103 pass and 1 xfail overall. On the S32K344 bench board, `hil/sop_hil.py` runs 21 cases through the test override, and `hil/sop_init_hil.py` samples the first 20 s after a reset with J-Link HSS and checks SP-14 on the live startup. SP-06 to SP-09 are **not** written, and SP-10 and SP-11 were covered by the `Bms_BattCfg` move. Each case below says where it stands.
 
 SOP is a good fit for SIL. It is computation over the outputs of `Battery_Monitor` and `Bms_Soc`. The current SIL setup drives both: cell voltages and pack current arrive as real CAN frames on CAN1 and CAN2, and the pack temperatures come from the faked ADC.
 
@@ -519,8 +550,15 @@ SOP is a good fit for SIL. It is computation over the outputs of `Battery_Monito
 |---|---|
 | SP-01 | The table returns the exact value at a breakpoint and interpolates between breakpoints. It clamps at all four edges. |
 | SP-02 | The discharge lookup uses the Min SOC branch and the charge and regen lookups use the Max SOC branch. To test, make the two SOCs differ and watch which limit moves. The two cannot be made to differ through the normal CAN signal path (section 5.7), so this case has to set `Min.Soc_pct_x10` and `Max.Soc_pct_x10` directly. |
-| SP-03 | The derate factor is 1000 in the safe region, `DerateFloor` past the end point, and linear between the two. |
+| SP-03 | The derate factor is 1000 in the safe region, `DerateFloor` (0) at and past the end point, and linear between the two. |
 | SP-04 | The combined derate is the minimum of the applicable factors, never the product. |
+
+### 4.1a Envelope and validity gate
+
+| ID | Case |
+|---|---|
+| SP-13 | Past the V-low End the discharge limit is 0 and charge is still allowed. Past the V-high End regen and charge are 0 and discharge is still allowed. Past the T-high End all three are 0. At the under-temperature set point all three are 0 and `DerateActiveTLow` is set. One step warmer the maps apply again. **SIL and HIL.** |
+| SP-14 | With healthy inputs `InputsValid` is `TRUE`. An invalid thermistor set, no cell voltage set since power-on, and a pending SOC init each publish all limits as 0, with the calibration fields kept. The pending case runs in Charge mode, where the map would allow a full charge at 0 % SOC. **SIL, and on the bench through the HSS startup test (INIT-09, INIT-10).** |
 
 ### 4.2 Integration: mode and signal chain
 
@@ -544,7 +582,7 @@ These run over the `Bms_BattCfg` constants. They are not runtime tests.
 
 | ID | Case |
 |---|---|
-| SP-12 | Every derate `End` threshold sits inside its matching fault threshold (SOP-FR-06). **Runnable and passing** since the derate windows landed. Extended to check the ramp directions, the floor range, and that each fault threshold's clear value sits on the safe side of its set value - which is the only coverage the envelope move from `47b18d8` has. |
+| SP-12 | Every derate `End` threshold sits inside its matching fault threshold (SOP-FR-06). **Runnable and passing** since the derate windows landed. Extended to check the ramp directions, that `DerateFloor` is 0, and that each fault threshold's clear value sits on the safe side of its set value - which is the only coverage the envelope move from `47b18d8` has. |
 
 ### 4.5 Not coverable in SIL
 
@@ -581,17 +619,20 @@ SOC has the same gap (`SOC_DESIGN.md` section 5.10). There is no requirement tha
 
 `PROJECT_PLAN.md` F12 and `SOC_DESIGN.md` section 5.11 describe a stuck vPACK alive counter that leaves `PackCurrentValid[0]` at `TRUE` while the current value freezes. An earlier draft of this design read pack current directly, so that earlier draft was exposed to the same defect. The static-table design in this document does not read pack current at all. SOC, cell voltage, and temperature are its only inputs. F12 stays a real defect elsewhere in the firmware. It does not affect the limits this module publishes.
 
-### 5.6 No handling for invalid inputs
+### 5.6 Invalid inputs: what the gate covers
 
-The module does not check whether its inputs are valid. `Bms_Soc` can report `Min.Valid` or `Max.Valid` as `FALSE`. `Battery_Monitor` can report `CellVoltageValid` or `TemperatureSummaryValid` as `FALSE`. Either way, this module still runs the table lookup and the derate on whatever value it currently holds. There is no fallback, and no validity bit on the published frame.
+Since 2026-09-13 the gate in section 3.6.4 zeroes every limit while the cell voltages or the temperature are not valid, or while the SOC init is pending. That closes the two startup cases this section used to describe:
 
-Two concrete cases come out of the `Bms_Soc` startup path in `SOC_DESIGN.md` section 3.8.
+- During the pending-init window, `Min.Soc_pct_x10` and `Max.Soc_pct_x10` read 0. The charge map at 0 percent SOC returns the full charge allowance. The gate now holds the charge limit at 0 until the init resolves (SP-14).
+- Before the first vAFE cell set arrives, `Battery_Monitor` reports 0 mV. Without the gate, discharge sat at the old 0.100 floor and regen had no voltage derate. The HIL startup test measured this window from 160 to 350 ms after reset. The gate now holds all limits at 0 there.
 
-During the pending-init window, `Bms_Soc_MarkUnseeded()` commits a capacity of zero to all three estimators, so `Min.Soc_pct_x10` and `Max.Soc_pct_x10` both read **0** while `Valid` is `FALSE`. This module cannot tell that apart from a genuinely empty pack. The discharge limit it publishes is therefore near zero, which is harmless. The **charge** limit is not: a table indexed at 0 percent SOC returns the full charge allowance, so the module would invite a charger to push current into a pack whose real SOC nobody has measured yet. The window is up to `g_BmsSocOcvWaitTimeout_ms`, 500 ms by default.
+Three gaps remain.
 
-If the wait then resolves to tier 3, all three estimators are set to `BMS_SOC_INITIAL_PCT_X10`, that is `500`. That number is a compile-time guess and `Valid` stays `FALSE`, but this module has no way to tell it apart from a real, measured 50 percent SOC. It publishes a limit computed from the guess, with no signal to the consumer that anything is uncertain.
+If the SOC wait resolves to tier 3, all three estimators hold `BMS_SOC_INITIAL_PCT_X10`, that is `500`, with `Valid` at `FALSE`. The gate does not read `Min.Valid` or `Max.Valid`, so the module still publishes limits from that guess. Gating on `Valid` would also zero the limits whenever pack current is lost, even with a good NVM anchor. That trade is not decided.
 
-This was cut at your request, along with the rate limiter (old SOP-FR-08) and the invalid-input fallback (old SOP-FR-09). It must be revisited before this design ships to real hardware.
+`CellVoltageValid` only proves that a cell set arrived once. `Bms_Vafe` sets `DataValid` when a set arrives, and nothing clears it when the frames stop. After a vAFE loss the module keeps using the last cell voltages, and the gate stays open. This is a defect in `Bms_Vafe`, not in this module, but it limits what SP-14 can prove.
+
+`0x30C` has no validity bit. A consumer sees a limit of 0 and cannot tell an invalid input from a real zero.
 
 ### 5.7 The weak-cell and strong-cell split is inert today
 
@@ -621,6 +662,7 @@ This is the same status the OCV curve has carried since `Bms_Soc` was written, a
 
 | Date | Change | Rationale |
 |---|---|---|
+| 2026-09-13 | Limits now go to zero outside the envelope and on invalid inputs. `DerateFloor` changed from 100 to 0, so each ramp ends at a zero limit (SOP-FR-06 rewritten). Added SOP-FR-12, a validity gate on `CellVoltageValid`, `TemperatureSummaryValid` and a pending SOC init, and SOP-FR-13, a zero at or below `TemperatureMin_dC`. Added `InputsValid` and `DerateActiveTLow` to `Bms_Sop_DataType`, section 3.6.4, SP-13 and SP-14, and rewrote section 5.6. | Review decision: a cell operating outside its envelope must have zero limits in the unsafe direction. The HSS startup test showed the old floor publishing 8.1 A of discharge, and regen with no voltage derate, from 0 mV cell voltages. This reverses the 2026-09-10 removal of the invalid-input fallback in a smaller, stateless form. `k_tLow` returns as a cut-off, not as the removed ramp. |
 | 2026-09-12 | Published the limits on CAN frame `0x30C` (`dc68326`), with a DBC entry. Recorded in section 3.10 that this makes the section 5.6 validity gap reachable by a real consumer, and that the 18th blocking send now costs about 2 ms rather than 100 ms. | The module computed limits that no CAN consumer could see. The timeout fix removed the objection that had made this a real decision. |
 | 2026-09-12 | Answered section 7.3: **dropped `0x30D`**, calibrate over XCP. `g_BmsSopData` links inside the existing XCP read window, so the data is reachable with no firmware change. Recorded the two costs: a RAM address is not self-describing and moves between builds, and no A2L generation exists. | XCP runs on its own FlexCAN instance and cannot add to the F7 blocking total. |
 | 2026-09-12 | Answered section 7.1: **deferred**. No mode-provider component yet. The mode is `g_BmsSopMode`, a volatile calibratable variable defaulting to Discharge and on the XCP write whitelist. `Bms_Sop_Init()` restores the default. | Keeps the bench demo usable without committing to a mode interface. The stand-in is explicitly not the final interface. |

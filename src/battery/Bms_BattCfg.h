@@ -72,9 +72,10 @@ typedef struct
 
     /*
      * Derate windows for Bms_Sop. Each ramp runs from Start (no derate) to
-     * End (DerateFloor). SOP-FR-06 requires every End to sit on the safe side
-     * of the matching fault threshold above, so that derating finishes before
-     * protection starts. Test SP-12 checks exactly that relation.
+     * End (DerateFloor, 0 as calibrated), so a limit reaches 0 at End.
+     * SOP-FR-06 requires every End to sit on the safe side of the matching
+     * fault threshold above, so that the limit is 0 before protection starts.
+     * Test SP-12 checks exactly that relation.
      */
 
     /** @brief Charge and regen derate on rising cell voltage. End < CellVoltageMax_mV. */
@@ -89,7 +90,7 @@ typedef struct
     sint16 DerateTHighStart_dC;
     sint16 DerateTHighEnd_dC;
 
-    /** @brief Lowest factor derating may reach. Unit: 0.001, range 0-1000. */
+    /** @brief Factor at and past each End. 0 cuts the limit to 0. Unit: 0.001, range 0-1000. */
     uint16 DerateFloor;
 
 } Bms_BattCfg_CellLimitsType;

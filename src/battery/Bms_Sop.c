@@ -9,8 +9,10 @@
  *                         and the maximum pack temperature, combined by
  *                         minimum, never by product.
  *
- *  The mode then forces the published value of any limit that does not apply
- *  to zero, and the result is written to g_BmsSopData.
+ *  Each ramp ends at a zero limit. At or below the under-temperature fault set
+ *  point every limit is zero. The mode then forces the published value of any
+ *  limit that does not apply to zero, and so does an input that is not valid.
+ *  The result is written to g_BmsSopData.
  *
  *  Published limits are unsigned magnitudes in 0.1 A. The direction lives in
  *  the field name, so no sign convention reaches the CAN interface.
@@ -156,6 +158,21 @@ static uint16 Bms_Sop_FactorTHigh(sint16 temp_dC,
                         (uint16)limits->DerateTHighEnd_dC,   limits->DerateFloor);
 }
 
+/**
+ * @brief Factor for the cold end of the cell envelope.
+ *
+ * There is no cold derate ramp, because the static maps carry the cold
+ * roll-off (SOP_DESIGN.md section 3.6.2). At or below the under-temperature
+ * fault set point the pack is outside its envelope, so the factor is 0 and
+ * every limit is 0. The comparison matches Battery_Monitor, which raises the
+ * fault at or below the same value.
+ */
+static uint16 Bms_Sop_FactorTLow(sint16 temp_dC,
+                                 const Bms_BattCfg_CellLimitsType *limits)
+{
+    return (temp_dC <= limits->TemperatureMin_dC) ? 0U : BMS_SOP_DERATE_NONE;
+}
+
 /** @brief Smaller of two derate factors. The rule is minimum, never product. */
 static uint16 Bms_Sop_MinFactor(uint16 a, uint16 b)
 {
@@ -198,6 +215,8 @@ void Bms_Sop_Init(void)
     g_BmsSopData.DerateActiveVLow  = FALSE;
     g_BmsSopData.DerateActiveVHigh = FALSE;
     g_BmsSopData.DerateActiveTHigh = FALSE;
+    g_BmsSopData.DerateActiveTLow  = FALSE;
+    g_BmsSopData.InputsValid       = FALSE;
 }
 
 void Bms_Sop_MainFunction(void)
@@ -211,9 +230,13 @@ void Bms_Sop_MainFunction(void)
     sint16 temp_dC;
     uint16 socMin_pct_x10;
     uint16 socMax_pct_x10;
+    boolean cellValid;
+    boolean tempValid;
+    boolean socValid;
     uint16 kVLow;
     uint16 kVHigh;
     uint16 kTHigh;
+    uint16 kTemp;
 
     if ((battery == NULL_PTR) || (soc == NULL_PTR) || (limits == NULL_PTR))
     {
@@ -221,11 +244,15 @@ void Bms_Sop_MainFunction(void)
     }
 
     /*
-     * No validity flag is read here. Bms_Soc and Battery_Monitor both publish
-     * one and this module deliberately ignores both: there is no fallback and
-     * no validity bit on the published frame. SOP_DESIGN.md section 5.6
-     * records what that costs. Revisit before this reaches real hardware.
+     * A limit computed from an input that is not valid is not published
+     * (SOP-FR-12). Bms_Soc Min.Valid and Max.Valid are not part of the gate:
+     * they report whether current is being integrated, and an SOC restored
+     * from NVM is usable without it. SOP_DESIGN.md section 5.6.
      */
+    cellValid = battery->CellVoltageValid;
+    tempValid = battery->TemperatureSummaryValid;
+    socValid  = (soc->InitSource != BMS_SOC_INIT_SOURCE_PENDING) ? TRUE : FALSE;
+
     minCell_mV = Bms_Sop_VoltsTo_mV(battery->MinCellVoltage);
     maxCell_mV = Bms_Sop_VoltsTo_mV(battery->MaxCellVoltage);
     temp_dC    = battery->MaxPackTemperature_dC;
@@ -257,16 +284,34 @@ void Bms_Sop_MainFunction(void)
         {
             socMax_pct_x10 = g_BmsSopTestOverride.SocMax_pct_x10;
         }
+
+        /* An overridden input is a known value, so it counts as valid. */
+        if ((enable & (BMS_SOP_OVR_MIN_CELL | BMS_SOP_OVR_MAX_CELL)) ==
+            (BMS_SOP_OVR_MIN_CELL | BMS_SOP_OVR_MAX_CELL))
+        {
+            cellValid = TRUE;
+        }
+        if ((enable & BMS_SOP_OVR_MAX_TEMP) != 0U)
+        {
+            tempValid = TRUE;
+        }
+        if ((enable & (BMS_SOP_OVR_SOC_MIN | BMS_SOP_OVR_SOC_MAX)) ==
+            (BMS_SOP_OVR_SOC_MIN | BMS_SOP_OVR_SOC_MAX))
+        {
+            socValid = TRUE;
+        }
     }
 #endif
 
     kVLow  = Bms_Sop_FactorVLow(minCell_mV, limits);
     kVHigh = Bms_Sop_FactorVHigh(maxCell_mV, limits);
     kTHigh = Bms_Sop_FactorTHigh(temp_dC, limits);
+    kTemp  = Bms_Sop_MinFactor(kTHigh, Bms_Sop_FactorTLow(temp_dC, limits));
 
     g_BmsSopData.DerateActiveVLow  = (kVLow  < BMS_SOP_DERATE_NONE) ? TRUE : FALSE;
     g_BmsSopData.DerateActiveVHigh = (kVHigh < BMS_SOP_DERATE_NONE) ? TRUE : FALSE;
     g_BmsSopData.DerateActiveTHigh = (kTHigh < BMS_SOP_DERATE_NONE) ? TRUE : FALSE;
+    g_BmsSopData.DerateActiveTLow  = (kTemp  < kTHigh) ? TRUE : FALSE;
 
     /*
      * The discharge map follows the weakest cell, which reaches the low cutoff
@@ -277,19 +322,19 @@ void Bms_Sop_MainFunction(void)
         &g_BmsSopData.Discharge,
         Bms_BattCfg_GetStaticLimit_dA(BMS_BATTCFG_LIMIT_DISCHARGE,
                                       socMin_pct_x10, temp_dC),
-        Bms_Sop_MinFactor(kVLow, kTHigh));
+        Bms_Sop_MinFactor(kVLow, kTemp));
 
     Bms_Sop_ApplyLimit(
         &g_BmsSopData.Regen,
         Bms_BattCfg_GetStaticLimit_dA(BMS_BATTCFG_LIMIT_REGEN,
                                       socMax_pct_x10, temp_dC),
-        Bms_Sop_MinFactor(kVHigh, kTHigh));
+        Bms_Sop_MinFactor(kVHigh, kTemp));
 
     Bms_Sop_ApplyLimit(
         &g_BmsSopData.Charge,
         Bms_BattCfg_GetStaticLimit_dA(BMS_BATTCFG_LIMIT_CHARGE,
                                       socMax_pct_x10, temp_dC),
-        Bms_Sop_MinFactor(kVHigh, kTHigh));
+        Bms_Sop_MinFactor(kVHigh, kTemp));
 
     /*
      * Anything that is not a valid mode reads as Discharge. That is the safe
@@ -312,6 +357,17 @@ void Bms_Sop_MainFunction(void)
     else
     {
         g_BmsSopData.Charge.Final_dA = 0U;
+    }
+
+    /* Same rule for an input that is not valid: only the published value goes to 0. */
+    g_BmsSopData.InputsValid =
+        ((cellValid == TRUE) && (tempValid == TRUE) && (socValid == TRUE)) ? TRUE : FALSE;
+
+    if (g_BmsSopData.InputsValid == FALSE)
+    {
+        g_BmsSopData.Discharge.Final_dA = 0U;
+        g_BmsSopData.Regen.Final_dA     = 0U;
+        g_BmsSopData.Charge.Final_dA    = 0U;
     }
 }
 
