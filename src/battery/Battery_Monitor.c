@@ -6,25 +6,37 @@
 #include "vAFE/Bms_Vafe.h"
 #include "vPACK/Bms_Vpack.h"
 #include "Fault_Manager.h"
+#include "Bms_BattCfg.h"
 
-/* Simulation-stage cell voltage fault thresholds, tune per cell chemistry later */
-#define BMS_CELL_OV_FAULT_SET_MV       (4250U)
-#define BMS_CELL_OV_FAULT_CLEAR_MV     (4150U)
+/*
+ * Cell safety envelope: owned by Bms_BattCfg, not by this file.
+ *
+ * These names are kept as forwarding macros so that every comparison in the
+ * fault evaluators below reads exactly as it did before the move. The only
+ * thing that changed is where the numbers come from - which is what keeps the
+ * diff on a safety-critical path down to this block.
+ *
+ * See SOP_DESIGN.md section 7.4 and CFG-FR-06.
+ */
+#define BMS_CELL_LIMITS                (Bms_BattCfg_GetCellLimits())
 
-#define BMS_CELL_UV_FAULT_SET_MV       (2500U)
-#define BMS_CELL_UV_FAULT_CLEAR_MV     (2700U)
+#define BMS_CELL_OV_FAULT_SET_MV       (BMS_CELL_LIMITS->CellVoltageMax_mV)
+#define BMS_CELL_OV_FAULT_CLEAR_MV     (BMS_CELL_LIMITS->CellVoltageMaxClear_mV)
 
-#define BMS_TEMP_HIGH_FAULT_SET_DC        (2000)    /* 200.0°C */
-#define BMS_TEMP_HIGH_FAULT_CLEAR_DC      (1950)    /* 195.0°C */
+#define BMS_CELL_UV_FAULT_SET_MV       (BMS_CELL_LIMITS->CellVoltageMin_mV)
+#define BMS_CELL_UV_FAULT_CLEAR_MV     (BMS_CELL_LIMITS->CellVoltageMinClear_mV)
 
-#define BMS_TEMP_LOW_FAULT_SET_DC         (-200)   /* -20.0°C */
-#define BMS_TEMP_LOW_FAULT_CLEAR_DC       (-150)   /* -15.0°C */
+#define BMS_TEMP_HIGH_FAULT_SET_DC     (BMS_CELL_LIMITS->TemperatureMax_dC)
+#define BMS_TEMP_HIGH_FAULT_CLEAR_DC   (BMS_CELL_LIMITS->TemperatureMaxClear_dC)
 
-#define BMS_TEMP_DELTA_FAULT_SET_DC       (500)    /* 50.0°C (dC = 0.1 °C) */
-#define BMS_TEMP_DELTA_FAULT_CLEAR_DC     (100)    /* 10.0°C */
+#define BMS_TEMP_LOW_FAULT_SET_DC      (BMS_CELL_LIMITS->TemperatureMin_dC)
+#define BMS_TEMP_LOW_FAULT_CLEAR_DC    (BMS_CELL_LIMITS->TemperatureMinClear_dC)
 
-#define BMS_CELL_IMBALANCE_SET_MV      (300U)
-#define BMS_CELL_IMBALANCE_CLEAR_MV    (200U)
+#define BMS_TEMP_DELTA_FAULT_SET_DC    (BMS_CELL_LIMITS->TemperatureDeltaMax_dC)
+#define BMS_TEMP_DELTA_FAULT_CLEAR_DC  (BMS_CELL_LIMITS->TemperatureDeltaMaxClear_dC)
+
+#define BMS_CELL_IMBALANCE_SET_MV      (BMS_CELL_LIMITS->CellImbalanceMax_mV)
+#define BMS_CELL_IMBALANCE_CLEAR_MV    (BMS_CELL_LIMITS->CellImbalanceMaxClear_mV)
 
 /*
  * Pack current sign convention:

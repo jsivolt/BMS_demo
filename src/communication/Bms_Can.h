@@ -29,6 +29,19 @@ void Bms_Can_SendSocStatus(void);
  */
 void Bms_Can_SendCellSoc(void);
 
+/**
+ * @brief Transmits the Pack 1 state-of-power current limits on 0x30C.
+ *
+ * Reads Bms_Sop_GetData(). Limits are unsigned magnitudes in 0.1 A; the signal
+ * name carries the direction. A limit that does not apply to the active mode
+ * is published as zero.
+ *
+ * The frame carries no validity signal. Bms_Sop does not check whether its
+ * inputs are valid, so there is nothing truthful to publish (SOP_DESIGN.md
+ * section 5.6). Byte 6 bits 3-7 are reserved and would be the place for one.
+ */
+void Bms_Can_SendSopLimits(void);
+
 /*
  * Poll CAN RX mailbox.
  *

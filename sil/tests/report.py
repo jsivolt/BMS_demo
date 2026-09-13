@@ -26,9 +26,14 @@ SIL_DIR = Path(__file__).resolve().parent.parent
 REPO = SIL_DIR.parent
 REPORT = SIL_DIR / "TEST_REPORT.md"
 
-# Requirement coverage, keyed by test-ID prefix. IDs refer to SOC_DESIGN.md §1.
+# Requirement coverage, keyed by test-ID prefix. The longest matching prefix
+# wins. SOC-* IDs refer to SOC_DESIGN.md §1, SOP-* IDs to SOP_DESIGN.md §1.
 _REQUIREMENTS = {
     "LI": "SOC-FR-13",
+    # The 2-D lookup is still a reusable library function (SOC-FR-13); it
+    # exists for the SOP static limit maps. Without this entry "LI2" would
+    # fall back to the "LI" prefix and cite only the SOC requirement.
+    "LI2": "SOC-FR-13, SOP-FR-04",
     "SA_01": "SOC-FR-03, SOC-FR-04",
     "SA_02": "SOC-FR-03, SOC-FR-04",
     "SA_03": "SOC-FR-03, SOC-FR-04",
@@ -52,14 +57,21 @@ _REQUIREMENTS = {
     "CH_stuck": "SOC-FR-12, SOC-IR-01",
     "blend_divergence": "SOC-FR-02",
     "coulomb": "SOC-FR-01",
+    "SP_01": "SOP-FR-04",
+    "SP_02": "SOP-FR-04",
+    "SP_03": "SOP-FR-05, SOP-FR-06",
+    "SP_04": "SOP-FR-07",
+    "SP_05": "SOP-FR-02, SOP-FR-03",
+    "SP_12": "SOP-FR-06",
 }
 
 # One report per feature. Keyed by test module stem.
 _FEATURES = {
     "test_lib_interp": (
         "lib_interp",
-        "Lib_Interp — generic 1-D table interpolation",
-        "The shared lookup helper in `src/common/Lib_Interp.c` (SOC-FR-13).",
+        "Lib_Interp — generic 1-D and 2-D table interpolation",
+        "The shared lookup helpers in `src/common/Lib_Interp.c` (SOC-FR-13). The "
+        "2-D lookup serves the SOP static limit maps (SOP-FR-04).",
     ),
     "test_soc": (
         "soc",
@@ -73,6 +85,17 @@ _FEATURES = {
         "persistence",
         "Persistence — Bms_Nvm and the Data Flash record log",
         "Append-only log, rate limiting, erase-and-wrap, write failure and power loss.",
+    ),
+    "test_sop": (
+        "sop",
+        "SOP — Pack 1 current limits",
+        "`src/battery/Bms_Sop.c` and the SOP data in `src/battery/Bms_BattCfg.c`. "
+        "Covers the static limit maps, the feedback derate ramps and their "
+        "minimum-not-product combination, mode gating, and a static check that "
+        "every derate window ends inside its fault threshold. The map values are "
+        "placeholder calibration, so these cases prove the arithmetic, not the "
+        "numbers (SOP_DESIGN.md §5.8). CAN frame 0x30C is not covered: Bms_Can.c "
+        "is not compiled into SIL.",
     ),
 }
 

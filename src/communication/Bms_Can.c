@@ -14,10 +14,31 @@
 
 #include "../battery/vAFE/Bms_Vafe.h"
 #include "../battery/vPACK/Bms_Vpack.h"
+#include "../battery/Bms_Sop.h"
 #include "../battery/Bms_Soc.h"
 
 
-#define BMS_CAN_TX_TIMEOUT_MS   (100U)
+/*
+ * Blocking-send timeout, per frame.
+ *
+ * This bounds the FAILURE path, not the success path. A standard 8-byte frame
+ * at 500 kbit/s occupies about 0.26 ms on the wire, so all the CAN0 status
+ * frames together need roughly 4.5 ms of a 100 ms task. A send that is going
+ * to succeed never comes near this value.
+ *
+ * It used to be 100 ms. With every frame sharing one mailbox, an unacknowledged
+ * bus made the 100 ms task block for the sum of all the timeouts, near 1.7 s.
+ * That stalled fault evaluation, ignored operator commands, froze the contactor
+ * sequence and made Bms_Soc discard whole integration intervals, because the
+ * Coulomb counter assumes a fixed 100 ms step (PROJECT_PLAN.md finding F7).
+ *
+ * At 2 ms the same failure costs about 34 ms in total, which fits the window.
+ *
+ * TODO: confirm on the bench that 2 ms clears the worst real arbitration delay
+ * on CAN0. A frame that repeatedly loses arbitration can legitimately wait
+ * longer than its own transmission time.
+ */
+#define BMS_CAN_TX_TIMEOUT_MS   (2U)
 #define BMS_CAN_LED_PORT         PTA_H_HALF
 #define BMS_CAN_LED_PIN          (14U)
 
@@ -129,6 +150,7 @@ static uint8 g_BmsCanPackCurrentAliveCounter = 0U;
 static uint8 g_BmsCanPackPowerAliveCounter = 0U;
 static uint8 g_BmsCanSocAliveCounter = 0U;
 static uint8 g_BmsCanCellSocAliveCounter = 0U;
+static uint8 g_BmsCanSopAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -592,6 +614,77 @@ Std_ReturnType Bms_Can_Init(void)
 
 
 /* ================================================================================================
+ * Transmit helper
+ * ============================================================================================== */
+
+/**
+ * @brief Sends one frame and escalates a send that does not complete.
+ *
+ * FlexCAN_Ip_SendBlocking() returns a status that nothing used to read, so a
+ * dead bus was invisible to the rest of the firmware. On a failed send this
+ * aborts the transfer, which frees the mailbox so the next frame is not held
+ * up behind it, and raises FAULT_CAN_TIMEOUT.
+ *
+ * FAULT_CAN_TIMEOUT is not in FAULT_CRITICAL_MASK, so this reports the
+ * condition without opening the contactors. It reaches the host on the system
+ * mask in 0x304 and is captured by the latched fault history on 0x30A, which
+ * is what catches a failure too brief to see live.
+ *
+ * @param[in] instance   FlexCAN instance.
+ * @param[in] mb         Transmit message buffer index.
+ * @param[in] msgId      Standard identifier.
+ * @param[in] txData     Eight payload bytes.
+ * @param[in] raiseFault TRUE for the host bus. The CAN1 test frame passes
+ *                       FALSE: a failure there says nothing about CAN0, and
+ *                       the vAFE link has FAULT_AFE_COMM of its own.
+ * @return Driver status of the send.
+ */
+static Flexcan_Ip_StatusType Bms_Can_SendFrame(
+        uint8 instance,
+        uint8 mb,
+        uint32 msgId,
+        const uint8 *txData,
+        boolean raiseFault)
+{
+    Flexcan_Ip_StatusType status;
+
+    status = FlexCAN_Ip_SendBlocking(
+        instance,
+        mb,
+        &g_BmsCanTxInfo,
+        msgId,
+        txData,
+        BMS_CAN_TX_TIMEOUT_MS
+    );
+
+    if (status != FLEXCAN_STATUS_SUCCESS)
+    {
+        (void)FlexCAN_Ip_AbortTransfer(instance, mb);
+
+        if (raiseFault == TRUE)
+        {
+            FaultManager_SetSystem(FAULT_CAN_TIMEOUT);
+        }
+    }
+    else if (raiseFault == TRUE)
+    {
+        /*
+         * Live masks self-clear, the same as every other fault here. A pass
+         * where some frames fail and others succeed leaves the bit clear, and
+         * the latched history on 0x30A is what preserves it.
+         */
+        FaultManager_ClearSystem(FAULT_CAN_TIMEOUT);
+    }
+    else
+    {
+        /* CAN1 test frame succeeded: nothing to report. */
+    }
+
+    return status;
+}
+
+
+/* ================================================================================================
  * CAN TX status frame
  * ============================================================================================== */
 
@@ -696,13 +789,12 @@ void Bms_Can_SendStatus(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_STATUS_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -757,13 +849,12 @@ void Bms_Can_SendPackStatus(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_PACK_STATUS_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
@@ -869,13 +960,12 @@ void Bms_Can_SendContactorStatus(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_CONTACTOR_STATUS_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
@@ -928,13 +1018,12 @@ void Bms_Can_SendFaultStatus1(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_FAULT_12_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -981,13 +1070,12 @@ void Bms_Can_SendFaultStatus2(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_FAULT_3_SYSTEM_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -1034,13 +1122,12 @@ void Bms_Can_SendLastFaultStatus1(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_LAST_FAULT_12_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -1087,13 +1174,12 @@ void Bms_Can_SendLastFaultStatus2(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_LAST_FAULT_3_SYSTEM_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -1173,13 +1259,12 @@ void Bms_Can_SendCellSummary(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_CELL_SUMMARY_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -1230,13 +1315,12 @@ static void Bms_Can_SendCellVoltageFrame(
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             canId,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 }
 
@@ -1399,13 +1483,12 @@ void Bms_Can_SendPackCurrent(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_PACK_CURRENT_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
@@ -1478,13 +1561,12 @@ void Bms_Can_SendPackPower(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_PACK_POWER_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
@@ -1554,13 +1636,12 @@ void Bms_Can_SendSocStatus(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_SOC_STATUS_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
@@ -1643,19 +1724,114 @@ void Bms_Can_SendCellSoc(void)
     );
 
     g_BmsCanTxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN_CFG_INSTANCE,
             BMS_CAN_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN_CFG_TX_CELL_SOC_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            TRUE
         );
 
     if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
     {
         g_BmsCanCellSocAliveCounter =
             (uint8)((g_BmsCanCellSocAliveCounter + 1U) & 0x0FU);
+    }
+}
+
+
+/* ================================================================================================
+ * CAN TX state-of-power limits frame
+ * ============================================================================================== */
+
+void Bms_Can_SendSopLimits(void)
+{
+    const Bms_Sop_DataType *sopData;
+    uint8 txData[8] = {0U};
+    uint16 limitRaw;
+
+    sopData = Bms_Sop_GetData();
+
+    if (sopData == NULL_PTR)
+    {
+        return;
+    }
+
+    /*
+     * Byte0-1 = discharge limit, unit 0.1 A, magnitude.
+     * Zero in Charge mode.
+     */
+    limitRaw = sopData->Discharge.Final_dA;
+
+    txData[0] = (uint8)(limitRaw & 0xFFU);
+    txData[1] = (uint8)((limitRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte2-3 = regenerative braking limit, unit 0.1 A, magnitude.
+     * Zero in Charge mode.
+     */
+    limitRaw = sopData->Regen.Final_dA;
+
+    txData[2] = (uint8)(limitRaw & 0xFFU);
+    txData[3] = (uint8)((limitRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte4-5 = charge limit, unit 0.1 A, magnitude.
+     * Zero in Discharge mode.
+     */
+    limitRaw = sopData->Charge.Final_dA;
+
+    txData[4] = (uint8)(limitRaw & 0xFFU);
+    txData[5] = (uint8)((limitRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte6 bit0 = cell-voltage-low derate active
+     * Byte6 bit1 = cell-voltage-high derate active
+     * Byte6 bit2 = temperature-high derate active
+     * Byte6 bit3-7 reserved
+     */
+    if (sopData->DerateActiveVLow == TRUE)
+    {
+        txData[6] |= 0x01U;
+    }
+
+    if (sopData->DerateActiveVHigh == TRUE)
+    {
+        txData[6] |= 0x02U;
+    }
+
+    if (sopData->DerateActiveTHigh == TRUE)
+    {
+        txData[6] |= 0x04U;
+    }
+
+    /*
+     * Byte7 bit0-3 = alive counter
+     */
+    txData[7] =
+        (uint8)(g_BmsCanSopAliveCounter & 0x0FU);
+
+    /*
+     * Handle previous polling TX completion.
+     */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        Bms_Can_SendFrame(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            BMS_CAN_CFG_TX_SOP_LIMITS_ID,
+            txData,
+            TRUE
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanSopAliveCounter =
+            (uint8)((g_BmsCanSopAliveCounter + 1U) & 0x0FU);
     }
 }
 
@@ -1929,12 +2105,11 @@ void Bms_Can1_SendTest(void)
     );
 
     g_BmsCan1TxStatus =
-        FlexCAN_Ip_SendBlocking(
+        Bms_Can_SendFrame(
             BMS_CAN1_CFG_INSTANCE,
             BMS_CAN1_CFG_TX_MB_INDEX,
-            &g_BmsCanTxInfo,
             BMS_CAN1_CFG_TX_TEST_ID,
             txData,
-            BMS_CAN_TX_TIMEOUT_MS
+            FALSE
         );
 }

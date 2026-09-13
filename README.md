@@ -4,7 +4,8 @@ A bare-metal (no-OS) Battery Management System demo for the **NXP S32K344** (Cor
 **S32K3 RTD 7.0.1** low-level IP drivers. It monitors three battery packs, decodes 16 cell voltages
 from a CAN-based "virtual AFE", decodes pack current/voltage from a CAN-based "virtual ADBMS2950"
 pack monitor, runs a precharge/contactor state machine per pack, estimates Pack 1 state-of-charge by
-Coulomb counting (persisted to data flash), tracks faults, and publishes everything over CAN.
+Coulomb counting (persisted to data flash), computes Pack 1 current limits (state of power), tracks
+faults, and publishes everything over CAN.
 
 ---
 
@@ -74,15 +75,19 @@ src/
     Bms_Adc.*               ADC_SAR wrapper (unit 0 = bus V, unit 1 = pack V + NTC)
   battery/
     Battery_Monitor.*       Aggregates cell/pack/current/temperature data, applies thresholds
+    Bms_BattCfg.*           Battery data: capacity, OCV curve, cell safety envelope, SOP limit maps
     Bms_Ntc.*               3-channel NTC (Beta equation) -> 0.1 degC
     Bms_Ntc_Cfg.h           NTC hardware constants
     Bms_Soc.*               Pack 1 state-of-charge: three cell-based estimators, OCV/NVM/default init
+    Bms_Sop.*               Pack 1 state of power: discharge/regen/charge current limits (see §14)
     Bms_SleepTime.*         Elapsed power-off time provider for the SOC OCV reset (stubbed, no RTC yet)
     Bms_Afe.*               Physical AFE stub (unused)
     vAFE/Bms_Vafe.*         Decodes 16 cell voltages from CAN1 frames 0x401-0x404
     vPACK/Bms_Vpack.*       Decodes pack current/voltage from CAN2 (virtual ADBMS2950) frames 0x410-0x411
-    SOP_DESIGN.md           Draft design for Bms_Sop (current-limit calc) + Bms_BattCfg (shared cell/pack
-                            config); not yet implemented, open questions pending review
+    SOC_DESIGN.md           SOC design, validation plan and known limitations
+    SOP_DESIGN.md           SOP + Bms_BattCfg design, validation plan and known limitations
+  common/
+    Lib_Interp.*            1-D and 2-D table interpolation (OCV curve, SOP limit maps)
   communication/
     Bms_Can.*               CAN0 (host) + CAN1 (vAFE) + CAN2 (vPACK): polled RX, blocking TX
     Bms_Can_Cfg.h           Instances, mailbox indices, all message IDs
@@ -107,7 +112,8 @@ generate/     Generated RTD configs: Clock, ADC, FlexCAN, PIT, LPSPI, IntCtrl, O
 RTD/          NXP Real-Time Drivers source + headers
 DBC/          BMS_demo.dbc  — CAN database for PCAN / CANalyzer
 Project_Settings/  Linker scripts, startup code, debugger launches
-sil/          Software-in-the-loop test platform: same src/ code, native build, pytest (see §13)
+sil/          Software-in-the-loop test platform: same src/ code, native build, pytest (see §15)
+hil/          Hardware-in-the-loop SOP tests on the S32K344 board, with reports (see §16)
 
 Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_reset.bat ·
                debug_live.bat · fault_snapshot.bat · fault_decode.gdb  (see §1 and §10)
@@ -120,7 +126,7 @@ Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_
 `main()` initialises, in order: clocks → pins → LED off → interrupt controller → PIT0 → ADC (with
 calibration) → NTC → CAN0/CAN1/CAN2 → CAN5 (XCP transport, `Xcp_Can_Init`) → LPSPI1 → fault manager →
 contactors → state machine → application → vAFE → vPACK → battery monitor → NVM (scans data flash) →
-SOC estimator → scheduler → PIT start. Any init failure traps with LED1 red on.
+SOC estimator → SOP limits → scheduler → PIT start. Any init failure traps with LED1 red on.
 
 The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`, which increments a pending-tick count; all work
 runs from the main loop. `Bms_Scheduler_MainFunction` atomically captures and clears the pending count,
@@ -134,7 +140,7 @@ first per call) are exposed for inspection (e.g. via the XCP/debugger tooling in
 | Task | Period | Contents |
 | --- | --- | --- |
 | `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, **XCP CAN5 poll (`Xcp_Can_MainFunction`)**, contactor state machine, 1 Hz LED blink |
-| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, SOC integration, state machine, TX of 0x300–0x30A and 0x400 |
+| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, SOC integration, SOP limits, state machine, TX of 0x300–0x30C, 0x310–0x313 and 0x400 |
 | `Bms_MainFunction_1000ms` | 1000 ms | SOC persistence (`Bms_Soc_1sFunction`, saves to NVM when due/changed) |
 
 XCP is polled from the 10 ms task (not 100 ms) since a real XCP master/DAQ tool expects lower latency
@@ -211,7 +217,7 @@ contactor feedback, contactor weld, over-current, vPACK comm timeout/alive error
 voltage timeout, and pack discharge/charge over-current. Any critical fault opens the contactors and
 forces the supervisor into `FAULT`.
 
-### Detection thresholds (hysteretic, `Battery_Monitor.c`)
+### Detection thresholds (hysteretic, `Bms_BattCfg.c`)
 
 | Condition | Set | Clear |
 | --- | --- | --- |
@@ -247,6 +253,8 @@ negative = discharge.
 - **State of charge** — `Bms_Soc` Coulomb-counts Pack 1 current (100 ms sample period) into three
   estimators, saving to data flash at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s) or sooner if it
   changes by more than `BMS_SOC_SAVE_DELTA_X10` (0.1 %) — see §13.
+- **State of power** — `Bms_Sop` computes the Pack 1 discharge, regen and charge current limits from
+  SOC, cell voltage and temperature every 100 ms — see §14.
 - **Temperatures** — three NTCs on ADC1, Beta equation (`R25 = 10 kΩ`, `Beta = 3435 K`,
   series 10 kΩ), reported in 0.1 °C over −40.0 … 125.0 °C.
 - **Bus voltages** — ADC0 channels P0/P1/P3/P4 (bus 1/2/3 + spare), used for precharge completion.
@@ -256,7 +264,8 @@ negative = discharge.
 ## 8. CAN interface
 
 CAN0 runs at **500 kbit/s**; CAN1 (virtual AFE) and CAN2 (virtual ADBMS2950 pack monitor) run at
-**1 Mbit/s**. TX is `SendBlocking` with a 100 ms timeout on MB0; RX is polled from the 100 ms task.
+**1 Mbit/s**. TX is `SendBlocking` with a 2 ms timeout on MB0; a failed send aborts the transfer and sets
+`FAULT_CAN_TIMEOUT` (not critical). RX is polled from the 100 ms task.
 Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding.
 
 ### CAN0 transmit (every 100 ms)
@@ -352,6 +361,19 @@ fault history (`uint32` LE).
 (`Min`), 2–3 strongest cell (`Max`), 4–5 average (`Avg`); byte 6 bits 2:0 = Min/Max/Avg valid; byte 7
 bits 3:0 alive counter. See §13 for what the three estimators are.
 
+**0x30C `SOP_Limits`**
+
+| Byte | Content |
+| --- | --- |
+| 0–1 | Pack1 discharge limit, `uint16` LE, 0.1 A/bit, magnitude |
+| 2–3 | Pack1 regen limit |
+| 4–5 | Pack1 charge limit |
+| 6 | bit0 VLow derate, bit1 VHigh derate, bit2 THigh derate active; bits 7:3 reserved |
+| 7 | bits 3:0 alive counter |
+
+A limit that does not apply to the operating mode is sent as 0. All limits are 0 while an input is not
+valid (see §14).
+
 ### CAN0 receive
 
 | ID | Mailbox | Byte 0 command |
@@ -386,7 +408,7 @@ raise `FAULT_VPACK_DEVICE_FAULT`. Signal layout beyond what `Bms_Vpack.c` decode
 
 1. Connect a CAN tool to CAN0 (PTA6/PTA7) at 500 kbit/s, and the vAFE simulator to CAN1 (PTC8/PTC9)
    and the vPACK simulator to CAN2 (PTE24/PTE25), both at 1 Mbit/s.
-2. Power up — LED1 red blinks at 1 Hz and 0x300–0x30A plus 0x310–0x313 appear every 100 ms.
+2. Power up — LED1 red blinks at 1 Hz and 0x300–0x30C plus 0x310–0x313 appear every 100 ms.
 3. Feed 0x405 (measurement header, byte 0 = counter) followed by 0x401–0x404 so
    `CellVoltageValid` in 0x305 goes to 1.
 4. Feed 0x410/0x411 so pack current/voltage/SOC (0x306–0x308) go valid and Pack1 voltage tracks CAN2.
@@ -562,9 +584,42 @@ not characterized, no per-cell capacity data, float precision floor, etc.) in
 
 ---
 
-## 14. Software-in-the-loop (SIL) test platform
+## 14. State-of-power (SOP) current limits
 
-`sil/` compiles the SOC/battery-monitor/fault/NVM production `.c` files unmodified into a native DLL
+`Bms_Sop` publishes three Pack 1 current limits on CAN 0x30C: discharge, regen and charge. It holds no
+state; every limit is recomputed each 100 ms from the present inputs.
+
+1. **Static map** — each limit comes from a calibration map over SOC and temperature in `Bms_BattCfg`.
+   Discharge follows the weakest-cell SOC (`Min`), regen and charge follow the strongest-cell SOC (`Max`).
+2. **Feedback derate** — a factor from 1 down to 0 trims the map value as a signal nears its fault
+   threshold. The factors combine by minimum, not by product.
+3. **Mode and gate** — the limit that does not apply to the mode is sent as 0, and so is every limit
+   while an input is not valid.
+
+| Rule | Window | Limits set to 0 |
+| --- | --- | --- |
+| Low cell voltage | 2900 → 2600 mV | Discharge (charge still allowed) |
+| High cell voltage | 4100 → 4200 mV | Regen, charge (discharge still allowed) |
+| High temperature | 45.0 → 60.0 °C | All three |
+| Under-temperature | at or below −20.0 °C | All three |
+| Input not valid | `CellVoltageValid` or `TemperatureSummaryValid` FALSE, or SOC init pending | All three |
+
+Each ramp is linear from its start (no derate) to its end (limit 0), and every end sits inside the
+matching fault threshold. `g_BmsSopData` also keeps each map value and derate factor, plus the
+`DerateActiveTLow` and `InputsValid` flags, for XCP or a debugger.
+
+The operating mode is `g_BmsSopMode` (0 = Discharge, 1 = Charge), an XCP-writable stand-in until a
+mode-provider component exists. `g_BmsSopTestOverride` lets a bench test replace any input; it is
+compiled in while `BMS_SOP_TEST_OVERRIDE` is `1U` and must be `0U` for a vehicle build.
+
+**The limit maps and derate windows are placeholders**, not datasheet ratings. Full design, validation
+plan and known limitations in [`src/battery/SOP_DESIGN.md`](src/battery/SOP_DESIGN.md).
+
+---
+
+## 15. Software-in-the-loop (SIL) test platform
+
+`sil/` compiles the SOC/SOP/battery-monitor/fault/NVM production `.c` files unmodified into a native DLL
 and drives them from Python via `pytest` — no hardware, no target build, real application logic.
 Stimulus goes in as actual CAN frames through the production decoders (`0x405`/`0x401-0x404` for cell
 voltages, `0x410`/`0x411` for pack current/voltage), so a test also catches an upstream decoder or
@@ -579,3 +634,32 @@ cd sil && python -m pytest   # run the suite
 Needs a host C compiler (MinGW-w64 GCC) and `pytest`; see [`sil/README.md`](sil/README.md) for setup,
 layout, and how to write a new test. Test reports are generated per feature under `sil/reports/`, rolled
 up in [`sil/TEST_REPORT.md`](sil/TEST_REPORT.md).
+
+---
+
+## 16. Hardware-in-the-loop (HIL) SOP tests
+
+`hil/` holds two Python tests that run `Bms_Sop` on the S32K344 board (`Debug_FLASH`, J-Link probe).
+Both reach the board through [pylink](https://github.com/square/pylink) (`pylink-square`), the Python
+wrapper for the SEGGER J-Link DLL, and read and write memory while the core runs. Each writes a Markdown
+report under `hil/reports/`.
+
+| Script | What it does |
+| --- | --- |
+| `sop_hil.py` | Forces inputs through `g_BmsSopTestOverride` and checks the limits against hand-derived values (21 cases) |
+| `sop_init_hil.py` | Samples inputs, validity bits and limits every 10 ms for 20 s after reset with J-Link HSS (10 checks); also writes a CSV and a Plotly page |
+
+```powershell
+python -m pip install pylink-square    # once
+python hil/sop_hil.py
+python hil/sop_init_hil.py
+```
+
+Needs the SEGGER J-Link software (`JLink_x64.dll`) and no J-Link GDB server running, since the probe
+serves one tool at a time. `hil/hil_common.py` holds the shared J-Link session, flash check and ELF
+symbol lookup (through the S32DS gdb, offline); `hil/plot_sop_trace.py` turns the CSV into the plot.
+HSS (High-Speed Sampling) is the engine behind SEGGER J-Scope; pylink has no wrapper for it, so
+`hil_common.py` calls the four DLL functions directly.
+
+**Every new J-Link connection with device S32K344 fills the application RAM with 0xDEADBEEF**, which
+corrupts the running firmware. Both scripts reset the MCU right after they connect.

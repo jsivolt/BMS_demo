@@ -17,31 +17,13 @@
 #include "Bms_Soc.h"
 #include "Battery_Monitor.h"
 #include "Bms_SleepTime.h"
+#include "Bms_BattCfg.h"
 #include "../storage/Bms_Nvm.h"
 #include "../common/Lib_Interp.h"
 
 /*==================================================================================================
 *                                       LOCAL CONSTANTS
 ==================================================================================================*/
-
-/**
- * @brief Open-circuit-voltage curve. X = cell voltage (mV), Y = SOC (0.1 %).
- *
- * Placeholder curve: must be replaced with characterization data for the
- * actual cell chemistry before the OCV reset is trusted.
- */
-static const uint16 g_BmsSocOcvTable[][2] =
-{
-    { 3000U,    0U },
-    { 3300U,  200U },
-    { 3450U,  500U },
-    { 3600U,  800U },
-    { 3700U,  900U },
-    { 3900U, 1000U }
-};
-
-#define BMS_SOC_OCV_TABLE_SIZE \
-    (sizeof(g_BmsSocOcvTable) / sizeof(g_BmsSocOcvTable[0]))
 
 /*==================================================================================================
 *                                       LOCAL VARIABLES
@@ -105,7 +87,7 @@ static uint16 Bms_Soc_VoltsToMilliVolts(float voltage_V)
  */
 static float Bms_Soc_SocX10ToCapacity_mAh(uint16 soc_pct_x10)
 {
-    return ((float)BMS_SOC_PACK1_CAPACITY_MAH * (float)soc_pct_x10) / 1000.0f;
+    return ((float)Bms_BattCfg_GetNominalCapacity_mAh() * (float)soc_pct_x10) / 1000.0f;
 }
 
 /**
@@ -118,7 +100,7 @@ static uint16 Bms_Soc_AbsDiff_pct_x10(uint16 a, uint16 b)
 
 /**
  * @brief Stores a new remaining capacity in one estimator, clamped to
- *        [0, BMS_SOC_PACK1_CAPACITY_MAH], and derives Soc_pct_x10 from it.
+ *        [0, Bms_BattCfg_GetNominalCapacity_mAh()], and derives Soc_pct_x10 from it.
  *
  * Does not touch est->Valid; that is the caller's decision.
  */
@@ -126,13 +108,15 @@ static void Bms_Soc_SetEstimatorCapacity(
     Bms_Soc_EstimatorType *est,
     float capacity_mAh)
 {
+    const float nominalCapacity_mAh = (float)Bms_BattCfg_GetNominalCapacity_mAh();
+
     if (capacity_mAh < 0.0f)
     {
         capacity_mAh = 0.0f;
     }
-    else if (capacity_mAh > (float)BMS_SOC_PACK1_CAPACITY_MAH)
+    else if (capacity_mAh > nominalCapacity_mAh)
     {
-        capacity_mAh = (float)BMS_SOC_PACK1_CAPACITY_MAH;
+        capacity_mAh = nominalCapacity_mAh;
     }
     else
     {
@@ -142,7 +126,7 @@ static void Bms_Soc_SetEstimatorCapacity(
     est->RemainingCapacity_mAh = capacity_mAh;
 
     est->Soc_pct_x10 = (uint16)(((capacity_mAh * 1000.0f)
-                                 / (float)BMS_SOC_PACK1_CAPACITY_MAH) + 0.5f);
+                                 / nominalCapacity_mAh) + 0.5f);
 }
 
 /**
@@ -335,8 +319,8 @@ uint32 Bms_Soc_GetElapsedSleepTime_s(void)
 uint16 Bms_Soc_OcvToSoc(uint16 voltage_mV)
 {
     return Lib_Interp_Lookup_1D_uint16(
-        g_BmsSocOcvTable,
-        (uint16)BMS_SOC_OCV_TABLE_SIZE,
+        Bms_BattCfg_GetOcvTable(),
+        Bms_BattCfg_GetOcvTableSize(),
         voltage_mV);
 }
 

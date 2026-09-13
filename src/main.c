@@ -51,6 +51,7 @@
 #include "Bms_Adc.h"
 #include "Bms_Ntc.h"
 #include "Bms_Soc.h"
+#include "battery/Bms_Sop.h"
 #include "battery/vAFE/Bms_Vafe.h"
 #include "battery/vPACK/Bms_Vpack.h"
 #include "communication/Bms_Can.h"
@@ -268,6 +269,9 @@ static void Bms_MainFunction_100ms(void)
 
     Bms_Soc_MainFunction();
 
+    /* Reads BatteryMonitor and Bms_Soc, so it runs after both. */
+    Bms_Sop_MainFunction();
+
     Bms_StateMachine_MainFunction();
 
     Bms_Can_SendStatus();
@@ -303,6 +307,8 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendSocStatus();
 
     Bms_Can_SendCellSoc();
+
+    Bms_Can_SendSopLimits();
 }
 
 static void Bms_MainFunction_1000ms(void)
@@ -516,6 +522,9 @@ int main(void)
     Bms_Nvm_Init();
 
     Bms_Soc_Init();
+
+    /* Current limits. Runs after Bms_Soc_Init; all limits start at zero. */
+    Bms_Sop_Init();
 
 
     /* ============================================================================================

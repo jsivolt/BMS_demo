@@ -43,6 +43,52 @@ uint16 Lib_Interp_Lookup_1D_uint16(
     uint16 tableSize,
     uint16 x);
 
+/**
+ * @brief Bilinearly interpolates a value from a 2-D uint16 map.
+ *
+ * The map is an explicit-axis calibration table: two independent breakpoint
+ * arrays and a rectangular block of dependent values. Both axes are sint32 so
+ * a negative independent variable (a temperature axis, say) needs no offset.
+ *
+ * @p values is row-major and indexed values[(iy * xCount) + ix], so one row
+ * holds every X breakpoint at a single Y. It must therefore hold exactly
+ * xCount * yCount entries.
+ *
+ * Both axes must be sorted ascending and hold at least one breakpoint. This is
+ * a caller responsibility and is not checked at runtime. An axis of one
+ * breakpoint is legal and makes the map constant along that axis. Duplicate
+ * neighbouring breakpoints are tolerated: the lower one wins, as in the 1-D
+ * case.
+ *
+ * Inputs at or beyond an edge are clamped to that edge, on each axis
+ * independently, so all four corners and all four edges clamp rather than
+ * extrapolate. As in the 1-D case the function never reports an out-of-range
+ * input; a caller that must tell "inside the map" from "clamped" has to
+ * compare against the axis end points itself.
+ *
+ * @note Arithmetic is 32-bit. The span between neighbouring breakpoints on
+ *       either axis must not exceed 65535, so that span x value-delta stays
+ *       inside uint32. Also a caller responsibility, unchecked.
+ *
+ * @param[in] xAxis   X breakpoints, sorted ascending.
+ * @param[in] xCount  Number of X breakpoints. Must be >= 1.
+ * @param[in] yAxis   Y breakpoints, sorted ascending.
+ * @param[in] yCount  Number of Y breakpoints. Must be >= 1.
+ * @param[in] values  xCount * yCount dependent values, row-major by Y.
+ * @param[in] x       X value to look up.
+ * @param[in] y       Y value to look up.
+ * @return Interpolated value, or 0 if any pointer is NULL_PTR or either count
+ *         is zero.
+ */
+uint16 Lib_Interp_Lookup_2D_uint16(
+    const sint32 *xAxis,
+    uint16        xCount,
+    const sint32 *yAxis,
+    uint16        yCount,
+    const uint16 *values,
+    sint32        x,
+    sint32        y);
+
 #ifdef __cplusplus
 }
 #endif

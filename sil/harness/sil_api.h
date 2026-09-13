@@ -10,6 +10,7 @@
 #define SIL_API_H
 
 #include "Std_Types.h"
+#include "Bms_BattCfg.h"
 
 #if defined(_WIN32)
 #define SIL_API __declspec(dllexport)
@@ -168,5 +169,46 @@ SIL_API boolean Sil_NvmLoad(uint16 *socMin, uint16 *socMax, uint16 *socAvg);
 
 /** flatTable holds rows*2 uint16 values laid out as X,Y,X,Y,... */
 SIL_API uint16 Sil_InterpLookup(const uint16 *flatTable, uint16 rows, uint16 x);
+
+/** values holds xCount*yCount entries, row-major by Y. See Lib_Interp.h. */
+SIL_API uint16 Sil_InterpLookup2D(const sint32 *xAxis, uint16 xCount,
+                                  const sint32 *yAxis, uint16 yCount,
+                                  const uint16 *values, sint32 x, sint32 y);
+
+/* ================================================================================================
+ * State of power - Bms_Sop / Bms_BattCfg
+ * ============================================================================================== */
+
+/** @brief Flattened Bms_Sop_DataType, so ctypes does not need the nested struct. */
+typedef struct
+{
+    uint16  DischargeTable_dA;
+    uint16  DischargeDerate;
+    uint16  DischargeFinal_dA;
+    uint16  RegenTable_dA;
+    uint16  RegenDerate;
+    uint16  RegenFinal_dA;
+    uint16  ChargeTable_dA;
+    uint16  ChargeDerate;
+    uint16  ChargeFinal_dA;
+    uint8   Mode;
+    boolean DerateActiveVLow;
+    boolean DerateActiveVHigh;
+    boolean DerateActiveTHigh;
+    boolean DerateActiveTLow;
+    boolean InputsValid;
+} Sil_SopSnapshotType;
+
+/** Overwrite the calibratable operating mode. 0 = Discharge, 1 = Charge. */
+SIL_API void   Sil_SetSopMode(uint8 mode);
+
+/** Copy out the published SOP snapshot. */
+SIL_API void   Sil_GetSopLimits(Sil_SopSnapshotType *out);
+
+/** Direct access to one static limit map. limitId: 0 discharge, 1 regen, 2 charge. */
+SIL_API uint16 Sil_SopStaticLimit(uint8 limitId, uint16 soc_pct_x10, sint16 temp_dC);
+
+/** Copy out the cell safety envelope, for the static threshold-ordering check. */
+SIL_API void   Sil_GetCellLimits(Bms_BattCfg_CellLimitsType *out);
 
 #endif /* SIL_API_H */

@@ -17,6 +17,7 @@
 #include "Bms_Vpack.h"
 #include "Fault_Manager.h"
 #include "Lib_Interp.h"
+#include "Bms_Sop.h"
 #include "C40_Ip.h"
 
 #include <string.h>
@@ -59,6 +60,7 @@ static void Sil_BootModules(void)
     BatteryMonitor_Init();
     Bms_Nvm_Init();
     Bms_Soc_Init();
+    Bms_Sop_Init();
 }
 
 static void Sil_ResetHarnessState(void)
@@ -106,6 +108,7 @@ void Sil_Run100ms(void)
     Bms_Vpack_MainFunction();
     BatteryMonitor_MainFunction();
     Bms_Soc_MainFunction();
+    Bms_Sop_MainFunction();
 }
 
 void Sil_Run1000ms(void)
@@ -345,4 +348,63 @@ boolean Sil_NvmLoad(uint16 *socMin, uint16 *socMax, uint16 *socAvg)
 uint16 Sil_InterpLookup(const uint16 *flatTable, uint16 rows, uint16 x)
 {
     return Lib_Interp_Lookup_1D_uint16((const uint16 (*)[2])flatTable, rows, x);
+}
+
+uint16 Sil_InterpLookup2D(const sint32 *xAxis, uint16 xCount,
+                          const sint32 *yAxis, uint16 yCount,
+                          const uint16 *values, sint32 x, sint32 y)
+{
+    return Lib_Interp_Lookup_2D_uint16(xAxis, xCount, yAxis, yCount, values, x, y);
+}
+
+/* ================================================================================================
+ * State of power
+ * ============================================================================================== */
+
+void Sil_SetSopMode(uint8 mode)
+{
+    g_BmsSopMode = mode;
+}
+
+void Sil_GetSopLimits(Sil_SopSnapshotType *out)
+{
+    const Bms_Sop_DataType *sop = Bms_Sop_GetData();
+
+    if (out == NULL_PTR)
+    {
+        return;
+    }
+
+    out->DischargeTable_dA  = sop->Discharge.Table_dA;
+    out->DischargeDerate    = sop->Discharge.DerateFactor;
+    out->DischargeFinal_dA  = sop->Discharge.Final_dA;
+
+    out->RegenTable_dA      = sop->Regen.Table_dA;
+    out->RegenDerate        = sop->Regen.DerateFactor;
+    out->RegenFinal_dA      = sop->Regen.Final_dA;
+
+    out->ChargeTable_dA     = sop->Charge.Table_dA;
+    out->ChargeDerate       = sop->Charge.DerateFactor;
+    out->ChargeFinal_dA     = sop->Charge.Final_dA;
+
+    out->Mode               = (uint8)sop->Mode;
+    out->DerateActiveVLow   = sop->DerateActiveVLow;
+    out->DerateActiveVHigh  = sop->DerateActiveVHigh;
+    out->DerateActiveTHigh  = sop->DerateActiveTHigh;
+    out->DerateActiveTLow   = sop->DerateActiveTLow;
+    out->InputsValid        = sop->InputsValid;
+}
+
+uint16 Sil_SopStaticLimit(uint8 limitId, uint16 soc_pct_x10, sint16 temp_dC)
+{
+    return Bms_BattCfg_GetStaticLimit_dA(
+        (Bms_BattCfg_LimitIdType)limitId, soc_pct_x10, temp_dC);
+}
+
+void Sil_GetCellLimits(Bms_BattCfg_CellLimitsType *out)
+{
+    if (out != NULL_PTR)
+    {
+        *out = *Bms_BattCfg_GetCellLimits();
+    }
 }

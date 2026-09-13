@@ -10,17 +10,17 @@ Source: `sil/tests/test_soc.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-06 23:52:47 |
+| Executed (UTC) | 2026-09-13 07:05:00 |
 | Host | Windows 11 (AMD64) |
 | Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
 | Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 128168 bytes, built 2026-09-06 23:52:46 UTC |
-| Repo commit | 3a1992e (working tree has uncommitted changes) |
+| SIL library | bms_sil.dll, 151920 bytes, built 2026-09-13 07:04:59 UTC |
+| Repo commit | aaf69ae (working tree has uncommitted changes) |
 
 ## Summary
 
-**27 test cases** (30 executions) in 0.10 s.
+**27 test cases** (30 executions) in 0.11 s.
 
 | Outcome | Count |
 |---|---|
@@ -148,7 +148,7 @@ assert bms.soc_min == bms.soc_max == bms.soc_avg
 | Case ID | SA-05 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 2.5 ms |
+| Duration | 2.8 ms |
 | Source | `sil/tests/test_soc.py:104` |
 
 **Objective.** SA-05: sustained discharge saturates at 0 % and does not wrap.
@@ -172,7 +172,7 @@ assert bms.capacity_avg_mAh == pytest.approx(0.0, abs=1e-3)
 | Case ID | SA-06 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 2.4 ms |
+| Duration | 2.8 ms |
 | Source | `sil/tests/test_soc.py:115` |
 
 **Objective.** SA-06: sustained charge saturates at 100 %.
@@ -215,7 +215,7 @@ assert bms.soc_avg == MAX_PCT_X10
 | Case ID | SA-08 |
 | Requirement | SOC-FR-01, SOC-IR-01 |
 | Result | PASS |
-| Duration | 16.2 ms |
+| Duration | 17.5 ms |
 | Source | `sil/tests/test_soc.py:132` |
 
 **Objective.** SA-08: positive current charges, negative discharges.
@@ -243,7 +243,7 @@ assert bms.soc < 500, "negative current must lower SOC"
 | Case ID | SA-09 |
 | Requirement | SOC-FR-01, SOC-TR-01 |
 | Result | PASS |
-| Duration | 48.1 ms |
+| Duration | 52.1 ms |
 | Source | `sil/tests/test_soc.py:148` |
 
 **Objective.** SA-09: a 1 C discharge for one hour takes a full pack from 100 % to ~0 %.
@@ -266,7 +266,7 @@ assert bms.soc == pytest.approx(0, abs=5)   # within 0.5 %
 | Case ID | — |
 | Requirement | SOC-FR-01 |
 | Result | PASS |
-| Duration | 7.9 ms |
+| Duration | 8.8 ms |
 | Source | `sil/tests/test_soc.py:159` |
 
 **Objective.** The integrated charge matches mAh computed independently in Python.
@@ -316,7 +316,7 @@ assert bms.init_source == INIT_SOURCE_DEFAULT
 | Case ID | IT-01 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.9 ms |
+| Duration | 1.0 ms |
 | Source | `sil/tests/test_soc.py:188` |
 
 **Objective.** IT-01: a persisted record is restored into all three estimators, valid.
@@ -402,7 +402,7 @@ assert bms.soc_valid is True
 | Case ID | IT-06 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.5 ms |
 | Source | `sil/tests/test_soc.py:236` |
 
 **Objective.** IT-06: while the estimate is a blind guess, nothing is written to flash.
@@ -489,7 +489,7 @@ assert bms.init_source == INIT_SOURCE_PENDING, "wait must not resolve early"
 | Case ID | IT-10 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.9 ms |
+| Duration | 1.0 ms |
 | Source | `sil/tests/test_soc.py:286` |
 
 **Objective.** IT-10: cell voltages never arriving times out into tier 2, not tier 1.
@@ -659,7 +659,7 @@ assert bms.soc == INITIAL_PCT_X10
 | Case ID | IT-07 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 8.7 ms |
+| Duration | 9.6 ms |
 | Source | `sil/tests/test_soc.py:396` |
 
 **Objective.** IT-07: the init source reports how SOC was *seeded*, not its current state.
@@ -800,7 +800,7 @@ assert bms.soc_valid is True
 | Case ID | — |
 | Requirement | SOC-FR-12, SOC-IR-01 |
 | Result | XFAIL (known defect) |
-| Duration | 8.0 ms |
+| Duration | 9.4 ms |
 | Source | `sil/tests/test_soc.py:482` |
 
 **Objective.** A *sustained* alive-counter failure must invalidate pack current.
@@ -834,4 +834,4 @@ assert bms.soc == soc_before, "SOC must not drift on a frozen current value"
 DEFECT: Battery_Monitor.c:286 sets PackCurrentValid[0] from g_BmsVpackData.CurrentValid (frame arrival only), while the data copy is gated on g_BmsVpackData.Valid (which includes AliveValid). A stuck alive counter therefore freezes PackCurrent_mA at its last value while still reporting it valid, and SOC integrates the stale current forever.
 ```
 
-<!-- sil-report slug='soc' title='SOC — estimation, initialization and upstream signal chain' cases='27' duration='0.098' verdict='PASS' executed='2026-09-06 23:52:47' passed='26' xfailed='1' skipped='0' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='soc' title='SOC — estimation, initialization and upstream signal chain' cases='27' duration='0.107' verdict='PASS' executed='2026-09-13 07:05:01' passed='26' xfailed='1' skipped='0' xpassed='0' failed='0' error='0' -->

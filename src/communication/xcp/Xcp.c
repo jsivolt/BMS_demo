@@ -1,6 +1,7 @@
 #include "Xcp.h"
 #include "Xcp_Cfg.h"
 #include "Xcp_Can.h"
+#include "../../battery/Bms_Sop.h"
 
 
 /* ================================================================================================
@@ -126,6 +127,20 @@ static boolean Xcp_IsWritableRange(
 
     if ((address == calAddress) &&
         (length <= sizeof(g_BmsXcpTestCalibration)))
+    {
+        return TRUE;
+    }
+
+    /*
+     * SOP operating mode. The design has this arriving from a mode-provider
+     * component that does not exist yet, so until it does the mode is set
+     * here, by hand, from a calibration tool. Values are Bms_Sop_ModeType:
+     * 0 Discharge, 1 Charge. Anything else reads as Discharge.
+     */
+    calAddress = (uint32)&g_BmsSopMode;
+
+    if ((address == calAddress) &&
+        (length <= sizeof(g_BmsSopMode)))
     {
         return TRUE;
     }

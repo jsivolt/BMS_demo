@@ -132,6 +132,9 @@ extern "C" {
 /** @brief CAN identifier used to broadcast the per-cell-extreme SOC estimates. */
 #define BMS_CAN_CFG_TX_CELL_SOC_ID              (0x30BU)
 
+/** @brief Pack 1 state-of-power current limits. */
+#define BMS_CAN_CFG_TX_SOP_LIMITS_ID            (0x30CU)
+
 /** @brief CAN identifier used for incoming debug frames. */
 #define BMS_CAN_CFG_RX_DEBUG_ID           (0x200U)
 
