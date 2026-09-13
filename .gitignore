@@ -21,6 +21,8 @@ Release_FLASH/
 /make/build/**/*.o
 /make/build/**/*.d
 /make/build/**/*.rsp
+# ...and the generated make fragments / per-build bookkeeping
+/make/build/*/.gen/
 
 # Eclipse/S32DS workspace metadata
 .metadata/

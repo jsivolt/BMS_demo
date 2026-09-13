@@ -50,6 +50,47 @@ prepended to `PATH`:
 & "C:\NXP\S32DS.3.6.10\S32DS\build_tools\msys32\usr\bin\bash.exe" -lc 'export PATH="/c/NXP/S32DS.3.6.10/S32DS/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin:$PATH" && cd /c/S32K344/workspace/BMS_demo/Debug_FLASH && make -j28 all'
 ```
 
+### Portable build (Linux or Windows, without S32DS)
+
+A second, self-contained build lives in `make/` and needs no S32DS installation — a bare-metal Arm GNU
+toolchain, `make` and Python 3 are enough. It is a peer of the S32DS project, not a replacement: S32DS
+still owns the project definition, and the portable build *derives* its source list, compiler flags,
+assembler flags and link line from the CDT-generated files of the selected configuration, so the two
+cannot drift apart. Nothing under `Debug_FLASH/` or `Release_RAM/` is written by it; output goes to
+`make/build/<CONFIG>/`.
+
+```bash
+make                    # Debug_FLASH (default)
+make CONFIG=Release_RAM
+make -j$(nproc)
+make clean              # removes make/build/<CONFIG> only, never the S32DS files
+make check-toolchain    # compiler identity, sysroot, nano.specs / libc_nano.a / libm.a / libgcc.a
+make print-config       # configuration, paths and the exact flags in use
+make help
+```
+
+| Prerequisite | Value |
+| --- | --- |
+| Toolchain | Arm GNU Toolchain **10.3-2021.10** (x86_64 Linux) — closest release to the S32DS GCC 10.2 this project ships with |
+| Alternative | S32DS for Linux, or any `arm-none-eabi-gcc` on `PATH`; a version other than 10.3.x only warns |
+| `make`, Python 3 | any recent version. Python is used only to derive sources and flags from the S32DS files |
+| SDK headers | already vendored in `sdk/`, no S32DS install needed (see `sdk/README.md`) |
+
+Point the build at a specific toolchain with `ARMGCC_DIR`, the directory containing `bin/arm-none-eabi-gcc`:
+
+```bash
+make ARMGCC_DIR=~/arm-gnu-toolchain-10.3-2021.10-x86_64-arm-none-eabi
+```
+
+If a toolchain cannot resolve `nano.specs`/`libc_nano.a` by itself (the S32DS one expects
+`--sysroot=<gcc>/arm-none-eabi/lib`), `make check-toolchain` reports it and the value can be supplied with
+`make SYSROOT=<path>`. Under the S32DS MSYS shell on Windows the user `PATH` is not inherited, so pass the
+interpreter explicitly there: `make PYTHON=/c/Users/<you>/AppData/Local/Programs/Python/Python313/python.exe`.
+
+Status: both configurations compile and link on Linux. Measured against the S32DS build, the portable
+build produces an identical symbol set, identical `text`/`data`/`bss` and an identical section layout —
+only the DWARF debug sections differ, because the two builds spell the same source paths differently.
+
 Flash/debug launch configurations for SEGGER are in `Project_Settings/Debugger/` (use these from S32DS for
 interactive debugging). To flash from the command line instead (J-Link probe connected, board powered):
 
@@ -114,9 +155,13 @@ DBC/          BMS_demo.dbc  — CAN database for PCAN / CANalyzer
 Project_Settings/  Linker scripts, startup code, debugger launches
 sil/          Software-in-the-loop test platform: same src/ code, native build, pytest (see §15)
 hil/          Hardware-in-the-loop SOP tests on the S32K344 board, with reports (see §16)
+make/         Portable build (Linux/Windows, no S32DS needed): derives its sources and flags from the
+              Debug_FLASH / Release_RAM configuration files, output in make/build/ (see §1)
+sdk/          Vendored NXP RTD base headers (BaseNXP / Platform) the portable build resolves its four
+              SDK include roots from; provenance and scope in sdk/README.md
 
 Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_reset.bat ·
-               debug_live.bat · fault_snapshot.bat · fault_decode.gdb  (see §1 and §10)
+               debug_live.bat · fault_snapshot.bat · fault_decode.gdb · Makefile  (see §1 and §10)
 ```
 
 ---
