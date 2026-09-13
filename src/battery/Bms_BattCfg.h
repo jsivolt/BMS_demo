@@ -70,7 +70,45 @@ typedef struct
     sint16 TemperatureDeltaMax_dC;
     sint16 TemperatureDeltaMaxClear_dC;
 
+    /*
+     * Derate windows for Bms_Sop. Each ramp runs from Start (no derate) to
+     * End (DerateFloor). SOP-FR-06 requires every End to sit on the safe side
+     * of the matching fault threshold above, so that derating finishes before
+     * protection starts. Test SP-12 checks exactly that relation.
+     */
+
+    /** @brief Charge and regen derate on rising cell voltage. End < CellVoltageMax_mV. */
+    uint16 DerateVHighStart_mV;
+    uint16 DerateVHighEnd_mV;
+
+    /** @brief Discharge derate on falling cell voltage. End > CellVoltageMin_mV. */
+    uint16 DerateVLowStart_mV;
+    uint16 DerateVLowEnd_mV;
+
+    /** @brief All limits derate on rising temperature. End < TemperatureMax_dC. */
+    sint16 DerateTHighStart_dC;
+    sint16 DerateTHighEnd_dC;
+
+    /** @brief Lowest factor derating may reach. Unit: 0.001, range 0-1000. */
+    uint16 DerateFloor;
+
 } Bms_BattCfg_CellLimitsType;
+
+/**
+ * @brief Which static limit table to read.
+ *
+ * Owned here, not by Bms_Sop. Bms_BattCfg is a foundation module that Bms_Soc
+ * and Battery_Monitor already depend on; naming a Bms_Sop type in this header
+ * would make Bms_BattCfg.h include Bms_Sop.h while Bms_Sop.h includes this
+ * one. The identifier alone picks the table: the operating mode decides which
+ * limits Bms_Sop publishes, not which table each limit reads.
+ */
+typedef enum
+{
+    BMS_BATTCFG_LIMIT_DISCHARGE = 0U,
+    BMS_BATTCFG_LIMIT_REGEN     = 1U,
+    BMS_BATTCFG_LIMIT_CHARGE    = 2U
+} Bms_BattCfg_LimitIdType;
 
 /*==================================================================================================
 *                                       FUNCTION PROTOTYPES
@@ -114,6 +152,23 @@ uint16 Bms_BattCfg_GetOcvTableSize(void);
  * @return Pointer to the constant envelope. Never NULL_PTR.
  */
 const Bms_BattCfg_CellLimitsType *Bms_BattCfg_GetCellLimits(void);
+
+/**
+ * @brief Static current limit for one direction, by SOC and temperature.
+ *
+ * Bilinear interpolation over the calibration map for @p limitId, clamped at
+ * every edge. PLACEHOLDER DATA: the maps are shaped plausibly but are not
+ * derived from the cell, contactor or fuse datasheets. They must be replaced
+ * with real ratings before any limit published from them is trusted.
+ *
+ * @param[in] limitId     Which map to read.
+ * @param[in] soc_pct_x10 State of charge. Unit: 0.1 %, range 0-1000.
+ * @param[in] temp_dC     Temperature. Unit: 0.1 degC.
+ * @return Current limit magnitude. Unit: 0.1 A. Returns 0 for an unknown id.
+ */
+uint16 Bms_BattCfg_GetStaticLimit_dA(Bms_BattCfg_LimitIdType limitId,
+                                     uint16                  soc_pct_x10,
+                                     sint16                  temp_dC);
 
 #ifdef __cplusplus
 }
