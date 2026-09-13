@@ -57,9 +57,70 @@ OCV_TABLE = [
     (3900, 1000),
 ]
 
+# Bms_Sop_ModeType, mirrored from Bms_Sop.h.
+SOP_MODE_DISCHARGE = 0
+SOP_MODE_CHARGE = 1
+
+# Bms_BattCfg_LimitIdType, mirrored from Bms_BattCfg.h.
+SOP_LIMIT_DISCHARGE = 0
+SOP_LIMIT_REGEN = 1
+SOP_LIMIT_CHARGE = 2
+
+# Shared breakpoints of the static limit maps, as compiled into Bms_BattCfg.c.
+SOP_SOC_AXIS = [0, 100, 200, 400, 600, 800, 900, 1000]
+SOP_TEMP_AXIS = [-200, -100, 0, 100, 250, 400, 500, 600]
+
+SOP_DERATE_NONE = 1000
+
 u8, u16, u32 = ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32
 s16, s32 = ctypes.c_int16, ctypes.c_int32
 f32, bl = ctypes.c_float, ctypes.c_bool
+
+
+class SopSnapshot(ctypes.Structure):
+    """Mirrors Sil_SopSnapshotType in sil/harness/sil_api.h."""
+
+    _fields_ = [
+        ("DischargeTable_dA", u16),
+        ("DischargeDerate", u16),
+        ("DischargeFinal_dA", u16),
+        ("RegenTable_dA", u16),
+        ("RegenDerate", u16),
+        ("RegenFinal_dA", u16),
+        ("ChargeTable_dA", u16),
+        ("ChargeDerate", u16),
+        ("ChargeFinal_dA", u16),
+        ("Mode", u8),
+        ("DerateActiveVLow", bl),
+        ("DerateActiveVHigh", bl),
+        ("DerateActiveTHigh", bl),
+    ]
+
+
+class CellLimits(ctypes.Structure):
+    """Mirrors Bms_BattCfg_CellLimitsType in src/battery/Bms_BattCfg.h."""
+
+    _fields_ = [
+        ("CellVoltageMax_mV", u16),
+        ("CellVoltageMaxClear_mV", u16),
+        ("CellVoltageMin_mV", u16),
+        ("CellVoltageMinClear_mV", u16),
+        ("CellImbalanceMax_mV", u16),
+        ("CellImbalanceMaxClear_mV", u16),
+        ("TemperatureMax_dC", s16),
+        ("TemperatureMaxClear_dC", s16),
+        ("TemperatureMin_dC", s16),
+        ("TemperatureMinClear_dC", s16),
+        ("TemperatureDeltaMax_dC", s16),
+        ("TemperatureDeltaMaxClear_dC", s16),
+        ("DerateVHighStart_mV", u16),
+        ("DerateVHighEnd_mV", u16),
+        ("DerateVLowStart_mV", u16),
+        ("DerateVLowEnd_mV", u16),
+        ("DerateTHighStart_dC", s16),
+        ("DerateTHighEnd_dC", s16),
+        ("DerateFloor", u16),
+    ]
 
 _SIGNATURES = {
     "Sil_FlashWipe": (None, []),
@@ -112,6 +173,10 @@ _SIGNATURES = {
     "Sil_NvmRecordCount": (u32, []),
     "Sil_NvmLoad": (bl, [ctypes.POINTER(u16)] * 3),
     "Sil_InterpLookup": (u16, [ctypes.POINTER(u16), u16, u16]),
+    "Sil_SetSopMode": (None, [u8]),
+    "Sil_GetSopLimits": (None, [ctypes.POINTER(SopSnapshot)]),
+    "Sil_SopStaticLimit": (u16, [u8, u16, s16]),
+    "Sil_GetCellLimits": (None, [ctypes.POINTER(CellLimits)]),
     "Sil_InterpLookup2D": (
         u16,
         [ctypes.POINTER(s32), u16, ctypes.POINTER(s32), u16,
@@ -389,6 +454,26 @@ class Bms:
         return self.lib.Sil_InterpLookup2D(
             xs, len(x_axis), ys, len(y_axis), vs, x, y
         )
+
+    # -- state of power ----------------------------------------------------
+
+    def set_sop_mode(self, mode: int) -> None:
+        """Overwrite the calibratable mode, as an XCP master would."""
+        self.lib.Sil_SetSopMode(mode)
+
+    def sop(self) -> SopSnapshot:
+        snap = SopSnapshot()
+        self.lib.Sil_GetSopLimits(ctypes.byref(snap))
+        return snap
+
+    def sop_static_limit(self, limit_id: int, soc_pct_x10: int, temp_dC: int) -> int:
+        """One static map value, straight from Bms_BattCfg, no derate applied."""
+        return self.lib.Sil_SopStaticLimit(limit_id, soc_pct_x10, temp_dC)
+
+    def cell_limits(self) -> CellLimits:
+        limits = CellLimits()
+        self.lib.Sil_GetCellLimits(ctypes.byref(limits))
+        return limits
 
     def interp2d_raw(self, x_axis, y_axis, flat, x_count, y_count, x, y) -> int:
         """Escape hatch for malformed-map cases (counts deliberately wrong)."""

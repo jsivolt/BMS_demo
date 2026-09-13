@@ -30,6 +30,7 @@ LIB_NAME = "bms_sil.dll" if os.name == "nt" else "libbms_sil.so"
 PRODUCTION_SOURCES = [
     "src/battery/Bms_BattCfg.c",
     "src/battery/Bms_Soc.c",
+    "src/battery/Bms_Sop.c",
     "src/battery/Battery_Monitor.c",
     "src/battery/vAFE/Bms_Vafe.c",
     "src/battery/vPACK/Bms_Vpack.c",
