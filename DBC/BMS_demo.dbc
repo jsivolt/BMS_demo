@@ -129,6 +129,15 @@ BO_ 779 SOC_CellBased: 8 S32K344_BMS
  SG_ Pack1SOCAvgValid : 50|1@1+ (1,0) [0|1] "" PCAN
  SG_ CellSOCAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
 
+BO_ 780 SOP_Limits: 8 S32K344_BMS
+ SG_ Pack1DischargeLimit : 0|16@1+ (0.1,0) [0|6553.5] "A" PCAN
+ SG_ Pack1RegenLimit : 16|16@1+ (0.1,0) [0|6553.5] "A" PCAN
+ SG_ Pack1ChargeLimit : 32|16@1+ (0.1,0) [0|6553.5] "A" PCAN
+ SG_ Pack1SOPDerateVLow : 48|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1SOPDerateVHigh : 49|1@1+ (1,0) [0|1] "" PCAN
+ SG_ Pack1SOPDerateTHigh : 50|1@1+ (1,0) [0|1] "" PCAN
+ SG_ SOPAliveCounter : 56|4@1+ (1,0) [0|15] "" PCAN
+
 BO_ 1024 CAN1_Test: 8 S32K344
  SG_ TestByte0 : 0|8@1+ (1,0) [0|255] "" PCAN
  SG_ TestByte1 : 8|8@1+ (1,0) [0|255] "" PCAN

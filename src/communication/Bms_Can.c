@@ -14,6 +14,7 @@
 
 #include "../battery/vAFE/Bms_Vafe.h"
 #include "../battery/vPACK/Bms_Vpack.h"
+#include "../battery/Bms_Sop.h"
 #include "../battery/Bms_Soc.h"
 
 
@@ -149,6 +150,7 @@ static uint8 g_BmsCanPackCurrentAliveCounter = 0U;
 static uint8 g_BmsCanPackPowerAliveCounter = 0U;
 static uint8 g_BmsCanSocAliveCounter = 0U;
 static uint8 g_BmsCanCellSocAliveCounter = 0U;
+static uint8 g_BmsCanSopAliveCounter = 0U;
 
 volatile uint8 g_BmsCanRxData[8] =
 {
@@ -1734,6 +1736,102 @@ void Bms_Can_SendCellSoc(void)
     {
         g_BmsCanCellSocAliveCounter =
             (uint8)((g_BmsCanCellSocAliveCounter + 1U) & 0x0FU);
+    }
+}
+
+
+/* ================================================================================================
+ * CAN TX state-of-power limits frame
+ * ============================================================================================== */
+
+void Bms_Can_SendSopLimits(void)
+{
+    const Bms_Sop_DataType *sopData;
+    uint8 txData[8] = {0U};
+    uint16 limitRaw;
+
+    sopData = Bms_Sop_GetData();
+
+    if (sopData == NULL_PTR)
+    {
+        return;
+    }
+
+    /*
+     * Byte0-1 = discharge limit, unit 0.1 A, magnitude.
+     * Zero in Charge mode.
+     */
+    limitRaw = sopData->Discharge.Final_dA;
+
+    txData[0] = (uint8)(limitRaw & 0xFFU);
+    txData[1] = (uint8)((limitRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte2-3 = regenerative braking limit, unit 0.1 A, magnitude.
+     * Zero in Charge mode.
+     */
+    limitRaw = sopData->Regen.Final_dA;
+
+    txData[2] = (uint8)(limitRaw & 0xFFU);
+    txData[3] = (uint8)((limitRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte4-5 = charge limit, unit 0.1 A, magnitude.
+     * Zero in Discharge mode.
+     */
+    limitRaw = sopData->Charge.Final_dA;
+
+    txData[4] = (uint8)(limitRaw & 0xFFU);
+    txData[5] = (uint8)((limitRaw >> 8U) & 0xFFU);
+
+    /*
+     * Byte6 bit0 = cell-voltage-low derate active
+     * Byte6 bit1 = cell-voltage-high derate active
+     * Byte6 bit2 = temperature-high derate active
+     * Byte6 bit3-7 reserved
+     */
+    if (sopData->DerateActiveVLow == TRUE)
+    {
+        txData[6] |= 0x01U;
+    }
+
+    if (sopData->DerateActiveVHigh == TRUE)
+    {
+        txData[6] |= 0x02U;
+    }
+
+    if (sopData->DerateActiveTHigh == TRUE)
+    {
+        txData[6] |= 0x04U;
+    }
+
+    /*
+     * Byte7 bit0-3 = alive counter
+     */
+    txData[7] =
+        (uint8)(g_BmsCanSopAliveCounter & 0x0FU);
+
+    /*
+     * Handle previous polling TX completion.
+     */
+    FlexCAN_Ip_MainFunctionWrite(
+        BMS_CAN_CFG_INSTANCE,
+        BMS_CAN_CFG_TX_MB_INDEX
+    );
+
+    g_BmsCanTxStatus =
+        Bms_Can_SendFrame(
+            BMS_CAN_CFG_INSTANCE,
+            BMS_CAN_CFG_TX_MB_INDEX,
+            BMS_CAN_CFG_TX_SOP_LIMITS_ID,
+            txData,
+            TRUE
+        );
+
+    if (g_BmsCanTxStatus == FLEXCAN_STATUS_SUCCESS)
+    {
+        g_BmsCanSopAliveCounter =
+            (uint8)((g_BmsCanSopAliveCounter + 1U) & 0x0FU);
     }
 }
 

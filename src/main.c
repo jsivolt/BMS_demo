@@ -307,6 +307,8 @@ static void Bms_MainFunction_100ms(void)
     Bms_Can_SendSocStatus();
 
     Bms_Can_SendCellSoc();
+
+    Bms_Can_SendSopLimits();
 }
 
 static void Bms_MainFunction_1000ms(void)
