@@ -2,8 +2,8 @@
 
 Modules: `Bms_Sop` (Pack 1 state of power, meaning the current limits), `Bms_BattCfg` (shared battery data configuration).
 Target: NXP S32K344, bare metal, S32K3 RTD 7.0.1.
-Status: Partly implemented. `Bms_BattCfg` and the shared 2-D lookup are built and tested; `Bms_Sop` itself is not written. Four decisions still open. See section 7.
-Last updated: 2026-09-11.
+Status: **Implemented and published.** `Bms_Sop`, `Bms_BattCfg`, the shared 2-D lookup and CAN frame `0x30C` are all built, and 33 SIL cases cover the module. The limit maps are **placeholder calibration**, not datasheet ratings, so no published limit is trustworthy yet. One decision still open, section 7.6. See section 7.
+Last updated: 2026-09-12.
 
 State of power (SOP) is the largest current the pack can carry right now without breaking a cell limit.
 
@@ -325,7 +325,7 @@ typedef struct
 } Bms_BattCfg_CellLimitsType;
 ```
 
-The derate windows are **not in this struct yet**. They belong here — SOP-FR-06 needs `DerateVHighStart/End_mV`, `DerateVLowStart/End_mV`, `DerateTHighStart/End_dC` and a `DerateFloor`, each sitting inside its matching threshold above — but they have no consumer until `Bms_Sop` is written, and no calibrated values yet. They land with the module, and SP-12 becomes checkable at the same time.
+The derate windows landed with the module on 2026-09-12 (`104d24f`) and sit in the same struct: `DerateVHighStart/End_mV`, `DerateVLowStart/End_mV`, `DerateTHighStart/End_dC` and `DerateFloor`. As built they are 4100 to 4200 mV rising, 2900 to 2600 mV falling, 45.0 to 60.0 degC, floor 0.100. Every End sits on the safe side of its matching fault threshold, which is what SP-12 now checks. These are placeholder calibration too.
 
 Read functions:
 
@@ -390,7 +390,9 @@ The discharge table is indexed by the SOC of the Min estimator. The regen table 
 
 This uses `Lib_Interp_Lookup_2D_uint16()`, added to `Lib_Interp` on 2026-09-11 for exactly this table. See section 7.2 for the signature.
 
-Proposed breakpoints, as a calibration and not fixed by this design: SOC at 0, 10, 20, 40, 60, 80, 90, 100 percent. Temperature at -20, -10, 0, 10, 25, 40, 50, 60 degC.
+Breakpoints as built (`104d24f`): SOC at 0, 10, 20, 40, 60, 80, 90, 100 percent. Temperature at -20, -10, 0, 10, 25, 40, 50, 60 degC. Three 8-by-8 maps, one per limit, in `Bms_BattCfg.c`.
+
+**The map values are placeholders.** They are not from the cell, contactor or fuse datasheets. Nobody measured them. They are shaped to be plausible, to exercise the lookup, and to be wrong in safe directions: discharge falls to zero at empty and rolls off at both temperature ends; charge and regen fall to zero at full; charge and regen are zero at -20 degC and tiny at -10 degC; and every value stays inside the over-current trips, discharge peaking at 90.0 A against a 100.0 A trip, charge at 70.0 A and regen at 75.0 A against an 80.0 A trip. A SIL case asserts that last property, so a future calibration cannot quietly publish a limit that trips a fault. Replace all three maps before any published limit is trusted. Same status as the OCV curve.
 
 ### 3.6 Subfunction: feedback derating
 
@@ -474,13 +476,15 @@ The module starts at zero, not at a table value. This is on purpose. The first `
 
 | Constant | Proposed | Note |
 |---|---|---|
-| `BMS_SOP_DEFAULT_MODE` | `DISCHARGE` | Used until the mode-provider component exists. Section 7.1. |
+| `BMS_SOP_DEFAULT_MODE` | `DISCHARGE` | The mode `Bms_Sop_Init()` restores. Section 7.1. |
+
+The mode itself is `volatile uint8 g_BmsSopMode`, not a constant. It is initialized to `BMS_SOP_DEFAULT_MODE` and left non-static so a debugger or an XCP master can overwrite it live; it is on the XCP write whitelist in `Xcp_IsWritableRange()`. Anything that is not a valid `Bms_Sop_ModeType` reads as Discharge, which publishes no charge limit. `Bms_Sop_Init()` restores the default, so a value written earlier does not survive a restart. This is the stand-in for the mode-provider component, not the final interface (section 7.1).
 
 There is no `BMS_SOP_SAMPLE_PERIOD_MS`. Nothing in this design uses a time step. The module is stateless (section 3.2), so no term is integrated and no output is rate-limited. The 100 ms period is a scheduler fact (SOP-TR-01), not a module constant.
 
 ### 3.10 Published CAN signals
 
-`0x30C SOP_Limits`. New. 100 ms. CAN0.
+`0x30C SOP_Limits`. **Built and published** (`dc68326`). 100 ms. CAN0.
 
 | Bytes | Signal | Encoding |
 |---|---|---|
@@ -493,15 +497,19 @@ There is no `BMS_SOP_SAMPLE_PERIOD_MS`. Nothing in this design uses a time step.
 
 The frame carries no mode signal and no validity signal. The mode-provider component publishes the mode, see SOP-IR-06. Nothing publishes validity, see section 5.6.
 
-`0x30D SOP_Debug`. Optional. Calibration only. One frame carries `Table_dA` and `DerateFactor` for a single limit, plus a selector byte holding the `Bms_BattCfg_LimitIdType` value that says which limit the frame describes. Successive frames cycle through the three limits, so a full picture takes three frames. Section 7.3 asks whether it is worth the cost.
+That last point matters more now than it did on paper. During the pending-init window `Bms_Soc` reports SOC as 0, and the charge map at SOC 0 returns its full value, so `0x30C` briefly publishes a healthy-looking charge limit computed from a guess. While nothing transmitted, that was theoretical. It is on the wire now. Byte 6 bits 3-7 are reserved and are where a validity flag would go if section 5.6 is ever closed.
 
-Both frames need entries in `DBC/BMS_demo.dbc`. The file `DBC/BMS_demo.sym` is already out of date with the SOC frames. This design does not maintain it either.
+Publishing takes the 100 ms task from 17 blocking sends to 18. That was the argument against it, but the per-frame timeout dropped from 100 ms to 2 ms in `a90746b`, so the 18th send costs about 2 ms of worst case rather than 100 ms, and 0.26 ms of bus time. CAN0 carries roughly 4.7 percent load.
+
+`0x30D SOP_Debug` was **dropped**, see section 7.3. The calibration detail it would have carried is read over XCP instead.
+
+`0x30C` has an entry in `DBC/BMS_demo.dbc`. The file `DBC/BMS_demo.sym` is already out of date with the SOC frames. This design does not maintain it either.
 
 ---
 
 ## 4. Validation plan
 
-This plan is not run yet. Nothing is implemented. This section states what the SIL suite must cover, so the test cases are agreed before the code is written, not after.
+**Run as of 2026-09-12.** 33 cases in `sil/tests/test_sop.py` cover SP-01 to SP-05 and SP-12. The suite is 93 pass and 1 xfail overall. SP-06 to SP-09 are **not** written, and SP-10 and SP-11 were covered by the `Bms_BattCfg` move. Each case below says where it stands.
 
 SOP is a good fit for SIL. It is computation over the outputs of `Battery_Monitor` and `Bms_Soc`. The current SIL setup drives both: cell voltages and pack current arrive as real CAN frames on CAN1 and CAN2, and the pack temperatures come from the faked ADC.
 
@@ -519,9 +527,9 @@ SOP is a good fit for SIL. It is computation over the outputs of `Battery_Monito
 | ID | Case |
 |---|---|
 | SP-05 | Discharge mode forces `Charge.Final_dA` to zero. Charge mode forces `Discharge.Final_dA` and `Regen.Final_dA` to zero. The `Table_dA` and `DerateFactor` fields of the forced limits stay at their computed values (SOP-FR-03). |
-| SP-06 | A cell-voltage set sent over CAN1 that drives `MinCellVoltage` into the derate window reduces the discharge limit within one task cycle. |
+| SP-06 | A cell-voltage set sent over CAN1 that drives `MinCellVoltage` into the derate window reduces the discharge limit within one task cycle. **Not written.** The equivalent is covered at module level by the SP-03 cases, which drive cell voltage through the SIL doubles rather than over CAN1. |
 | SP-07 | A rising thermistor reading sent through the ADC double reduces every limit that the active mode publishes, and reduces the `DerateFactor` field of all three. The published value of an inactive limit stays zero, so `k_tHigh` has to be checked on the calibration fields (SOP-FR-03), not on `Final_dA`. |
-| SP-08 | The `0x30C` frame encodes the limits and the derate flags correctly. The alive counter rolls 0 to 15 to 0. |
+| SP-08 | The `0x30C` frame encodes the limits and the derate flags correctly. The alive counter rolls 0 to 15 to 0. **Not written, and not writable yet.** SIL does not compile `Bms_Can.c`, so no CAN frame has test coverage. Closing this needs a `FlexCAN_Ip` fake in `sil/fakes/`; the driver surface `Bms_Can.c` uses is nine functions, of which only `SendBlocking` and `Receive` need real behavior. The frame ships verified by inspection and a bench capture only. |
 
 ### 4.3 Regression: the `Bms_BattCfg` move
 
@@ -536,13 +544,14 @@ These run over the `Bms_BattCfg` constants. They are not runtime tests.
 
 | ID | Case |
 |---|---|
-| SP-12 | Every derate `End` threshold sits inside its matching fault threshold (SOP-FR-06). Not runnable yet: the fault thresholds are in `Bms_BattCfg` as of 2026-09-11, the derate windows are not (section 3.3). |
+| SP-12 | Every derate `End` threshold sits inside its matching fault threshold (SOP-FR-06). **Runnable and passing** since the derate windows landed. Extended to check the ramp directions, the floor range, and that each fault threshold's clear value sits on the safe side of its set value - which is the only coverage the envelope move from `47b18d8` has. |
 
 ### 4.5 Not coverable in SIL
 
 - Whether the static table's current ratings match the cell, contactor, and fuse datasheets. SIL proves the lookup arithmetic, not the calibration data.
 - Thermal behavior under a sustained load. There is no thermal model.
 - Whether the derate windows are calibrated well enough to keep a real pack off its fault thresholds across the full temperature range.
+- Anything in `Bms_Can`, including the `0x30C` encoding (SP-08) and the transmit-failure handling added in `a90746b`. `Bms_Can.c` is not in the SIL source list.
 - The end-to-end property behind SOP-FR-06: that a sustained discharge at the published limit never trips `FAULT_CELL_UV`. This was test case SP-09 in an earlier draft of this plan. It needs a cell model whose voltage falls in response to the current drawn. SIL has no such model: cell voltages arrive as injected CAN1 frames and do not react to the pack current injected on CAN2. SP-12 is the static stand-in, and it only proves the thresholds are ordered, not that the ramp is fast enough.
 - Any case that needs the Min and Max SOC estimators to hold different values. See section 5.7.
 
@@ -594,12 +603,28 @@ The effect on this module is that all three tables are indexed by the same numbe
 
 This also limits validation. SP-02 cannot drive the two branches apart through the normal signal chain and has to set the two SOC fields directly.
 
+### 5.8 The limit maps are not calibration data
+
+Every number in the three static maps, and every derate window, is a placeholder written to be plausible. None of it comes from the cell, contactor or fuse datasheets, and none of it was measured. The lookup arithmetic is tested; the values are evidence of nothing.
+
+The shapes are chosen to fail safe rather than to be right: zero discharge at empty, zero charge and regen at full, no charge below freezing, and every value inside the over-current trips. That makes the module safe to run on a bench. It does not make a published limit meaningful, and section 4.4 already says SIL cannot close this. Replace the maps before the pack is real.
+
+This is the same status the OCV curve has carried since `Bms_Soc` was written, and it should be read the same way.
+
+### 5.9 The published frame has no test
+
+`0x30C` is transmitted by `Bms_Can`, and `Bms_Can.c` is not in the SIL source list, so no CAN frame in this firmware has automated coverage. SP-08 records what the case would assert. Until a `FlexCAN_Ip` fake exists, the encoding, the byte order, the derate-flag bits and the alive-counter rollover rest on inspection and on a bus capture at the bench.
+
 ---
 
 ## 6. Change log
 
 | Date | Change | Rationale |
 |---|---|---|
+| 2026-09-12 | Published the limits on CAN frame `0x30C` (`dc68326`), with a DBC entry. Recorded in section 3.10 that this makes the section 5.6 validity gap reachable by a real consumer, and that the 18th blocking send now costs about 2 ms rather than 100 ms. | The module computed limits that no CAN consumer could see. The timeout fix removed the objection that had made this a real decision. |
+| 2026-09-12 | Answered section 7.3: **dropped `0x30D`**, calibrate over XCP. `g_BmsSopData` links inside the existing XCP read window, so the data is reachable with no firmware change. Recorded the two costs: a RAM address is not self-describing and moves between builds, and no A2L generation exists. | XCP runs on its own FlexCAN instance and cannot add to the F7 blocking total. |
+| 2026-09-12 | Answered section 7.1: **deferred**. No mode-provider component yet. The mode is `g_BmsSopMode`, a volatile calibratable variable defaulting to Discharge and on the XCP write whitelist. `Bms_Sop_Init()` restores the default. | Keeps the bench demo usable without committing to a mode interface. The stand-in is explicitly not the final interface. |
+| 2026-09-12 | Built `Bms_Sop` (`3770dc2`) and the placeholder limit maps and derate windows in `Bms_BattCfg` (`104d24f`). 33 SIL cases, SP-01 to SP-05 and SP-12; suite now 93 pass / 1 xfail. Section 7.5 settled as built: no `Init()`. Added sections 5.8 and 5.9 to record that the calibration is invented and that the published frame has no test. | The design was agreed; this is the implementation. The maps are placeholders so that the module can run before datasheet ratings exist. |
 | 2026-09-11 | Answered section 7.4 **yes** and moved the cell safety envelope out of `Battery_Monitor.c` into `Bms_BattCfg_CellLimitsType`: cell OV/UV, imbalance, over/under-temperature and pack-to-pack delta, each as a set and clear pair. `Battery_Monitor` keeps the old macro names as forwards to the struct. Pack over-current thresholds stayed behind. Updated the section 3.3 struct to match what was built. | The doc's single-value fields could not express hysteresis, which every threshold in the fault path uses. Forwarding macros keep the diff on a safety-critical path to one block. |
 | 2026-09-11 | Answered section 7.2 with `Lib_Interp_Lookup_2D_uint16()` and built it: explicit `sint32` axes, row-major `uint16` values, independent clamping on each axis, 12 SIL cases over a non-separable map. Section 3.5 no longer says the interpolation is missing. | The static SOP table is two-dimensional and `Lib_Interp` only did one. Putting it in the shared library keeps `Bms_BattCfg` free of algorithm (CFG-FR-03) and stops the next module copying it. |
 | 2026-09-11 | Implemented section 3.4: `Bms_BattCfg` now owns the OCV curve and the nominal capacity, `Bms_Soc` reads them through accessors. No `Init()`, per section 7.5. | Ordered first by section 3.4 — a pure refactor with a green suite reviews fast. |
@@ -614,9 +639,9 @@ This also limits validation. SP-02 cannot drive the two branches apart through t
 
 ## 7. Open questions for review
 
-There are six decisions this design cannot make on its own. They are numbered so you can answer by number.
+Five of the six are settled. Only 7.6 is still open. The answered ones are kept, with their answers, because the reasoning is what a later reader needs.
 
-### 7.1 How will the mode-provider component decide the mode?
+### 7.1 How will the mode-provider component decide the mode? — DEFERRED 2026-09-12
 
 The operating mode is an input (SOP-IR-06). A separate component owns it. That component does not exist yet, which is fine for this design. `Bms_Sop` only consumes the result, so none of the options below change the SOP design. The open question is the decision rule for that component. Candidates:
 
@@ -627,7 +652,9 @@ The operating mode is an input (SOP-IR-06). A separate component owns it. That c
 | Derive from `Bms_StateMachine`. | This needs a charging state that does not exist today. |
 | A dedicated charger-detect input. | This is the right answer on real hardware. No pin is assigned. |
 
-My suggestion: the CAN command, for the bench demo. It matches the existing control interface and keeps the mode explicit and easy to watch. It is your call, and it can be made later.
+**Answered: deferred, at your direction.** No mode-provider component is being built yet. Until one exists the mode is `g_BmsSopMode`, a volatile calibratable variable defaulting to Discharge and writable over XCP (section 3.9). That keeps the bench demo usable — a calibration tool flips the mode by hand — without committing to any of the options above.
+
+The table stands as the menu for whoever builds the component. My suggestion is still the CAN command for a bench demo: it matches the existing control interface and keeps the mode explicit and easy to watch. Note the XCP stand-in is deliberately not that interface. It is a RAM write by a calibration tool, invisible to every other consumer, so it should not be mistaken for the real thing or shipped as one.
 
 ### 7.2 Who owns the two-dimensional lookup? — ANSWERED 2026-09-11: `Lib_Interp`
 
@@ -655,7 +682,7 @@ Both axes are `sint32` so the temperature axis needs no offset to hold negative 
 
 Twelve SIL cases cover it (LI2-01 to LI2-12), deliberately over a non-separable map so a pair of chained 1-D lookups could not reproduce the result.
 
-### 7.3 Is the `0x30D` diagnostic frame worth a 19th blocking transmit?
+### 7.3 Is the `0x30D` diagnostic frame worth a 19th blocking transmit? — ANSWERED 2026-09-12: dropped
 
 The 100 ms task already makes 17 calls to `FlexCAN_Ip_SendBlocking()` on one mailbox. The `PROJECT_PLAN.md` F7 finding puts the worst case near 1.7 s of blocking on a bus-off. `0x30C` makes it 18. `0x30D` makes it 19.
 
@@ -666,7 +693,11 @@ The debug frame is useful for calibrating the derate windows. Without it, you ca
 - Ship it at 1 Hz instead of 10 Hz.
 - Drop it and read the values over XCP. XCP is the calibration protocol already running on CAN5.
 
-My suggestion: drop `0x30D` and use XCP. It costs nothing on CAN0 and the data is already reachable.
+**Answered: dropped. Use XCP.** The whole `Bms_Sop_DataType` snapshot already sits inside the XCP read window: `g_BmsSopData` links at `0x204001e0` against a whitelist of `0x20400000` to `0x2047FFFF`, so a master can read all three limits, each with `Table_dA`, `DerateFactor` and `Final_dA`, plus the derate flags, with no firmware change at all. CAN5 is a separate FlexCAN instance on its own mailbox, so it cannot add to the F7 blocking total by construction, and it polls at 10 ms rather than 100 ms.
+
+Two things this choice costs, worth stating plainly. A RAM address is not self-describing, and it moves when any earlier-linked module gains a static, so calibrating this way means reading `BMS_demo.map` or generating an A2L file, and neither is a build step today. And the 1 Hz option above would not have helped anyway: the timeout is per call, not per second, so a frame sent once a second still contributes its full timeout on the cycle it fires.
+
+This also vindicates keeping `Table_dA` and `DerateFactor` live for the inactive direction under SOP-FR-03. That was done for `0x30D`, and it pays off identically over XCP.
 
 ### 7.4 Does `Battery_Monitor` move too? — ANSWERED 2026-09-11: yes
 
@@ -682,11 +713,11 @@ The pack over-current thresholds (`BMS_PACK_CHARGE_OC_SET_MA` and the discharge 
 
 Two things this move did **not** do. It did not fix F2: the 200 degC over-temperature set point is still unreachable behind the 125 degC thermistor ceiling. It only puts both numbers where a reviewer can see the mismatch, and the struct carries a comment saying so. And the derate windows are still absent — see section 3.3.
 
-### 7.5 Does `Bms_BattCfg` need an init at all?
+### 7.5 Does `Bms_BattCfg` need an init at all? — ANSWERED 2026-09-12: no
 
 If it is only `const` tables in flash behind read functions (CFG-FR-03), there is nothing to initialize and `Bms_BattCfg_Init()` must not exist. Every other `Bms_*` module has one. Adding it here for symmetry is tempting. It is also dead code.
 
-My suggestion: no init function. Tell me that the asymmetry is fine with you.
+**Answered: no init function.** Built that way. `Bms_BattCfg` is the one `Bms_*` module without an `Init()`, and the header says why so the asymmetry does not read as an oversight.
 
 ### 7.6 One document or two?
 
