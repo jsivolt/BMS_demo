@@ -10,17 +10,17 @@ Source: `sil/tests/test_soc.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-13 04:10:21 |
-| Host | Windows 10 (AMD64) |
+| Executed (UTC) | 2026-09-13 07:05:00 |
+| Host | Windows 11 (AMD64) |
 | Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.10.11 |
+| Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 149778 bytes, built 2026-09-13 02:35:52 UTC |
-| Repo commit | b777234 (working tree has uncommitted changes) |
+| SIL library | bms_sil.dll, 151920 bytes, built 2026-09-13 07:04:59 UTC |
+| Repo commit | aaf69ae (working tree has uncommitted changes) |
 
 ## Summary
 
-**27 test cases** (30 executions) in 0.30 s.
+**27 test cases** (30 executions) in 0.11 s.
 
 | Outcome | Count |
 |---|---|
@@ -70,7 +70,7 @@ Source: `sil/tests/test_soc.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 | Case ID | SA-03 |
 | Requirement | SOC-FR-03, SOC-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:53` |
 
 **Objective.** SA-03 (partial): the blend reduces to the common value when all three agree.
@@ -98,7 +98,7 @@ for target in (0, 123, 500, 999, MAX_PCT_X10):
 | Case ID | — |
 | Requirement | SOC-FR-03, SOC-FR-04 |
 | Result | PASS |
-| Duration | 0.8 ms over 4 variants |
+| Duration | 0.3 ms over 4 variants |
 | Source | `sil/tests/test_soc.py:69` |
 
 **Objective.** SA-01/02/03/04: the documented blend formula, checked as arithmetic.
@@ -120,7 +120,7 @@ assert expected_blend(soc_min, soc_max, soc_avg) == expected
 | Case ID | — |
 | Requirement | SOC-FR-02 |
 | Result | PASS |
-| Duration | 0.6 ms |
+| Duration | 0.2 ms |
 | Source | `sil/tests/test_soc.py:88` |
 
 **Objective.** Documents SOC_DESIGN.md 5.1 empirically rather than by assertion of prose.
@@ -148,7 +148,7 @@ assert bms.soc_min == bms.soc_max == bms.soc_avg
 | Case ID | SA-05 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 7.8 ms |
+| Duration | 2.8 ms |
 | Source | `sil/tests/test_soc.py:104` |
 
 **Objective.** SA-05: sustained discharge saturates at 0 % and does not wrap.
@@ -172,7 +172,7 @@ assert bms.capacity_avg_mAh == pytest.approx(0.0, abs=1e-3)
 | Case ID | SA-06 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 7.0 ms |
+| Duration | 2.8 ms |
 | Source | `sil/tests/test_soc.py:115` |
 
 **Objective.** SA-06: sustained charge saturates at 100 %.
@@ -195,7 +195,7 @@ assert bms.capacity_avg_mAh == pytest.approx(float(PACK_CAPACITY_MAH), rel=1e-6)
 | Case ID | SA-07 |
 | Requirement | SOC-FR-11 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:125` |
 
 **Objective.** SA-07: Bms_Soc_SetSoc_pct_x10 clamps an out-of-range request to 100 %.
@@ -215,7 +215,7 @@ assert bms.soc_avg == MAX_PCT_X10
 | Case ID | SA-08 |
 | Requirement | SOC-FR-01, SOC-IR-01 |
 | Result | PASS |
-| Duration | 51.0 ms |
+| Duration | 17.5 ms |
 | Source | `sil/tests/test_soc.py:132` |
 
 **Objective.** SA-08: positive current charges, negative discharges.
@@ -243,7 +243,7 @@ assert bms.soc < 500, "negative current must lower SOC"
 | Case ID | SA-09 |
 | Requirement | SOC-FR-01, SOC-TR-01 |
 | Result | PASS |
-| Duration | 153.8 ms |
+| Duration | 52.1 ms |
 | Source | `sil/tests/test_soc.py:148` |
 
 **Objective.** SA-09: a 1 C discharge for one hour takes a full pack from 100 % to ~0 %.
@@ -266,7 +266,7 @@ assert bms.soc == pytest.approx(0, abs=5)   # within 0.5 %
 | Case ID | — |
 | Requirement | SOC-FR-01 |
 | Result | PASS |
-| Duration | 22.8 ms |
+| Duration | 8.8 ms |
 | Source | `sil/tests/test_soc.py:159` |
 
 **Objective.** The integrated charge matches mAh computed independently in Python.
@@ -292,7 +292,7 @@ assert bms.capacity_avg_mAh == pytest.approx(expected, rel=1e-3)
 | Case ID | IT-02 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:177` |
 
 **Objective.** IT-02: no valid record -> tier 3, default SOC, estimates flagged invalid.
@@ -316,7 +316,7 @@ assert bms.init_source == INIT_SOURCE_DEFAULT
 | Case ID | IT-01 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 3.4 ms |
+| Duration | 1.0 ms |
 | Source | `sil/tests/test_soc.py:188` |
 
 **Objective.** IT-01: a persisted record is restored into all three estimators, valid.
@@ -347,7 +347,7 @@ assert bms.init_source == INIT_SOURCE_NVM
 | Case ID | IT-03 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:206` |
 
 **Objective.** IT-03: old 16-byte "SOC1" records are rejected -> one boot at tier 3.
@@ -380,7 +380,7 @@ assert bms.init_source == INIT_SOURCE_DEFAULT
 | Case ID | IT-05 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:226` |
 
 **Objective.** IT-05: a tier-3 blind start flips to valid on the first good current tick.
@@ -402,7 +402,7 @@ assert bms.soc_valid is True
 | Case ID | IT-06 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 1.2 ms |
+| Duration | 0.5 ms |
 | Source | `sil/tests/test_soc.py:236` |
 
 **Objective.** IT-06: while the estimate is a blind guess, nothing is written to flash.
@@ -424,7 +424,7 @@ assert bms.nvm_records == 0
 | Case ID | IT-04 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:245` |
 
 **Objective.** IT-04: tier 1 seeds all three estimators from the OCV table.
@@ -458,7 +458,7 @@ assert bms.soc_min == bms.soc_max == bms.soc_avg == bms.soc
 | Case ID | IT-09 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:267` |
 
 **Objective.** IT-09: while the OCV wait is pending, SOC is reported as unusable.
@@ -489,7 +489,7 @@ assert bms.init_source == INIT_SOURCE_PENDING, "wait must not resolve early"
 | Case ID | IT-10 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 2.7 ms |
+| Duration | 1.0 ms |
 | Source | `sil/tests/test_soc.py:286` |
 
 **Objective.** IT-10: cell voltages never arriving times out into tier 2, not tier 1.
@@ -520,7 +520,7 @@ assert bms.soc == 700
 | Case ID | IT-11 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:305` |
 
 **Objective.** IT-11: an unready sleep-time source gates the wait even if cells are fine.
@@ -552,7 +552,7 @@ assert bms.soc == INITIAL_PCT_X10
 | Case ID | IT-12 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:325` |
 
 **Objective.** IT-12: a timekeeping source that arrives late, but in time, still wins tier 1.
@@ -584,7 +584,7 @@ assert bms.soc == bms.ocv_to_soc(OCV_BREAKPOINT_MV)
 | Case ID | IT-13 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:345` |
 
 **Objective.** IT-13: once the sleep time reads short, the wait ends immediately.
@@ -615,7 +615,7 @@ assert bms.elapsed_ms < OCV_WAIT_TIMEOUT_MS, "must not burn the full budget"
 | Case ID | IT-14 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:364` |
 
 **Objective.** IT-14: current is not integrated onto an unseeded anchor.
@@ -659,7 +659,7 @@ assert bms.soc == INITIAL_PCT_X10
 | Case ID | IT-07 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 25.4 ms |
+| Duration | 9.6 ms |
 | Source | `sil/tests/test_soc.py:396` |
 
 **Objective.** IT-07: the init source reports how SOC was *seeded*, not its current state.
@@ -692,7 +692,7 @@ assert bms.init_source == source_at_boot
 | Case ID | IT-08 |
 | Requirement | SOC-FR-06, SOC-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:417` |
 
 **Objective.** IT-08: every init-source value fits the 3-bit CAN field on 0x308.
@@ -713,7 +713,7 @@ assert 0 <= bms.init_source <= 7
 | Case ID | CH-01 |
 | Requirement | SOC-FR-12 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:431` |
 
 **Objective.** CH-01: losing pack current invalidates the estimate but holds the value.
@@ -743,7 +743,7 @@ assert bms.soc == held, "SOC value must be held, not zeroed"
 | Case ID | CH-03 |
 | Requirement | SOC-IR-02 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:449` |
 
 **Objective.** CH-03: the vAFE average equals the mean of the 16 injected cells.
@@ -772,7 +772,7 @@ assert bms.cell_avg_V == pytest.approx(expected_avg_mV / 1000.0, abs=1e-6)
 | Case ID | — |
 | Requirement | SOC-FR-12, SOC-IR-01 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_soc.py:466` |
 
 **Objective.** A one-off alive-counter glitch costs one cycle of data and then resyncs.
@@ -800,7 +800,7 @@ assert bms.soc_valid is True
 | Case ID | — |
 | Requirement | SOC-FR-12, SOC-IR-01 |
 | Result | XFAIL (known defect) |
-| Duration | 23.1 ms |
+| Duration | 9.4 ms |
 | Source | `sil/tests/test_soc.py:482` |
 
 **Objective.** A *sustained* alive-counter failure must invalidate pack current.
@@ -834,4 +834,4 @@ assert bms.soc == soc_before, "SOC must not drift on a frozen current value"
 DEFECT: Battery_Monitor.c:286 sets PackCurrentValid[0] from g_BmsVpackData.CurrentValid (frame arrival only), while the data copy is gated on g_BmsVpackData.Valid (which includes AliveValid). A stuck alive counter therefore freezes PackCurrent_mA at its last value while still reporting it valid, and SOC integrates the stale current forever.
 ```
 
-<!-- sil-report slug='soc' title='SOC — estimation, initialization and upstream signal chain' cases='27' duration='0.304' verdict='PASS' executed='2026-09-13 04:10:21' passed='26' xfailed='1' skipped='0' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='soc' title='SOC — estimation, initialization and upstream signal chain' cases='27' duration='0.107' verdict='PASS' executed='2026-09-13 07:05:01' passed='26' xfailed='1' skipped='0' xpassed='0' failed='0' error='0' -->

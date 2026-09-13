@@ -10,21 +10,21 @@ Source: `sil/tests/test_sop.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-13 04:10:21 |
-| Host | Windows 10 (AMD64) |
+| Executed (UTC) | 2026-09-13 07:05:00 |
+| Host | Windows 11 (AMD64) |
 | Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.10.11 |
+| Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 149778 bytes, built 2026-09-13 02:35:52 UTC |
-| Repo commit | b777234 (working tree has uncommitted changes) |
+| SIL library | bms_sil.dll, 151920 bytes, built 2026-09-13 07:04:59 UTC |
+| Repo commit | aaf69ae (working tree has uncommitted changes) |
 
 ## Summary
 
-**30 test cases** (33 executions) in 0.01 s.
+**40 test cases** (43 executions) in 0.00 s.
 
 | Outcome | Count |
 |---|---|
-| PASS | 30 |
+| PASS | 40 |
 
 **Feature verdict: PASS**
 
@@ -57,9 +57,19 @@ Source: `sil/tests/test_sop.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 | SP-05 | [test_SP_05_mode_is_writable_at_runtime](#test-sp-05-mode-is-writable-at-runtime) | SOP-FR-02, SOP-FR-03 | PASS |
 | SP-05 | [test_SP_05_an_invalid_mode_reads_as_discharge](#test-sp-05-an-invalid-mode-reads-as-discharge) | SOP-FR-02, SOP-FR-03 | PASS |
 | SP-05 | [test_SP_05_limits_start_at_zero_before_the_first_update](#test-sp-05-limits-start-at-zero-before-the-first-update) | SOP-FR-02, SOP-FR-03 | PASS |
+| SP-13 | [test_SP_13_discharge_is_zero_past_the_low_voltage_end](#test-sp-13-discharge-is-zero-past-the-low-voltage-end) | — | PASS |
+| SP-13 | [test_SP_13_low_voltage_still_allows_charge](#test-sp-13-low-voltage-still-allows-charge) | — | PASS |
+| SP-13 | [test_SP_13_charge_and_regen_are_zero_past_the_high_voltage_end](#test-sp-13-charge-and-regen-are-zero-past-the-high-voltage-end) | — | PASS |
+| SP-13 | [test_SP_13_every_limit_is_zero_past_the_high_temperature_end](#test-sp-13-every-limit-is-zero-past-the-high-temperature-end) | — | PASS |
+| SP-13 | [test_SP_13_every_limit_is_zero_at_the_under_temperature_set_point](#test-sp-13-every-limit-is-zero-at-the-under-temperature-set-point) | — | PASS |
+| SP-13 | [test_SP_13_just_inside_the_cold_limit_discharge_is_allowed](#test-sp-13-just-inside-the-cold-limit-discharge-is-allowed) | — | PASS |
+| SP-14 | [test_SP_14_healthy_inputs_are_reported_valid](#test-sp-14-healthy-inputs-are-reported-valid) | — | PASS |
+| SP-14 | [test_SP_14_invalid_temperature_zeroes_every_limit](#test-sp-14-invalid-temperature-zeroes-every-limit) | — | PASS |
+| SP-14 | [test_SP_14_no_cell_voltages_yet_zeroes_every_limit](#test-sp-14-no-cell-voltages-yet-zeroes-every-limit) | — | PASS |
+| SP-14 | [test_SP_14_pending_soc_init_publishes_no_charge_limit](#test-sp-14-pending-soc-init-publishes-no-charge-limit) | — | PASS |
 | SP-12 | [test_SP_12_every_derate_end_sits_inside_its_fault_threshold](#test-sp-12-every-derate-end-sits-inside-its-fault-threshold) | SOP-FR-06 | PASS |
 | SP-12 | [test_SP_12_derate_ramps_run_the_right_way](#test-sp-12-derate-ramps-run-the-right-way) | SOP-FR-06 | PASS |
-| SP-12 | [test_SP_12_derate_floor_is_a_valid_factor](#test-sp-12-derate-floor-is-a-valid-factor) | SOP-FR-06 | PASS |
+| SP-12 | [test_SP_12_every_derate_ramp_ends_at_zero](#test-sp-12-every-derate-ramp-ends-at-zero) | SOP-FR-06 | PASS |
 | SP-12 | [test_SP_12_clear_sits_on_the_safe_side_of_set](#test-sp-12-clear-sits-on-the-safe-side-of-set) | SOP-FR-06 | PASS |
 | SP-12 | [test_SP_12_under_voltage_and_under_temperature_clear_upward](#test-sp-12-under-voltage-and-under-temperature-clear-upward) | SOP-FR-06 | PASS |
 
@@ -72,8 +82,8 @@ Source: `sil/tests/test_sop.py`  ·  Index: [../TEST_REPORT.md](../TEST_REPORT.m
 | Case ID | SP-01 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_sop.py:51` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:54` |
 
 **Objective.** SP-01: a lookup on both axes at breakpoints returns the stored value.
 
@@ -93,8 +103,8 @@ assert bms.sop_static_limit(SOP_LIMIT_DISCHARGE, 1000, T_ROOM) == 900
 | Case ID | SP-01 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:59` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:62` |
 
 **Objective.** SP-01: a SOC between two breakpoints interpolates linearly.
 
@@ -116,8 +126,8 @@ assert mid == (low + high) // 2
 | Case ID | SP-01 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:69` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:72` |
 
 **Objective.** SP-01: SOC and temperature past an edge clamp, never extrapolate.
 
@@ -151,8 +161,8 @@ assert bms.sop_static_limit(SOP_LIMIT_DISCHARGE, 600, -30000) == bms.sop_static_
 | Case ID | SP-01 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:91` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:94` |
 
 **Objective.** SP-01: an id outside the enum returns 0 rather than reading past a map.
 
@@ -169,8 +179,8 @@ assert bms.sop_static_limit(99, 500, T_ROOM) == 0
 | Case ID | SP-02 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:96` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:99` |
 
 **Objective.** SP-02: discharge, regen and charge are three separate calibrations.
 
@@ -193,8 +203,8 @@ assert r != c
 | Case ID | SP-02 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:107` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:110` |
 
 **Objective.** SP-02: a full pack accepts no charge and no regen, at any temperature.
 
@@ -213,8 +223,8 @@ for temp in SOP_TEMP_AXIS:
 | Case ID | SP-02 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:114` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:117` |
 
 **Objective.** SP-02: an empty pack delivers no discharge current, at any temperature.
 
@@ -232,8 +242,8 @@ for temp in SOP_TEMP_AXIS:
 | Case ID | SP-02 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:120` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:123` |
 
 **Objective.** SP-02: at -20 degC the maps allow no charge current at any SOC.
 
@@ -262,8 +272,8 @@ assert bms.sop_static_limit(SOP_LIMIT_DISCHARGE, 1000, -200) < bms.sop_static_li
 | Case ID | SP-02 |
 | Requirement | SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_sop.py:138` |
+| Duration | 0.2 ms |
+| Source | `sil/tests/test_sop.py:141` |
 
 **Objective.** SP-02: no map value would itself trip an over-current fault.
 
@@ -287,8 +297,8 @@ for soc in SOP_SOC_AXIS:
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:156` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:159` |
 
 **Objective.** SP-03: a healthy pack derates nothing and flags nothing.
 
@@ -313,8 +323,8 @@ assert not sop.DerateActiveTHigh
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:169` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:172` |
 
 **Objective.** SP-03: the V-low factor is linear between Start and End.
 
@@ -339,8 +349,8 @@ assert sop.DerateActiveVLow
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_sop.py:182` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:185` |
 
 **Objective.** SP-03: below the End breakpoint the factor sits at DerateFloor.
 
@@ -363,8 +373,8 @@ assert sop.DerateActiveVLow
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_sop.py:193` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:196` |
 
 **Objective.** SP-03: V-low governs discharge only — a low cell may still be charged.
 
@@ -388,8 +398,8 @@ assert sop.RegenDerate == SOP_DERATE_NONE
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:205` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:208` |
 
 **Objective.** SP-03: V-high governs the charge direction, not discharge.
 
@@ -415,8 +425,8 @@ assert not sop.DerateActiveVLow
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:219` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:222` |
 
 **Objective.** SP-03: T-high applies to all three limits.
 
@@ -441,8 +451,8 @@ assert sop.DerateActiveTHigh
 | Case ID | SP-03 |
 | Requirement | SOP-FR-05, SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.6 ms |
-| Source | `sil/tests/test_sop.py:232` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:235` |
 
 **Objective.** SP-03: a negative temperature is in the safe region of the T-high ramp.
 
@@ -466,8 +476,8 @@ assert sop.DischargeDerate == SOP_DERATE_NONE
 | Case ID | SP-04 |
 | Requirement | SOP-FR-07 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:245` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:248` |
 
 **Objective.** SP-04: two active factors do not multiply.
 
@@ -500,8 +510,8 @@ assert sop.DischargeDerate > product
 | Case ID | SP-04 |
 | Requirement | SOP-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:267` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:270` |
 
 **Objective.** SP-04: whichever constraint is tightest sets the factor.
 
@@ -525,8 +535,8 @@ assert sop.DischargeDerate == limits.DerateFloor
 | Case ID | SP-04 |
 | Requirement | SOP-FR-07 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:279` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:282` |
 
 **Objective.** SP-04: the published value is table x factor / 1000.
 
@@ -549,8 +559,8 @@ assert sop.DischargeFinal_dA == expected
 | Case ID | SP-05 |
 | Requirement | SOP-FR-02, SOP-FR-03 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:295` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:298` |
 
 **Objective.** SP-05: in Discharge mode only discharge and regen are published.
 
@@ -573,8 +583,8 @@ assert sop.RegenFinal_dA > 0
 | Case ID | SP-05 |
 | Requirement | SOP-FR-02, SOP-FR-03 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_sop.py:306` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:309` |
 
 **Objective.** SP-05: in Charge mode only the charge limit is published.
 
@@ -598,8 +608,8 @@ assert sop.ChargeFinal_dA > 0
 | Case ID | SP-05 |
 | Requirement | SOP-FR-02, SOP-FR-03 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:318` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:321` |
 
 **Objective.** SP-05: only the published value is zeroed, not the working values.
 
@@ -624,8 +634,8 @@ assert sop.ChargeDerate == SOP_DERATE_NONE
 | Case ID | SP-05 |
 | Requirement | SOP-FR-02, SOP-FR-03 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:332` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:335` |
 
 **Objective.** SP-05: the mode can be overwritten live, as an XCP master would.
 
@@ -654,8 +664,8 @@ assert bms.sop().Mode == SOP_MODE_DISCHARGE
 | Case ID | SP-05 |
 | Requirement | SOP-FR-02, SOP-FR-03 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:350` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:353` |
 
 **Objective.** SP-05: a bad value falls to Discharge, which publishes no charge limit.
 
@@ -677,8 +687,8 @@ assert sop.ChargeFinal_dA == 0
 | Case ID | SP-05 |
 | Requirement | SOP-FR-02, SOP-FR-03 |
 | Result | PASS |
-| Duration | 0.4 ms |
-| Source | `sil/tests/test_sop.py:360` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:363` |
 
 **Objective.** SP-05: Init publishes zero rather than a plausible-looking table value.
 
@@ -694,6 +704,267 @@ assert sop.ChargeFinal_dA == 0
 assert sop.Mode == SOP_MODE_DISCHARGE
 ```
 
+### test_SP_13_discharge_is_zero_past_the_low_voltage_end
+
+| | |
+|---|---|
+| Case ID | SP-13 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:379` |
+
+**Objective.** SP-13: at and below the V-low End the discharge limit is 0, not a floor.
+
+**Procedure.**
+
+```python
+limits = bms.cell_limits()
+
+settle(bms, cell_mV=limits.DerateVLowEnd_mV - 50)
+sop = bms.sop()
+
+assert sop.DischargeDerate == 0
+assert sop.DischargeFinal_dA == 0
+assert sop.DischargeTable_dA > 0, "the calibration field keeps the map value"
+```
+
+### test_SP_13_low_voltage_still_allows_charge
+
+| | |
+|---|---|
+| Case ID | SP-13 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:391` |
+
+**Objective.** SP-13: an empty cell zeroes discharge only, so the pack can be charged back.
+
+**Procedure.**
+
+```python
+limits = bms.cell_limits()
+
+settle(bms, cell_mV=limits.DerateVLowEnd_mV - 50)
+bms.set_sop_mode(SOP_MODE_CHARGE)
+bms.run_normal(100, cell_mV=limits.DerateVLowEnd_mV - 50)
+sop = bms.sop()
+
+assert sop.ChargeFinal_dA > 0
+```
+
+### test_SP_13_charge_and_regen_are_zero_past_the_high_voltage_end
+
+| | |
+|---|---|
+| Case ID | SP-13 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:403` |
+
+**Objective.** SP-13: at and above the V-high End regen and charge are 0, discharge is not.
+
+**Procedure.**
+
+```python
+limits = bms.cell_limits()
+cell_mV = limits.DerateVHighEnd_mV + 20
+
+settle(bms, cell_mV=cell_mV)
+sop = bms.sop()
+assert sop.RegenFinal_dA == 0
+assert sop.DischargeFinal_dA > 0
+
+bms.set_sop_mode(SOP_MODE_CHARGE)
+bms.run_normal(100, cell_mV=cell_mV)
+assert bms.sop().ChargeFinal_dA == 0
+```
+
+### test_SP_13_every_limit_is_zero_past_the_high_temperature_end
+
+| | |
+|---|---|
+| Case ID | SP-13 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.2 ms |
+| Source | `sil/tests/test_sop.py:418` |
+
+**Objective.** SP-13: past the T-high End all three published limits are 0.
+
+**Procedure.**
+
+```python
+limits = bms.cell_limits()
+temp_dC = limits.DerateTHighEnd_dC + 50
+
+settle(bms, cell_mV=3600, temp_dC=temp_dC)
+sop = bms.sop()
+assert sop.DischargeFinal_dA == 0
+assert sop.RegenFinal_dA == 0
+
+bms.set_sop_mode(SOP_MODE_CHARGE)
+bms.run_normal(100, cell_mV=3600)
+assert bms.sop().ChargeFinal_dA == 0
+```
+
+### test_SP_13_every_limit_is_zero_at_the_under_temperature_set_point
+
+| | |
+|---|---|
+| Case ID | SP-13 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:433` |
+
+**Objective.** SP-13: at the under-temperature fault set point every limit is 0.
+
+**Procedure.**
+
+```python
+limits = bms.cell_limits()
+
+settle(bms, cell_mV=3600, temp_dC=limits.TemperatureMin_dC)
+sop = bms.sop()
+
+assert sop.DerateActiveTLow
+assert sop.DischargeDerate == sop.RegenDerate == sop.ChargeDerate == 0
+assert sop.DischargeFinal_dA == sop.RegenFinal_dA == sop.ChargeFinal_dA == 0
+```
+
+### test_SP_13_just_inside_the_cold_limit_discharge_is_allowed
+
+| | |
+|---|---|
+| Case ID | SP-13 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:445` |
+
+**Objective.** SP-13: one step warmer than the set point, the map value applies again.
+
+**Procedure.**
+
+```python
+limits = bms.cell_limits()
+
+settle(bms, cell_mV=3600, temp_dC=limits.TemperatureMin_dC + 10)
+sop = bms.sop()
+
+assert not sop.DerateActiveTLow
+assert sop.DischargeFinal_dA > 0
+```
+
+### test_SP_14_healthy_inputs_are_reported_valid
+
+| | |
+|---|---|
+| Case ID | SP-14 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.4 ms |
+| Source | `sil/tests/test_sop.py:461` |
+
+**Objective.** SP-14: the gate is open on a healthy signal chain.
+
+**Procedure.**
+
+```python
+settle(bms)
+sop = bms.sop()
+
+assert sop.InputsValid
+assert sop.DischargeFinal_dA > 0
+```
+
+### test_SP_14_invalid_temperature_zeroes_every_limit
+
+| | |
+|---|---|
+| Case ID | SP-14 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:470` |
+
+**Objective.** SP-14: with no valid thermistor, nothing is published.
+
+**Procedure.**
+
+```python
+settle(bms)
+bms.set_ntc(T_ROOM, T_ROOM, T_ROOM, valid=False)
+bms.run_normal(100)
+sop = bms.sop()
+
+assert not sop.InputsValid
+assert sop.DischargeFinal_dA == sop.RegenFinal_dA == sop.ChargeFinal_dA == 0
+```
+
+### test_SP_14_no_cell_voltages_yet_zeroes_every_limit
+
+| | |
+|---|---|
+| Case ID | SP-14 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:481` |
+
+**Objective.** SP-14: before the first vAFE cell set, the 0 mV cell voltages publish nothing.
+
+> This is the startup window the HIL test measured: without the gate, discharge
+> sat at the derate floor and regen was published with no voltage derate.
+
+**Procedure.**
+
+```python
+bms.set_ntc(T_ROOM, T_ROOM, T_ROOM)
+# Current and pack voltage arrive, the cell voltage frames never do.
+bms.run_ms(700, current_mA=0, pack_mV=3600 * 16, bus_mV=3600 * 16)
+
+assert not bms.cell_valid, "precondition: no vAFE cycle has completed"
+assert bms.init_source != INIT_SOURCE_PENDING, "precondition: only the cells are missing"
+sop = bms.sop()
+assert not sop.InputsValid
+assert sop.DischargeFinal_dA == sop.RegenFinal_dA == sop.ChargeFinal_dA == 0
+```
+
+### test_SP_14_pending_soc_init_publishes_no_charge_limit
+
+| | |
+|---|---|
+| Case ID | SP-14 |
+| Requirement | — |
+| Result | PASS |
+| Duration | 0.3 ms |
+| Source | `sil/tests/test_sop.py:498` |
+
+**Objective.** SP-14: a pending SOC reads 0 %, which the map turns into a full charge limit.
+
+> The gate must hold it at 0 until the SOC init resolves. This is the
+> over-permissive charge case that SOP_DESIGN.md section 5.6 described.
+
+**Procedure.**
+
+```python
+bms = bms_dirty
+bms.power_on(sleep_s=OCV_SLEEP_THRESHOLD_S, sleep_ready=False)
+bms.set_ntc(T_ROOM, T_ROOM, T_ROOM)
+bms.set_sop_mode(SOP_MODE_CHARGE)
+bms.run_normal(300)
+
+assert bms.init_source == INIT_SOURCE_PENDING, "precondition: still inside the wait"
+sop = bms.sop()
+assert sop.ChargeTable_dA > 0, "the map would allow charging at 0 % SOC"
+assert not sop.InputsValid
+assert sop.ChargeFinal_dA == 0
+```
+
 ### test_SP_12_every_derate_end_sits_inside_its_fault_threshold
 
 | | |
@@ -701,8 +972,8 @@ assert sop.Mode == SOP_MODE_DISCHARGE
 | Case ID | SP-12 |
 | Requirement | SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:376` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:522` |
 
 **Objective.** SP-12: derating must finish before protection starts (SOP-FR-06).
 
@@ -725,8 +996,8 @@ assert c.DerateTHighEnd_dC < c.TemperatureMax_dC
 | Case ID | SP-12 |
 | Requirement | SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:388` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:534` |
 
 **Objective.** SP-12: each ramp starts on the safe side and ends nearer the trip.
 
@@ -740,24 +1011,24 @@ assert c.DerateVLowStart_mV > c.DerateVLowEnd_mV
 assert c.DerateTHighStart_dC < c.DerateTHighEnd_dC
 ```
 
-### test_SP_12_derate_floor_is_a_valid_factor
+### test_SP_12_every_derate_ramp_ends_at_zero
 
 | | |
 |---|---|
 | Case ID | SP-12 |
 | Requirement | SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.3 ms |
-| Source | `sil/tests/test_sop.py:397` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:543` |
 
-**Objective.** SP-12: the floor is a factor, so it cannot exceed 'no derate'.
+**Objective.** SP-12: past its End a ramp cuts the limit to 0 (SOP-FR-06), so the floor is 0.
 
 **Procedure.**
 
 ```python
 c = bms.cell_limits()
 
-assert 0 <= c.DerateFloor <= SOP_DERATE_NONE
+assert c.DerateFloor == 0
 ```
 
 ### test_SP_12_clear_sits_on_the_safe_side_of_set
@@ -767,8 +1038,8 @@ assert 0 <= c.DerateFloor <= SOP_DERATE_NONE
 | Case ID | SP-12 |
 | Requirement | SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.7 ms over 4 variants |
-| Source | `sil/tests/test_sop.py:404` |
+| Duration | 0.3 ms over 4 variants |
+| Source | `sil/tests/test_sop.py:550` |
 
 **Objective.** SP-12: hysteresis only works if the clear value is the safer one.
 
@@ -789,8 +1060,8 @@ assert getattr(c, clear) < getattr(c, setpoint), name
 | Case ID | SP-12 |
 | Requirement | SOP-FR-06 |
 | Result | PASS |
-| Duration | 0.2 ms |
-| Source | `sil/tests/test_sop.py:423` |
+| Duration | 0.1 ms |
+| Source | `sil/tests/test_sop.py:569` |
 
 **Objective.** SP-12: the two low-side thresholds clear in the opposite direction.
 
@@ -803,4 +1074,4 @@ assert c.CellVoltageMinClear_mV > c.CellVoltageMin_mV
 assert c.TemperatureMinClear_dC > c.TemperatureMin_dC
 ```
 
-<!-- sil-report slug='sop' title='SOP — Pack 1 current limits' cases='30' duration='0.009' verdict='PASS' executed='2026-09-13 04:10:21' passed='30' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='sop' title='SOP — Pack 1 current limits' cases='40' duration='0.004' verdict='PASS' executed='2026-09-13 07:05:01' passed='40' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->

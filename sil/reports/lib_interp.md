@@ -10,17 +10,17 @@ Source: `sil/tests/test_lib_interp.py`  ·  Index: [../TEST_REPORT.md](../TEST_R
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-13 04:10:21 |
-| Host | Windows 10 (AMD64) |
+| Executed (UTC) | 2026-09-13 07:05:00 |
+| Host | Windows 11 (AMD64) |
 | Host compiler | gcc.EXE (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r4) 16.1.0 |
-| Python | 3.10.11 |
+| Python | 3.13.15 |
 | pytest | 9.1.1 |
-| SIL library | bms_sil.dll, 149778 bytes, built 2026-09-13 02:35:52 UTC |
-| Repo commit | b777234 (working tree has uncommitted changes) |
+| SIL library | bms_sil.dll, 151920 bytes, built 2026-09-13 07:04:59 UTC |
+| Repo commit | aaf69ae (working tree has uncommitted changes) |
 
 ## Summary
 
-**20 test cases** (25 executions) in 0.01 s.
+**20 test cases** (25 executions) in 0.00 s.
 
 | Outcome | Count |
 |---|---|
@@ -62,7 +62,7 @@ Source: `sil/tests/test_lib_interp.py`  ·  Index: [../TEST_REPORT.md](../TEST_R
 | Case ID | LI-01 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.7 ms |
+| Duration | 0.2 ms |
 | Source | `sil/tests/test_lib_interp.py:19` |
 
 **Objective.** LI-01: x below the first breakpoint returns the first row's Y.
@@ -81,7 +81,7 @@ assert bms.interp(OCV_TABLE, 0) == OCV_TABLE[0][1]
 | Case ID | LI-02 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:25` |
 
 **Objective.** LI-02: x above the last breakpoint returns the last row's Y.
@@ -100,7 +100,7 @@ assert bms.interp(OCV_TABLE, 65535) == OCV_TABLE[-1][1]
 | Case ID | LI-03 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 1.2 ms over 6 variants |
+| Duration | 0.4 ms over 6 variants |
 | Source | `sil/tests/test_lib_interp.py:31` |
 
 **Objective.** LI-03: x exactly on a breakpoint returns that row's Y exactly.
@@ -118,7 +118,7 @@ assert bms.interp(OCV_TABLE, x) == y
 | Case ID | LI-04 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:37` |
 
 **Objective.** LI-04: linear interpolation between two rows, with correct rounding.
@@ -139,7 +139,7 @@ assert bms.interp(OCV_TABLE, 3350) == 300
 | Case ID | LI-05 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:45` |
 
 **Objective.** LI-05: Y decreasing with X (derating / NTC curve) interpolates downward.
@@ -164,7 +164,7 @@ assert bms.interp(table, 200) == 0
 | Case ID | LI-06 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:58` |
 
 **Objective.** LI-06: a one-row table returns that row's Y for any x.
@@ -184,7 +184,7 @@ for x in (0, 1234, 65535):
 | Case ID | LI-07 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.7 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:65` |
 
 **Objective.** LI-07: NULL table or zero size returns 0 rather than faulting.
@@ -203,7 +203,7 @@ assert bms.interp_raw([10, 20], 0, 100) == 0
 | Case ID | LI-08 |
 | Requirement | SOC-FR-13 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:71` |
 
 **Objective.** LI-08: full-range table does not overflow the uint32 intermediate.
@@ -228,7 +228,7 @@ assert abs(mid - 32768) <= 1
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.5 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:102` |
 
 **Objective.** LI2-01: every grid intersection returns its stored value unchanged.
@@ -248,7 +248,7 @@ for iy, y in enumerate(MAP_Y):
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:109` |
 
 **Objective.** LI2-02: on a Y breakpoint the result is the plain 1-D X interpolation.
@@ -267,7 +267,7 @@ assert bms.interp2d(MAP_X, MAP_Y, MAP_V, 250, 250) == 600
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:115` |
 
 **Objective.** LI2-03: on an X breakpoint the result is the plain 1-D Y interpolation.
@@ -286,7 +286,7 @@ assert bms.interp2d(MAP_X, MAP_Y, MAP_V, 500, 25) == 550
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:121` |
 
 **Objective.** LI2-04: an interior point blends all four surrounding corners.
@@ -306,7 +306,7 @@ assert bms.interp2d(MAP_X, MAP_Y, MAP_V, 250, 25) == 375
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:129` |
 
 **Objective.** LI2-05: past an edge, that axis clamps; the other still interpolates.
@@ -331,7 +331,7 @@ assert bms.interp2d(MAP_X, MAP_Y, MAP_V, 250, 9999) == 350
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:141` |
 
 **Objective.** LI2-06: outside on both axes returns the nearest corner value.
@@ -352,7 +352,7 @@ assert bms.interp2d(MAP_X, MAP_Y, MAP_V, 9999, 9999) == MAP_V[-1][-1]
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:149` |
 
 **Objective.** LI2-07: the map cannot be reproduced by chained 1-D lookups.
@@ -374,7 +374,7 @@ assert MAP_V[1][0] / MAP_V[0][0] != MAP_V[1][1] / MAP_V[0][1]
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.3 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:159` |
 
 **Objective.** LI2-08: a wholly negative Y axis interpolates without an offset.
@@ -394,7 +394,7 @@ assert bms.interp2d([0], y_axis, values, 0, -300) == 1500
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:166` |
 
 **Objective.** LI2-09: a one-breakpoint axis makes the map constant along it.
@@ -415,7 +415,7 @@ assert bms.interp2d([0], [0], [[42]], -5, 5) == 42
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:174` |
 
 **Objective.** LI2-10: a zero-width cell does not divide by zero; the lower row wins.
@@ -434,7 +434,7 @@ assert bms.interp2d([0], [5, 5], [[33], [44]], 0, 5) == 33
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:180` |
 
 **Objective.** LI2-11: NULL pointers or a zero count return 0 rather than faulting.
@@ -454,7 +454,7 @@ assert bms.interp2d_raw([0], [0], [], 1, 1, 0, 0) == 0
 | Case ID | — |
 | Requirement | SOC-FR-13, SOP-FR-04 |
 | Result | PASS |
-| Duration | 0.2 ms |
+| Duration | 0.1 ms |
 | Source | `sil/tests/test_lib_interp.py:187` |
 
 **Objective.** LI2-12: a falling map interpolates correctly in both directions.
@@ -471,4 +471,4 @@ assert bms.interp2d([0, 100], [0, 100], values, 50, 100) == 400
 assert bms.interp2d([0, 100], [0, 100], values, 50, 50) == 650
 ```
 
-<!-- sil-report slug='lib_interp' title='Lib_Interp — generic 1-D and 2-D table interpolation' cases='20' duration='0.007' verdict='PASS' executed='2026-09-13 04:10:21' passed='20' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->
+<!-- sil-report slug='lib_interp' title='Lib_Interp — generic 1-D and 2-D table interpolation' cases='20' duration='0.002' verdict='PASS' executed='2026-09-13 07:05:01' passed='20' xfailed='0' skipped='0' xpassed='0' failed='0' error='0' -->
