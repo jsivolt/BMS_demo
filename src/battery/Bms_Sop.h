@@ -37,6 +37,29 @@ extern "C"{
  */
 #define BMS_SOP_DEFAULT_MODE            (BMS_SOP_MODE_DISCHARGE)
 
+/**
+ * @brief Compiles the bench-test input override, g_BmsSopTestOverride.
+ *
+ * 1U for bench testing on the target, 0U for any build that goes on a
+ * vehicle. The project has no debug-only preprocessor symbol, so this switch
+ * is the only thing that keeps the override out of a release image.
+ */
+#define BMS_SOP_TEST_OVERRIDE           (1U)
+
+#if (BMS_SOP_TEST_OVERRIDE == 1U)
+/**
+ * @brief Enable bits for g_BmsSopTestOverride.Enable, one per input.
+ *
+ * Each input is overridden on its own, so a test can force the temperature
+ * and keep the measured cell voltages.
+ */
+#define BMS_SOP_OVR_MIN_CELL            (0x01U)
+#define BMS_SOP_OVR_MAX_CELL            (0x02U)
+#define BMS_SOP_OVR_MAX_TEMP            (0x04U)
+#define BMS_SOP_OVR_SOC_MIN             (0x08U)
+#define BMS_SOP_OVR_SOC_MAX             (0x10U)
+#endif
+
 /*==================================================================================================
 *                                       TYPE DEFINITIONS
 ==================================================================================================*/
@@ -85,6 +108,27 @@ typedef struct
 
 } Bms_Sop_DataType;
 
+#if (BMS_SOP_TEST_OVERRIDE == 1U)
+/**
+ * @brief Bench-test replacement values for the Bms_Sop inputs.
+ *
+ * The values replace the inputs inside Bms_Sop only. Battery_Monitor, Bms_Soc
+ * and the SOC saved to NVM keep the measured values.
+ */
+typedef struct
+{
+    /** @brief BMS_SOP_OVR_* bits. A clear bit uses the measured input. */
+    uint8  Enable;
+
+    uint16 MinCell_mV;       /**< Minimum cell voltage. Unit: 1 mV. */
+    uint16 MaxCell_mV;       /**< Maximum cell voltage. Unit: 1 mV. */
+    sint16 MaxTemp_dC;       /**< Maximum pack temperature. Unit: 0.1 degC. */
+    uint16 SocMin_pct_x10;   /**< SOC of the weakest cell. Unit: 0.1 %. */
+    uint16 SocMax_pct_x10;   /**< SOC of the strongest cell. Unit: 0.1 %. */
+
+} Bms_Sop_TestOverrideType;
+#endif
+
 /*==================================================================================================
 *                                       GLOBAL VARIABLES
 ==================================================================================================*/
@@ -105,6 +149,16 @@ typedef struct
  * is the safe reading: it publishes no charge limit.
  */
 extern volatile uint8 g_BmsSopMode;
+
+#if (BMS_SOP_TEST_OVERRIDE == 1U)
+/**
+ * @brief Bench-test input override. Write it from a debugger or an XCP master.
+ *
+ * Enable is 0 at startup, so the module uses the measured inputs until a test
+ * sets a bit. Bms_Sop_Init() does not clear it, the same as a calibration.
+ */
+extern volatile Bms_Sop_TestOverrideType g_BmsSopTestOverride;
+#endif
 
 /*==================================================================================================
 *                                       FUNCTION PROTOTYPES

@@ -43,6 +43,10 @@
 
 volatile uint8 g_BmsSopMode = (uint8)BMS_SOP_DEFAULT_MODE;
 
+#if (BMS_SOP_TEST_OVERRIDE == 1U)
+volatile Bms_Sop_TestOverrideType g_BmsSopTestOverride = { 0U, 0U, 0U, 0, 0U, 0U };
+#endif
+
 /*==================================================================================================
 *                                       LOCAL VARIABLES
 ==================================================================================================*/
@@ -205,6 +209,8 @@ void Bms_Sop_MainFunction(void)
     uint16 minCell_mV;
     uint16 maxCell_mV;
     sint16 temp_dC;
+    uint16 socMin_pct_x10;
+    uint16 socMax_pct_x10;
     uint16 kVLow;
     uint16 kVHigh;
     uint16 kTHigh;
@@ -223,6 +229,36 @@ void Bms_Sop_MainFunction(void)
     minCell_mV = Bms_Sop_VoltsTo_mV(battery->MinCellVoltage);
     maxCell_mV = Bms_Sop_VoltsTo_mV(battery->MaxCellVoltage);
     temp_dC    = battery->MaxPackTemperature_dC;
+    socMin_pct_x10 = soc->Min.Soc_pct_x10;
+    socMax_pct_x10 = soc->Max.Soc_pct_x10;
+
+#if (BMS_SOP_TEST_OVERRIDE == 1U)
+    {
+        /* One read of the enable mask, so a write mid-cycle cannot split it. */
+        uint8 enable = g_BmsSopTestOverride.Enable;
+
+        if ((enable & BMS_SOP_OVR_MIN_CELL) != 0U)
+        {
+            minCell_mV = g_BmsSopTestOverride.MinCell_mV;
+        }
+        if ((enable & BMS_SOP_OVR_MAX_CELL) != 0U)
+        {
+            maxCell_mV = g_BmsSopTestOverride.MaxCell_mV;
+        }
+        if ((enable & BMS_SOP_OVR_MAX_TEMP) != 0U)
+        {
+            temp_dC = g_BmsSopTestOverride.MaxTemp_dC;
+        }
+        if ((enable & BMS_SOP_OVR_SOC_MIN) != 0U)
+        {
+            socMin_pct_x10 = g_BmsSopTestOverride.SocMin_pct_x10;
+        }
+        if ((enable & BMS_SOP_OVR_SOC_MAX) != 0U)
+        {
+            socMax_pct_x10 = g_BmsSopTestOverride.SocMax_pct_x10;
+        }
+    }
+#endif
 
     kVLow  = Bms_Sop_FactorVLow(minCell_mV, limits);
     kVHigh = Bms_Sop_FactorVHigh(maxCell_mV, limits);
@@ -240,19 +276,19 @@ void Bms_Sop_MainFunction(void)
     Bms_Sop_ApplyLimit(
         &g_BmsSopData.Discharge,
         Bms_BattCfg_GetStaticLimit_dA(BMS_BATTCFG_LIMIT_DISCHARGE,
-                                      soc->Min.Soc_pct_x10, temp_dC),
+                                      socMin_pct_x10, temp_dC),
         Bms_Sop_MinFactor(kVLow, kTHigh));
 
     Bms_Sop_ApplyLimit(
         &g_BmsSopData.Regen,
         Bms_BattCfg_GetStaticLimit_dA(BMS_BATTCFG_LIMIT_REGEN,
-                                      soc->Max.Soc_pct_x10, temp_dC),
+                                      socMax_pct_x10, temp_dC),
         Bms_Sop_MinFactor(kVHigh, kTHigh));
 
     Bms_Sop_ApplyLimit(
         &g_BmsSopData.Charge,
         Bms_BattCfg_GetStaticLimit_dA(BMS_BATTCFG_LIMIT_CHARGE,
-                                      soc->Max.Soc_pct_x10, temp_dC),
+                                      socMax_pct_x10, temp_dC),
         Bms_Sop_MinFactor(kVHigh, kTHigh));
 
     /*
