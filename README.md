@@ -640,21 +640,26 @@ up in [`sil/TEST_REPORT.md`](sil/TEST_REPORT.md).
 ## 16. Hardware-in-the-loop (HIL) SOP tests
 
 `hil/` holds two Python tests that run `Bms_Sop` on the S32K344 board (`Debug_FLASH`, J-Link probe).
-Each writes a Markdown report under `hil/reports/`.
+Both reach the board through [pylink](https://github.com/square/pylink) (`pylink-square`), the Python
+wrapper for the SEGGER J-Link DLL, and read and write memory while the core runs. Each writes a Markdown
+report under `hil/reports/`.
 
-| Script | What it does | Needs |
-| --- | --- | --- |
-| `sop_hil.py` | Forces inputs through `g_BmsSopTestOverride` and checks the limits against hand-derived values (21 cases) | `debug_server.bat` running |
-| `sop_init_hil.py` | Resets the MCU and samples inputs, validity bits and limits every 10 ms for 20 s with J-Link HSS, without halting the core (10 checks); also writes a CSV and a Plotly page | No GDB server running |
+| Script | What it does |
+| --- | --- |
+| `sop_hil.py` | Forces inputs through `g_BmsSopTestOverride` and checks the limits against hand-derived values (21 cases) |
+| `sop_init_hil.py` | Samples inputs, validity bits and limits every 10 ms for 20 s after reset with J-Link HSS (10 checks); also writes a CSV and a Plotly page |
 
 ```powershell
-python hil/sop_init_hil.py    # stop debug_server.bat first
-python hil/sop_hil.py         # with debug_server.bat running, after one reset
+python -m pip install pylink-square    # once
+python hil/sop_hil.py
+python hil/sop_init_hil.py
 ```
 
-`sop_init_hil.py` uses HSS (High-Speed Sampling, the engine behind SEGGER J-Scope) through
-`JLink_x64.dll` from a SEGGER J-Link software install (`hil/jlink_hss.py`); `hil/plot_sop_trace.py`
-turns its CSV into the plot. **Every new J-Link connection with device S32K344 fills the application
-RAM with 0xDEADBEEF**, which corrupts the running firmware. `sop_init_hil.py` resets right after it
-connects; after starting `debug_server.bat`, reset once through GDB (`monitor reset`, `monitor go`)
-before running `sop_hil.py`.
+Needs the SEGGER J-Link software (`JLink_x64.dll`) and no J-Link GDB server running, since the probe
+serves one tool at a time. `hil/hil_common.py` holds the shared J-Link session, flash check and ELF
+symbol lookup (through the S32DS gdb, offline); `hil/plot_sop_trace.py` turns the CSV into the plot.
+HSS (High-Speed Sampling) is the engine behind SEGGER J-Scope; pylink has no wrapper for it, so
+`hil_common.py` calls the four DLL functions directly.
+
+**Every new J-Link connection with device S32K344 fills the application RAM with 0xDEADBEEF**, which
+corrupts the running firmware. Both scripts reset the MCU right after they connect.

@@ -6,16 +6,16 @@
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-13 06:55:33 |
-| Duration | 21.7 s |
+| Executed (UTC) | 2026-09-13 14:01:37 |
+| Duration | 16.4 s |
 | Host | Windows 11 (AMD64) |
 | Python | 3.13.15 |
-| GDB | GNU gdb (GDB src=g3848e4251b0 bld=g3848e4251b0 ) 15.1 |
-| GDB server | J-Link GDB server from `debug_server.bat`, localhost:2331 |
-| Target | NXP S32K344 bench board, SWD |
+| GDB (ELF symbol queries only) | GNU gdb (GDB src=g3848e4251b0 bld=g3848e4251b0 ) 15.1 |
+| J-Link | pylink-square 2.0.1, J-Link DLL V7.90, probe S/N 150712146 |
+| Target | S32K344 bench board, SWD 4000 kHz |
 | ELF | `Debug_FLASH\BMS_demo.elf`, 3977112 bytes, built 2026-09-13 06:48:57, sha256 121e22dfa2fe |
-| Flash on target | `compare-sections .pflash`: matched |
-| Repo commit | b777234 (working tree has uncommitted changes) |
+| Flash on target | `.pflash` read back and compared: matched |
+| Repo commit | 4e4aed0 (working tree has uncommitted changes) |
 | Settle time per step | 0.60 s (6 runs of the 100 ms task) |
 
 ## Summary
@@ -34,28 +34,31 @@ Verdict: PASS
 |---|---|---|---|
 | Flash matches the ELF | matched | matched | PASS |
 | Override hook compiled in | sizeof = 12 | 12 | PASS |
-| Firmware runs | g_LedCounter changes | [46, 29, 12] | PASS |
+| SOP inputs valid after reset | within 5 s | 0.4 s | PASS |
+| Firmware runs | g_LedCounter changes | [34, 10, 35] | PASS |
 | No HardFault before the run | HFSR = 0, CFSR = 0 | 0x00000000, 0x00000000 | PASS |
 | No HardFault after the run | HFSR = 0, CFSR = 0 | 0x00000000, 0x00000000 | PASS |
 | Override off at exit | Enable = 0, mode = 0 | written | PASS |
 
-Measured inputs and published limits with the override off, before the first case. HIL-SOP-18 and HIL-SOP-19 use these values.
+Measured inputs and published limits with the override off, before the first case. The last two cases use these values.
 
 | Min cell mV | Max cell mV | Max temp 0.1 degC | SOC min 0.1 % | SOC max 0.1 % |
 |---|---|---|---|---|
-| 3629 | 3769 | 279 | 469 | 469 |
+| 3630 | 3771 | 283 | 469 | 469 |
 
 | Limit | Table_dA | DerateFactor | Final_dA |
 |---|---|---|---|
 | Discharge | 819 | 1000 | 819 |
-| Regen | 590 | 1000 | 590 |
-| Charge | 556 | 1000 | 0 |
+| Regen | 589 | 1000 | 589 |
+| Charge | 555 | 1000 | 0 |
 
 Mode 0, DerateActiveVLow 0, DerateActiveVHigh 0, DerateActiveTHigh 0, DerateActiveTLow 0, InputsValid 1.
 
 ## Method
 
-The test writes replacement inputs into `g_BmsSopTestOverride` and `g_BmsSopMode` from a GDB session, then detaches so that the firmware runs. After the settle time, a second GDB session reads `g_BmsSopData`. Each GDB attach halts the core for a short time.
+The script connects through pylink-square, reads the `.pflash` section back and compares it with the ELF, then resets the MCU. The connect fills the application RAM with 0xDEADBEEF, so the reset is required. It waits until `g_BmsSopData.InputsValid` is 1.
+
+For each case it writes `g_BmsSopMode` and the whole `g_BmsSopTestOverride` struct, waits the settle time, and reads `g_BmsSopData`. Every read and write uses J-Link background memory access while the core runs. Variable addresses and sizes come from the ELF through GDB, which never connects to the board.
 
 The override replaces the inputs inside `Bms_Sop_MainFunction()` only. `Battery_Monitor`, `Bms_Soc` and the SOC saved to NVM keep the measured values.
 
@@ -656,9 +659,9 @@ Enable = 0. The tables return to the baseline read before the first case, within
 
 | Field | Expected | Actual | Result |
 |---|---|---|---|
-| D.table | 819 ±15 | 818 | PASS |
-| R.table | 590 ±15 | 588 | PASS |
-| C.table | 556 ±15 | 554 | PASS |
+| D.table | 819 ±15 | 819 | PASS |
+| R.table | 589 ±15 | 589 | PASS |
+| C.table | 555 ±15 | 555 | PASS |
 | mode | 0 | 0 | PASS |
 | vlow | 0 | 0 | PASS |
 | vhigh | 0 | 0 | PASS |
@@ -672,7 +675,6 @@ Enable = 0. The tables return to the baseline read before the first case, within
 - The override enters after `Battery_Monitor` and `Bms_Soc`, so this test does not cover the signal chain from CAN1 or the ADC (SP-06, SP-07).
 - The test does not read the CAN frame `0x30C` (SP-08).
 - The maps and derate windows are placeholder calibration. The test checks the arithmetic and the gating, not that a limit is safe for a real cell.
-- Each GDB attach halts the core, which delays the scheduler during the read and the write.
-- Do not use the jlink-mcp memory tools on this board. Each new J-Link connection runs the S32K344 J-Link script, which fills the application RAM with 0xDEADBEEF.
-- Core register reads through this GDB server return 0xDEADBEEF. The health checks use `g_LedCounter` and the HardFault capture variables instead.
+- Every run resets the MCU, because the J-Link connect clears the RAM. The test cannot inspect a board that is already running. Do not use the jlink-mcp memory tools on a running board for the same reason.
+- The override struct is written while the firmware runs, so one 100 ms cycle can see a partly written set. The settle time covers six cycles.
 - Set `BMS_SOP_TEST_OVERRIDE` to `0U` in `Bms_Sop.h` before any build that goes on a vehicle.

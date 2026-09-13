@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bms_Sop startup HIL test: reset the MCU and record the SOP time series with J-Link HSS.
 
-The test connects through the J-Link DLL, makes sure that the flash matches the
+The test connects through pylink-square, makes sure that the flash matches the
 ELF, resets the MCU and starts J-Link High-Speed Sampling (the J-Scope engine)
 right after the reset is released. HSS reads the SOP inputs, their validity
 bits, the SOC init source and the published limits every 10 ms while the core
@@ -16,7 +16,7 @@ Outputs:
 Prerequisites:
   1. build.bat and flash.bat were run, so the board runs Debug_FLASH/BMS_demo.elf.
   2. No J-Link GDB server runs. Stop debug_server.bat first.
-  3. SEGGER J-Link software is installed (JLink_x64.dll).
+  3. The SEGGER J-Link software (JLink_x64.dll) and pylink-square are installed.
 
 Usage:
   python hil/sop_init_hil.py [--duration 20] [--period-ms 10] [--elf ...] [--gdb ...]
@@ -33,28 +33,24 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime as dt
-import os
 import platform
-import re
 import struct
-import subprocess
 import sys
-import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from jlink_hss import DEFAULT_DLL, HSS_TIMESTAMP_BYTES, JLink, JLinkError  # noqa: E402
+from hil_common import (BLOCK_MERGE_GAP, HSS_TIMESTAMP_BYTES, REPO, Bench, Layout,  # noqa: E402
+                        SetupError, add_target_args, build_layout, check_host, gdb_version, git,
+                        ts)
 from plot_sop_trace import write_html  # noqa: E402
-from sop_hil import DEFAULT_ELF, DEFAULT_GDB, REPO, SetupError, gdb_version, git, ts  # noqa: E402
 
 DEFAULT_REPORT = REPO / "hil" / "reports" / "sop_init_hil.md"
 DEFAULT_CSV = REPO / "hil" / "reports" / "sop_init_trace.csv"
 
 TASK_PERIOD_MS = 100
-BLOCK_MERGE_GAP = 64          # bytes: fields closer than this share one HSS block
 
 INIT_SOURCE = {0: "DEFAULT", 1: "OCV", 2: "NVM", 3: "PENDING"}
 INIT_PENDING = 3
@@ -106,91 +102,6 @@ OUTPUT_KEYS = ("D_table", "D_factor", "D_final", "R_table", "R_factor", "R_final
                "C_table", "C_factor", "C_final", "mode", "vlow", "vhigh", "thigh", "tlow",
                "inputs_valid")
 LIMIT_KEYS = OUTPUT_KEYS[:9]
-
-MARKER = re.compile(r"@@([\w.]+)=(-?\d+)")
-
-
-# --------------------------------------------------------------------------------------------------
-# ELF
-# --------------------------------------------------------------------------------------------------
-
-def gdb_offline(gdb: Path, elf: Path, commands: list[str]) -> str:
-    """Runs GDB against the ELF file only. No target, so nothing touches the board."""
-    fd, path = tempfile.mkstemp(suffix=".gdb", prefix="sop_init_")
-    try:
-        with os.fdopen(fd, "w", encoding="ascii") as f:
-            f.write("\n".join(["set pagination off", *commands]) + "\n")
-        proc = subprocess.run([str(gdb), "-batch", "-nx", "-x", path, str(elf)],
-                              capture_output=True, text=True, timeout=60)
-    finally:
-        os.unlink(path)
-    return proc.stdout + proc.stderr
-
-
-@dataclass
-class Layout:
-    fields: dict[str, tuple[int, int, str]]              # key -> (address, size, code)
-    blocks: list[tuple[int, int]] = field(default_factory=list)
-    offsets: dict[str, int] = field(default_factory=dict)  # key -> offset in one sample
-    sample_size: int = 0
-
-
-def build_layout(gdb: Path, elf: Path) -> Layout:
-    cmds = []
-    for key, expr, _ in FIELDS:
-        cmds.append(f'printf "@@{key}.addr=%lu\\n", (unsigned long)&({expr})')
-        cmds.append(f'printf "@@{key}.size=%d\\n", (int)sizeof({expr})')
-    out = gdb_offline(gdb, elf, cmds)
-    values = {m.group(1): int(m.group(2)) for m in MARKER.finditer(out)}
-    layout = Layout(fields={})
-    for key, expr, code in FIELDS:
-        if f"{key}.addr" not in values:
-            raise SetupError(f"The ELF has no {expr}.\n{out.strip()}")
-        size = values[f"{key}.size"]
-        if size != struct.calcsize("<" + code):
-            raise SetupError(f"{expr} is {size} bytes, the script expects "
-                             f"{struct.calcsize('<' + code)}. Update FIELDS.")
-        layout.fields[key] = (values[f"{key}.addr"], size, code)
-
-    spans = sorted((addr, addr + size) for addr, size, _ in layout.fields.values())
-    merged: list[list[int]] = []
-    for start, end in spans:
-        if merged and start - merged[-1][1] <= BLOCK_MERGE_GAP:
-            merged[-1][1] = max(merged[-1][1], end)
-        else:
-            merged.append([start, end])
-    layout.blocks = [(start, end - start) for start, end in merged]
-
-    base = HSS_TIMESTAMP_BYTES
-    block_base = []
-    for addr, length in layout.blocks:
-        block_base.append((addr, length, base))
-        base += length
-    layout.sample_size = base
-    for key, (addr, _, _) in layout.fields.items():
-        for b_addr, b_len, b_off in block_base:
-            if b_addr <= addr < b_addr + b_len:
-                layout.offsets[key] = b_off + addr - b_addr
-    return layout
-
-
-def elf_section(gdb: Path, elf: Path, name: str, dump_path: Path) -> tuple[int, bytes]:
-    out = gdb_offline(gdb, elf, ["info files"])
-    m = re.search(rf"(0x[0-9a-f]+) - (0x[0-9a-f]+) is {re.escape(name)}\s*$", out, re.M)
-    if not m:
-        raise SetupError(f"The ELF has no {name} section.")
-    start, end = int(m.group(1), 16), int(m.group(2), 16)
-    gdb_offline(gdb, elf, [f"dump binary memory {dump_path.as_posix()} {start} {end}"])
-    return start, dump_path.read_bytes()
-
-
-def gdb_server_running() -> bool:
-    try:
-        out = subprocess.run(["tasklist", "/NH"], capture_output=True, text=True, timeout=15).stdout
-    except (OSError, subprocess.SubprocessError):
-        return False
-    return "JLinkGDBServer" in out
-
 
 # --------------------------------------------------------------------------------------------------
 # Decode
@@ -479,7 +390,7 @@ DISCRETE_KEYS = ("cell_valid", "temp_valid", "soc_min_valid", "soc_max_valid", "
 class RunInfo:
     started: dt.datetime
     finished: dt.datetime | None = None
-    dll_version: str = "unknown"
+    bench: str = "not connected"
     hss_caps: dict = field(default_factory=dict)
     flash_match: str = "not checked"
     layout: Layout | None = None
@@ -518,7 +429,7 @@ def write_report(path: Path, args: argparse.Namespace, info: RunInfo, ready: lis
           f"| Host | {platform.system()} {platform.release()} ({platform.machine()}) |",
           f"| Python | {platform.python_version()} |",
           f"| GDB (ELF symbol queries only) | {gdb_version(args.gdb)} |",
-          f"| J-Link DLL | V{info.dll_version}, `{args.jlink_dll}` |",
+          f"| J-Link | {info.bench} |",
           f"| HSS capability | {info.hss_caps.get('max_blocks', '-')} blocks, "
           f"{info.hss_caps.get('max_freq_hz', '-')} Hz maximum |",
           f"| Target | {args.device} bench board, SWD {args.speed} kHz |",
@@ -637,7 +548,7 @@ def write_report(path: Path, args: argparse.Namespace, info: RunInfo, ready: lis
         L += ["## Last sample", ""] + SAMPLE_HEADER + [sample_row(ready[-1]), ""]
 
     L += ["## Method", "",
-          "The script opens the J-Link through `JLink_x64.dll` and connects with device name "
+          "The script opens the J-Link through pylink-square and connects with device name "
           f"`{args.device}`. The connect halts the core and fills the application RAM with "
           "0xDEADBEEF. The script reads the `.pflash` section back and compares it with the "
           "ELF, then resets the MCU, releases it and starts J-Link High-Speed Sampling (HSS) "
@@ -659,8 +570,7 @@ def write_report(path: Path, args: argparse.Namespace, info: RunInfo, ready: lis
           "- The J-Link reset goes through the S32K344 J-Link setup. A power-on reset can "
           "differ in the analog and CAN timing.",
           "- The test does not read the CAN frame `0x30C`.",
-          "- The J-Link GDB server and HSS were not tested together, so the script refuses to "
-          "run while a GDB server runs.", ""]
+          "- The script refuses to run while a J-Link GDB server holds the probe.", ""]
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(L), encoding="utf-8")
@@ -672,13 +582,7 @@ def write_report(path: Path, args: argparse.Namespace, info: RunInfo, ready: lis
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--elf", type=Path, default=DEFAULT_ELF)
-    parser.add_argument("--gdb", type=Path, default=DEFAULT_GDB,
-                        help="arm-none-eabi-gdb, used offline for ELF symbol queries")
-    parser.add_argument("--jlink-dll", type=Path, default=DEFAULT_DLL)
-    parser.add_argument("--device", default="S32K344")
-    parser.add_argument("--speed", type=int, default=4000, help="SWD speed in kHz")
-    parser.add_argument("--usb-sn", type=int, default=None, help="J-Link serial number")
+    add_target_args(parser)
     parser.add_argument("--duration", type=float, default=20.0, help="capture length in s")
     parser.add_argument("--period-ms", type=int, default=10, help="HSS sample period in ms")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
@@ -692,26 +596,14 @@ def main() -> int:
     setup_error = None
 
     try:
-        if not args.gdb.exists():
-            raise SetupError(f"GDB not found: {args.gdb}. Set S32DS_ROOT or pass --gdb.")
-        if not args.elf.exists():
-            raise SetupError(f"ELF not found: {args.elf}. Run build.bat first.")
-        if gdb_server_running():
-            raise SetupError("A J-Link GDB server is running. Stop debug_server.bat first, "
-                             "because HSS and the GDB server were not tested together.")
+        check_host(args)
+        info.layout = build_layout(args.gdb, args.elf, FIELDS, header_bytes=HSS_TIMESTAMP_BYTES)
 
-        info.layout = build_layout(args.gdb, args.elf)
-        with tempfile.TemporaryDirectory(prefix="sop_init_") as tmp:
-            flash_addr, flash_image = elf_section(args.gdb, args.elf, ".pflash",
-                                                  Path(tmp) / "pflash.bin")
-
-        jlink = JLink(args.jlink_dll, args.device, args.speed, args.usb_sn)
-        info.dll_version = jlink.dll_version
         raw = bytearray()
-        try:
-            print(f"Connecting (J-Link DLL V{info.dll_version}) ...", flush=True)
-            jlink.open()
-            info.hss_caps = jlink.hss_caps()
+        print("Connecting ...", flush=True)
+        with Bench(args) as bench:
+            info.bench = bench.description
+            info.hss_caps = bench.hss_caps()
             if len(info.layout.blocks) > info.hss_caps["max_blocks"]:
                 raise SetupError(f"{len(info.layout.blocks)} HSS blocks needed, the J-Link "
                                  f"supports {info.hss_caps['max_blocks']}.")
@@ -719,28 +611,24 @@ def main() -> int:
                 raise SetupError(f"A {args.period_ms} ms period is above the HSS maximum of "
                                  f"{info.hss_caps['max_freq_hz']} Hz.")
 
-            on_target = jlink.read(flash_addr, len(flash_image))
-            info.flash_match = ("matched" if on_target == flash_image else
-                                f"MISMATCH at 0x{flash_addr + next(i for i, (a, b) in enumerate(zip(on_target, flash_image)) if a != b):08X}")
+            info.flash_match = bench.verify_flash(args.gdb, args.elf)
             if info.flash_match != "matched":
                 raise SetupError(f".pflash on the target does not match {args.elf} "
                                  f"({info.flash_match}). Flash the ELF first.")
 
             print(f"Resetting and sampling for {args.duration:.0f} s every {args.period_ms} ms "
                   "without halting ...", flush=True)
-            jlink.reset_and_go()
+            bench.reset_and_run()
             t_go = time.perf_counter()
-            jlink.hss_start(info.layout.blocks, args.period_ms * 1000)
+            bench.hss_start(info.layout.blocks, args.period_ms * 1000)
             info.hss_latency_ms = (time.perf_counter() - t_go) * 1000
-            while time.perf_counter() - t_go < args.duration:
-                raw += jlink.hss_read()
-                time.sleep(0.02)
-            jlink.hss_stop()
-            raw += jlink.hss_read()
-            if jlink.is_halted():
-                jlink.go()
-        finally:
-            jlink.close()
+            try:
+                while time.perf_counter() - t_go < args.duration:
+                    raw += bench.hss_read()
+                    time.sleep(0.02)
+            finally:
+                bench.hss_stop()
+            raw += bench.hss_read()
 
         info.raw_bytes = len(raw)
         if len(raw) % info.layout.sample_size:
@@ -764,7 +652,7 @@ def main() -> int:
                    x_title=f"Time since HSS start, {info.hss_latency_ms:.0f} ms after reset release (ms)",
                    sample_note=f"One J-Link HSS sample every {args.period_ms} ms, read while the "
                                "core runs")
-    except (SetupError, JLinkError) as exc:
+    except SetupError as exc:
         setup_error = str(exc)
         print(f"\nSETUP ERROR: {setup_error}", file=sys.stderr)
     finally:

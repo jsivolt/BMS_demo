@@ -8,19 +8,19 @@ Time series: [sop_init_trace.csv](sop_init_trace.csv), plot: [sop_init_trace.htm
 
 | | |
 |---|---|
-| Executed (UTC) | 2026-09-13 06:54:30 |
-| Duration | 21.5 s |
+| Executed (UTC) | 2026-09-13 14:02:00 |
+| Duration | 21.8 s |
 | Host | Windows 11 (AMD64) |
 | Python | 3.13.15 |
 | GDB (ELF symbol queries only) | GNU gdb (GDB src=g3848e4251b0 bld=g3848e4251b0 ) 15.1 |
-| J-Link DLL | V7.90, `C:\Program Files\SEGGER\JLink\JLink_x64.dll` |
+| J-Link | pylink-square 2.0.1, J-Link DLL V7.90, probe S/N 150712146 |
 | HSS capability | 10 blocks, 1000 Hz maximum |
 | Target | S32K344 bench board, SWD 4000 kHz |
 | ELF | `Debug_FLASH\BMS_demo.elf` |
 | Flash on target | matched |
-| Repo commit | b777234 (working tree has uncommitted changes) |
+| Repo commit | 4e4aed0 (working tree has uncommitted changes) |
 | Sampling | period 10 ms, 20 s, 4 blocks, 177 bytes per sample |
-| HSS start | 1.7 ms after the reset was released |
+| HSS start | 1.8 ms after the reset was released |
 
 ## Summary
 
@@ -28,20 +28,20 @@ Verdict: PASS
 
 | Check | Title | Expected | Actual | Result |
 |---|---|---|---|---|
-| INIT-01 | HSS sampling covered the whole capture | at least 90 % of 2000 samples, no gap of 100 ms or more | 1998 samples, largest gap 10.2 ms | PASS |
+| INIT-01 | HSS sampling covered the whole capture | at least 90 % of 2000 samples, no gap of 100 ms or more | 2000 samples, largest gap 10.1 ms | PASS |
 | INIT-02 | Sampling did not disturb the scheduler | g_BmsSchedulerMissedTickCount = 0 at the end | 0 | PASS |
 | INIT-03 | Firmware runs with no HardFault | g_LedCounter changes in the last second, HFSR = 0, CFSR = 0 | g_LedCounter changes, HFSR 0x00000000, CFSR 0x00000000 | PASS |
 | INIT-04 | No test override during the capture | g_BmsSopTestOverride.Enable = 0 in every sample | not 0 in 0 samples | PASS |
 | INIT-05 | Limits are 0 until the first Bms_Sop_MainFunction call | every Table_dA, DerateFactor and Final_dA is 0 before the first derate factor appears | 16 samples before 160 ms, 0 with a non-zero limit field | PASS |
 | INIT-06 | SOC init leaves PENDING within the OCV wait budget | PENDING lasts no longer than g_BmsSocOcvWaitTimeout_ms + one 100 ms task period | never PENDING in any sample, seeded from NVM at 60 ms | PASS |
-| INIT-07 | Outputs are stateless | for three consecutive samples with identical inputs, the outputs of the last two are identical | 1622 triples compared, 0 differ | PASS |
-| INIT-08 | HSS samples are consistent | Final_dA = Table_dA x DerateFactor / 1000, or 0 where the mode or an invalid input forces it, except single samples read in the middle of an update | 0 of 1982 samples inconsistent, 0 in a row | PASS |
-| INIT-09 | No limit is published from an input that is not valid (SOP-FR-12) | Final_dA = 0 while the cell voltages, the temperature or the SOC init are not valid, except single samples read in the middle of an update | 0 of 1982 samples with a limit above 0, 0 in a row | PASS |
-| INIT-10 | InputsValid matches the input validity bits | g_BmsSopData.InputsValid equals the cell, temperature and SOC init validity, except single samples read in the middle of an update | 0 of 1982 samples differ, 0 in a row | PASS |
+| INIT-07 | Outputs are stateless | for three consecutive samples with identical inputs, the outputs of the last two are identical | 1618 triples compared, 0 differ | PASS |
+| INIT-08 | HSS samples are consistent | Final_dA = Table_dA x DerateFactor / 1000, or 0 where the mode or an invalid input forces it, except single samples read in the middle of an update | 0 of 1984 samples inconsistent, 0 in a row | PASS |
+| INIT-09 | No limit is published from an input that is not valid (SOP-FR-12) | Final_dA = 0 while the cell voltages, the temperature or the SOC init are not valid, except single samples read in the middle of an update | 0 of 1984 samples with a limit above 0, 0 in a row | PASS |
+| INIT-10 | InputsValid matches the input validity bits | g_BmsSopData.InputsValid equals the cell, temperature and SOC init validity, except single samples read in the middle of an update | 0 of 1984 samples differ, 0 in a row | PASS |
 
 ## Event timeline
 
-Time counts from the start of HSS sampling, 1.7 ms after the reset was released. Each time is the first sample that shows the event, so the event itself happened up to 10 ms earlier.
+Time counts from the start of HSS sampling, 1.8 ms after the reset was released. Each time is the first sample that shows the event, so the event itself happened up to 10 ms earlier.
 
 | Event | Time |
 |---|---|
@@ -51,10 +51,10 @@ Time counts from the start of HSS sampling, 1.7 ms after the reset was released.
 | Scheduler runs (g_LedCounter first > 0) | 70 ms |
 | First Bms_Sop_MainFunction result | 160 ms |
 | TemperatureSummaryValid first TRUE | 160 ms |
-| CellVoltageValid first TRUE | 360 ms |
-| All SOP inputs valid | 360 ms |
-| Discharge Final_dA first > 0 | 360 ms |
-| Regen Final_dA first > 0 | 360 ms |
+| CellVoltageValid first TRUE | 260 ms |
+| All SOP inputs valid | 260 ms |
+| Discharge Final_dA first > 0 | 260 ms |
+| Regen Final_dA first > 0 | 260 ms |
 
 ## Limits published from inputs that were not valid
 
@@ -62,11 +62,11 @@ SOP-FR-12 requires every limit to be 0 while the cell voltages, the temperature 
 
 | Limit | Time span | Samples | Inputs not valid | Peak Final_dA (time) | Reference Final_dA (time) | Peak vs reference |
 |---|---|---|---|---|---|---|
-| Discharge | - | 0 | - | - | 820 (380 ms) | - |
-| Regen | - | 0 | - | - | 591 (380 ms) | - |
-| Charge | - | 0 | - | - | 0 (380 ms) | - |
+| Discharge | - | 0 | - | - | 819 (280 ms) | - |
+| Regen | - | 0 | - | - | 590 (280 ms) | - |
+| Charge | - | 0 | - | - | 0 (280 ms) | - |
 
-The gate held the limits at 0 in 20 samples, from 160 to 350 ms.
+The gate held the limits at 0 in 10 samples, from 160 to 250 ms.
 
 ## Startup samples
 
@@ -77,40 +77,39 @@ The first readable sample, then every sample where a shown value changed, until 
 | 0 | 0 | 0 | 0 | 0 | 0 | ---- | DEFAULT | 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | DISCHARGE | inputs not valid |
 | 60 | 0 | 0 | 0 | 469 | 469 | --mM | NVM | 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | DISCHARGE | inputs not valid |
 | 160 | 0 | 0 | 282 | 469 | 469 | -TmM | NVM | 819 / 0 / 0 | 590 / 1000 / 0 | 556 / 1000 / 0 | DISCHARGE | VLow, inputs not valid |
-| 260 | 0 | 0 | 279 | 469 | 469 | -TmM | NVM | 820 / 0 / 0 | 591 / 1000 / 0 | 557 / 1000 / 0 | DISCHARGE | VLow, inputs not valid |
-| 360 | 3632 | 3773 | 279 | 469 | 469 | CTmM | NVM | 820 / 1000 / 820 | 591 / 1000 / 591 | 557 / 1000 / 0 | DISCHARGE | - |
+| 260 | 3629 | 3764 | 281 | 469 | 469 | CTmM | NVM | 819 / 1000 / 819 | 590 / 1000 / 590 | 556 / 1000 / 0 | DISCHARGE | - |
 
 ## Later discrete events
 
-Samples after 360 ms where a validity bit, the SOC init source, the mode or a derate flag changed: 0.
+Samples after 260 ms where a validity bit, the SOC init source, the mode or a derate flag changed: 0.
 
 No change.
 
 ## Steady-state variation
 
-From 360 ms, the first sample with all inputs valid, to the end. `Bms_Sop` has no filter, so input noise reaches the published limits directly.
+From 260 ms, the first sample with all inputs valid, to the end. `Bms_Sop` has no filter, so input noise reaches the published limits directly.
 
 | Signal | Min | Max | Span |
 |---|---|---|---|
-| MinCell mV | 3626 | 3667 | 41 |
-| MaxCell mV | 3726 | 3774 | 48 |
-| MaxTemp 0.1 degC | 277 | 288 | 11 |
+| MinCell mV | 3626 | 3674 | 48 |
+| MaxCell mV | 3748 | 3773 | 25 |
+| MaxTemp 0.1 degC | 278 | 290 | 12 |
 | SocMin 0.1 % | 469 | 469 | 0 |
 | SocMax 0.1 % | 469 | 469 | 0 |
 | Discharge Final_dA | 817 | 820 | 3 |
-| Regen Final_dA | 588 | 591 | 3 |
-| Charge Table_dA | 554 | 557 | 3 |
+| Regen Final_dA | 587 | 591 | 4 |
+| Charge Table_dA | 553 | 557 | 4 |
 | Charge Final_dA | 0 | 0 | 0 |
 
 ## Last sample
 
 | t ms | MinCell mV | MaxCell mV | MaxTemp 0.1 degC | SocMin 0.1 % | SocMax 0.1 % | Valid | SOC init | Discharge tbl / k / final | Regen tbl / k / final | Charge tbl / k / final | Mode | Derate or gate |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 19970 | 3628 | 3765 | 283 | 469 | 469 | CTmM | NVM | 819 / 1000 / 819 | 589 / 1000 / 589 | 555 / 1000 / 0 | DISCHARGE | - |
+| 19990 | 3631 | 3766 | 287 | 469 | 469 | CTmM | NVM | 818 / 1000 / 818 | 588 / 1000 / 588 | 554 / 1000 / 0 | DISCHARGE | - |
 
 ## Method
 
-The script opens the J-Link through `JLink_x64.dll` and connects with device name `S32K344`. The connect halts the core and fills the application RAM with 0xDEADBEEF. The script reads the `.pflash` section back and compares it with the ELF, then resets the MCU, releases it and starts J-Link High-Speed Sampling (HSS) at once. HSS is the engine behind SEGGER J-Scope: the J-Link reads the listed memory blocks at a fixed period while the core runs, and tags each sample with a microsecond timestamp. The core is never halted after the reset, and the firmware has no trace code.
+The script opens the J-Link through pylink-square and connects with device name `S32K344`. The connect halts the core and fills the application RAM with 0xDEADBEEF. The script reads the `.pflash` section back and compares it with the ELF, then resets the MCU, releases it and starts J-Link High-Speed Sampling (HSS) at once. HSS is the engine behind SEGGER J-Scope: the J-Link reads the listed memory blocks at a fixed period while the core runs, and tags each sample with a microsecond timestamp. The core is never halted after the reset, and the firmware has no trace code.
 
 Variable addresses and sizes come from the ELF through GDB, which runs on the ELF file only and never connects to the board. Fields closer than 64 bytes share one HSS block. Samples taken before the startup code cleared the RAM are dropped: 0 in this run.
 
@@ -121,4 +120,4 @@ Variable addresses and sizes come from the ELF through GDB, which runs on the EL
 - The inputs are the values `Battery_Monitor` and `Bms_Soc` report. The capture does not show why an input is not valid, for example a missing vAFE frame.
 - The J-Link reset goes through the S32K344 J-Link setup. A power-on reset can differ in the analog and CAN timing.
 - The test does not read the CAN frame `0x30C`.
-- The J-Link GDB server and HSS were not tested together, so the script refuses to run while a GDB server runs.
+- The script refuses to run while a J-Link GDB server holds the probe.

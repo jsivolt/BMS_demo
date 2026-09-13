@@ -1,27 +1,28 @@
 #!/usr/bin/env python3
 """Bms_Sop hardware-in-the-loop test on the S32K344 bench board.
 
-The test writes replacement inputs into g_BmsSopTestOverride, lets the
-firmware run, then reads g_BmsSopData and compares it with values derived by
-hand from the placeholder calibration in Bms_BattCfg.c. It writes a Markdown
-report to hil/reports/sop_hil.md.
+The test writes replacement inputs into g_BmsSopTestOverride while the
+firmware runs, waits, then reads g_BmsSopData and compares it with values
+derived by hand from the placeholder calibration in Bms_BattCfg.c. It writes a
+Markdown report to hil/reports/sop_hil.md.
+
+The board is reached through pylink-square (hil_common.Bench). Every read and
+write uses J-Link background memory access, so the core is never halted
+during a case.
 
 Prerequisites:
   1. Bms_Sop.h has BMS_SOP_TEST_OVERRIDE set to 1U.
   2. build.bat and flash.bat were run, so the board runs Debug_FLASH/BMS_demo.elf.
-  3. debug_server.bat runs in another window (J-Link GDB server on port 2331).
+  3. No J-Link GDB server runs, and pylink-square is installed.
 
 Usage:
-  python hil/sop_hil.py [--port 2331] [--settle 0.6] [--elf ...] [--gdb ...]
+  python hil/sop_hil.py [--settle 0.6] [--elf ...] [--gdb ...] [--jlink-dll ...]
 
 Exit status: 0 all cases pass, 1 a case failed or was blocked, 2 setup error.
 
-Each step is one arm-none-eabi-gdb batch session: attach, read or write,
-detach. Reconnecting to the same GDB server does not reset the core. Do not
-use the jlink-mcp memory tools on this board instead: each new J-Link
-connection runs the S32K344 J-Link script, which fills the application RAM
-with 0xDEADBEEF. Register reads through this GDB server also return
-0xDEADBEEF, so firmware health comes from counters, not from the PC.
+The J-Link connect fills the application RAM with 0xDEADBEEF (built-in
+S32K344 setup of the J-Link DLL), so the test resets the MCU right after it
+connects and waits for the SOP inputs to become valid.
 """
 
 from __future__ import annotations
@@ -29,22 +30,23 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hashlib
-import os
 import platform
 import re
-import subprocess
+import struct
 import sys
-import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
-REPO = Path(__file__).resolve().parents[1]
-DEFAULT_ELF = REPO / "Debug_FLASH" / "BMS_demo.elf"
-DEFAULT_GDB = (Path(os.environ.get("S32DS_ROOT", r"C:\NXP\S32DS.3.6.10\S32DS"))
-               / "tools" / "gdb-arm" / "arm32-eabi" / "bin" / "arm-none-eabi-gdb.exe")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from hil_common import (REPO, Bench, SetupError, add_target_args, build_layout,  # noqa: E402
+                        check_host, elf_ints, gdb_version, git, ts)
+
 DEFAULT_REPORT = REPO / "hil" / "reports" / "sop_hil.md"
+
+READY_TIMEOUT_S = 5.0         # after reset, how long the SOP inputs may take to become valid
 
 # Bms_Sop.h BMS_SOP_OVR_* bits.
 OVR_MIN_CELL = 0x01
@@ -57,44 +59,49 @@ OVR_ALL = 0x1F
 MODE_DISCHARGE = 0
 MODE_CHARGE = 1
 
-# Published fields, as report name -> GDB expression.
-OUTPUT_FIELDS = {
-    "D.table":  "g_BmsSopData.Discharge.Table_dA",
-    "D.factor": "g_BmsSopData.Discharge.DerateFactor",
-    "D.final":  "g_BmsSopData.Discharge.Final_dA",
-    "R.table":  "g_BmsSopData.Regen.Table_dA",
-    "R.factor": "g_BmsSopData.Regen.DerateFactor",
-    "R.final":  "g_BmsSopData.Regen.Final_dA",
-    "C.table":  "g_BmsSopData.Charge.Table_dA",
-    "C.factor": "g_BmsSopData.Charge.DerateFactor",
-    "C.final":  "g_BmsSopData.Charge.Final_dA",
-    "mode":     "g_BmsSopData.Mode",
-    "vlow":     "g_BmsSopData.DerateActiveVLow",
-    "vhigh":    "g_BmsSopData.DerateActiveVHigh",
-    "thigh":    "g_BmsSopData.DerateActiveTHigh",
-    "tlow":     "g_BmsSopData.DerateActiveTLow",
-    "inputs_valid": "g_BmsSopData.InputsValid",
-}
+# Published fields: (report name, C expression, struct code).
+OUTPUT_FIELDS = [
+    ("D.table",      "g_BmsSopData.Discharge.Table_dA",     "H"),
+    ("D.factor",     "g_BmsSopData.Discharge.DerateFactor", "H"),
+    ("D.final",      "g_BmsSopData.Discharge.Final_dA",     "H"),
+    ("R.table",      "g_BmsSopData.Regen.Table_dA",         "H"),
+    ("R.factor",     "g_BmsSopData.Regen.DerateFactor",     "H"),
+    ("R.final",      "g_BmsSopData.Regen.Final_dA",         "H"),
+    ("C.table",      "g_BmsSopData.Charge.Table_dA",        "H"),
+    ("C.factor",     "g_BmsSopData.Charge.DerateFactor",    "H"),
+    ("C.final",      "g_BmsSopData.Charge.Final_dA",        "H"),
+    ("mode",         "g_BmsSopData.Mode",                   "I"),
+    ("vlow",         "g_BmsSopData.DerateActiveVLow",       "B"),
+    ("vhigh",        "g_BmsSopData.DerateActiveVHigh",      "B"),
+    ("thigh",        "g_BmsSopData.DerateActiveTHigh",      "B"),
+    ("tlow",         "g_BmsSopData.DerateActiveTLow",       "B"),
+    ("inputs_valid", "g_BmsSopData.InputsValid",            "B"),
+]
 
 # Measured Bms_Sop inputs, read before the override is applied.
-MEASURED_FIELDS = {
-    "min_mV":  "(int)(g_BatteryData.MinCellVoltage * 1000.0 + 0.5)",
-    "max_mV":  "(int)(g_BatteryData.MaxCellVoltage * 1000.0 + 0.5)",
-    "temp_dC": "g_BatteryData.MaxPackTemperature_dC",
-    "socmin":  "g_BmsSocPack.Min.Soc_pct_x10",
-    "socmax":  "g_BmsSocPack.Max.Soc_pct_x10",
-}
+MEASURED_FIELDS = [
+    ("min_V",   "g_BatteryData.MinCellVoltage",        "f"),
+    ("max_V",   "g_BatteryData.MaxCellVoltage",        "f"),
+    ("temp_dC", "g_BatteryData.MaxPackTemperature_dC", "h"),
+    ("socmin",  "g_BmsSocPack.Min.Soc_pct_x10",        "H"),
+    ("socmax",  "g_BmsSocPack.Max.Soc_pct_x10",        "H"),
+]
 
-HEALTH_FIELDS = {
-    "led":       "g_LedCounter",
-    "hf_hfsr":   "g_HardFault_HFSR",
-    "hf_cfsr":   "g_HardFault_CFSR",
-    "ovr_size":  "sizeof(g_BmsSopTestOverride)",
-}
+HEALTH_FIELDS = [
+    ("led",     "g_LedCounter",     "I"),
+    ("hf_hfsr", "g_HardFault_HFSR", "I"),
+    ("hf_cfsr", "g_HardFault_CFSR", "I"),
+]
 
-
-class SetupError(RuntimeError):
-    """The test cannot run: no GDB, no server, wrong firmware."""
+# g_BmsSopTestOverride members, written as one block.
+OVERRIDE_FIELDS = [
+    ("enable",  "g_BmsSopTestOverride.Enable",         "B"),
+    ("min_mV",  "g_BmsSopTestOverride.MinCell_mV",     "H"),
+    ("max_mV",  "g_BmsSopTestOverride.MaxCell_mV",     "H"),
+    ("temp_dC", "g_BmsSopTestOverride.MaxTemp_dC",     "h"),
+    ("socmin",  "g_BmsSopTestOverride.SocMin_pct_x10", "H"),
+    ("socmax",  "g_BmsSopTestOverride.SocMax_pct_x10", "H"),
+]
 
 
 # --------------------------------------------------------------------------------------------------
@@ -102,64 +109,42 @@ class SetupError(RuntimeError):
 # --------------------------------------------------------------------------------------------------
 
 class Target:
-    """One arm-none-eabi-gdb batch session per call, against a running GDB server."""
+    """The SOP variables on the board, read and written while the core runs."""
 
-    def __init__(self, gdb: Path, elf: Path, port: int):
-        self.gdb = gdb
-        self.elf = elf
-        self.port = port
+    def __init__(self, bench: Bench, args: argparse.Namespace):
+        self.bench = bench
+        self.outputs = build_layout(args.gdb, args.elf, OUTPUT_FIELDS)
+        self.measured = build_layout(args.gdb, args.elf, MEASURED_FIELDS)
+        self.health = build_layout(args.gdb, args.elf, HEALTH_FIELDS)
+        self.override = build_layout(args.gdb, args.elf, OVERRIDE_FIELDS)
+        syms = elf_ints(args.gdb, args.elf, {
+            "ovr_addr": "&g_BmsSopTestOverride", "ovr_size": "sizeof(g_BmsSopTestOverride)",
+            "mode_addr": "&g_BmsSopMode"})
+        self.ovr_addr, self.ovr_size, self.mode_addr = (
+            syms["ovr_addr"], syms["ovr_size"], syms["mode_addr"])
 
-    def run(self, commands: list[str]) -> str:
-        # A failed command ends a gdb -x script, so a missing marker means the
-        # connection failed.
-        script = ["set pagination off", "set confirm off",
-                  f"target remote localhost:{self.port}", 'printf "@@connected=1\\n"',
-                  *commands, "detach"]
-        fd, path = tempfile.mkstemp(suffix=".gdb", prefix="sop_hil_")
-        try:
-            with os.fdopen(fd, "w", encoding="ascii") as f:
-                f.write("\n".join(script) + "\n")
-            proc = subprocess.run([str(self.gdb), "-batch", "-nx", "-x", path, str(self.elf)],
-                                  capture_output=True, text=True, timeout=60)
-        finally:
-            os.unlink(path)
-        out = proc.stdout + proc.stderr
-        if "@@connected=1" not in out:
-            raise SetupError(f"Cannot connect to the GDB server on localhost:{self.port}. "
-                             f"Start debug_server.bat first.\n{out.strip()}")
-        if re.search(r"Connection refused|Connection timed out|Remote communication error|"
-                     r"Remote connection closed|No symbol", out):
-            raise SetupError(f"GDB session failed:\n{out.strip()}")
-        return out
+    def read_outputs(self) -> dict[str, int]:
+        return self.bench.read_layout(self.outputs)
 
-    def read(self, fields: dict[str, str]) -> dict[str, int]:
-        cmds = [f'printf "@@{name}=%d\\n", (int)({expr})' for name, expr in fields.items()]
-        out = self.run(cmds)
-        values = {m.group(1): int(m.group(2)) for m in re.finditer(r"@@([\w.]+)=(-?\d+)", out)}
-        missing = set(fields) - set(values)
-        if missing:
-            raise SetupError(f"Could not read {sorted(missing)}:\n{out.strip()}")
-        return values
+    def read_measured(self) -> dict[str, int]:
+        m = self.bench.read_layout(self.measured)
+        return {"min_mV": round(m["min_V"] * 1000), "max_mV": round(m["max_V"] * 1000),
+                "temp_dC": m["temp_dC"], "socmin": m["socmin"], "socmax": m["socmax"]}
+
+    def read_health(self) -> dict[str, int]:
+        return self.bench.read_layout(self.health)
 
     def write_override(self, enable: int, min_mV: int, max_mV: int, temp_dC: int,
                        socmin: int, socmax: int, mode: int) -> None:
-        # Enable goes last. The core is halted for the whole session, so the
-        # firmware sees the complete set either way, but the order keeps the
-        # write safe if the session ever breaks off part way.
-        self.run([
-            f"set var g_BmsSopTestOverride.MinCell_mV = {min_mV}",
-            f"set var g_BmsSopTestOverride.MaxCell_mV = {max_mV}",
-            f"set var g_BmsSopTestOverride.MaxTemp_dC = {temp_dC}",
-            f"set var g_BmsSopTestOverride.SocMin_pct_x10 = {socmin}",
-            f"set var g_BmsSopTestOverride.SocMax_pct_x10 = {socmax}",
-            f"set var g_BmsSopMode = {mode}",
-            f"set var g_BmsSopTestOverride.Enable = {enable}",
-        ])
-
-    def compare_flash(self) -> str:
-        out = self.run(["compare-sections .pflash"])
-        m = re.search(r"Section \.pflash.*?: (matched|MIS-MATCHED)", out)
-        return m.group(1) if m else "unknown"
+        # The whole struct goes out in one J-Link write, so Bms_Sop sees a torn
+        # set for at most one 100 ms cycle, well inside the settle time.
+        blob = bytearray(self.ovr_size)
+        values = {"enable": enable, "min_mV": min_mV, "max_mV": max_mV, "temp_dC": temp_dC,
+                  "socmin": socmin, "socmax": socmax}
+        for key, (addr, _, code) in self.override.fields.items():
+            struct.pack_into("<" + code, blob, addr - self.ovr_addr, values[key])
+        self.bench.write(self.mode_addr, bytes([mode & 0xFF]))
+        self.bench.write(self.ovr_addr, bytes(blob))
 
 
 # --------------------------------------------------------------------------------------------------
@@ -390,8 +375,10 @@ def case_list() -> list[Case]:
 class RunInfo:
     started: dt.datetime
     finished: dt.datetime | None = None
-    flash_match: str = "unknown"
+    bench: str = "not connected"
+    flash_match: str = "not checked"
     ovr_size: int = 0
+    ready_s: float | None = None
     running: bool = False
     led_samples: list[int] = field(default_factory=list)
     fault_before: tuple[int, int] = (0, 0)
@@ -404,21 +391,35 @@ class RunInfo:
 def firmware_running(target: Target, samples: int = 3, gap_s: float = 0.25) -> list[int]:
     values = []
     for _ in range(samples):
-        values.append(target.read({"led": "g_LedCounter"})["led"])
+        values.append(target.read_health()["led"])
         time.sleep(gap_s)
     return values
 
 
-def run_cases(target: Target, cases: list[Case], settle_s: float, info: RunInfo) -> None:
-    info.flash_match = target.compare_flash()
+def run_cases(bench: Bench, args: argparse.Namespace, cases: list[Case], info: RunInfo) -> None:
+    info.bench = bench.description
+    target = Target(bench, args)
+    info.ovr_size = target.ovr_size
+
+    info.flash_match = bench.verify_flash(args.gdb, args.elf)
     if info.flash_match != "matched":
-        raise SetupError(f"Flash on the target does not match {target.elf} "
-                         f"(compare-sections: {info.flash_match}). Flash the ELF first.")
+        raise SetupError(f".pflash on the target does not match {args.elf} "
+                         f"({info.flash_match}). Flash the ELF first.")
 
-    health = target.read(HEALTH_FIELDS)
-    info.ovr_size = health["ovr_size"]
+    # The connect cleared the RAM, so start the firmware again and wait for its inputs.
+    bench.reset_and_run()
+    t0 = time.perf_counter()
+    while time.perf_counter() - t0 < READY_TIMEOUT_S:
+        if target.read_outputs()["inputs_valid"] == 1:
+            info.ready_s = time.perf_counter() - t0
+            break
+        time.sleep(0.1)
+    if info.ready_s is None:
+        raise SetupError(f"g_BmsSopData.InputsValid did not become 1 within {READY_TIMEOUT_S} s "
+                         "after reset. Check the vAFE, vPACK and NTC inputs.")
+
+    health = target.read_health()
     info.fault_before = (health["hf_hfsr"], health["hf_cfsr"])
-
     info.led_samples = firmware_running(target)
     info.running = len(set(info.led_samples)) > 1
     if not info.running:
@@ -427,9 +428,9 @@ def run_cases(target: Target, cases: list[Case], settle_s: float, info: RunInfo)
 
     # Baseline with the override off, so a value left by an earlier run cannot leak in.
     target.write_override(0, 0, 0, 0, 0, 0, MODE_DISCHARGE)
-    time.sleep(settle_s)
-    info.measured = target.read(MEASURED_FIELDS)
-    info.baseline = target.read(OUTPUT_FIELDS)
+    time.sleep(args.settle)
+    info.measured = target.read_measured()
+    info.baseline = target.read_outputs()
 
     try:
         for case in cases:
@@ -442,8 +443,8 @@ def run_cases(target: Target, cases: list[Case], settle_s: float, info: RunInfo)
                     continue
             target.write_override(case.enable, case.min_mV, case.max_mV, case.temp_dC,
                                   case.socmin, case.socmax, case.mode)
-            time.sleep(settle_s)
-            case.actual = target.read(OUTPUT_FIELDS)
+            time.sleep(args.settle)
+            case.actual = target.read_outputs()
             case.resolved = case.expect(info.baseline) if callable(case.expect) else case.expect
             failed = [k for k, e in case.resolved.items() if not e.check(case.actual[k])]
             case.result = "FAIL" if failed else "PASS"
@@ -454,7 +455,7 @@ def run_cases(target: Target, cases: list[Case], settle_s: float, info: RunInfo)
         target.write_override(0, 0, 0, 0, 0, 0, MODE_DISCHARGE)
         info.restored = True
 
-    health = target.read(HEALTH_FIELDS)
+    health = target.read_health()
     info.fault_after = (health["hf_hfsr"], health["hf_cfsr"])
 
 
@@ -464,26 +465,6 @@ def run_cases(target: Target, cases: list[Case], settle_s: float, info: RunInfo)
 
 def slug(text: str) -> str:
     return re.sub(r"[^a-z0-9 -]", "", text.lower()).replace(" ", "-")
-
-
-def git(*args: str) -> str:
-    try:
-        return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True,
-                              timeout=15).stdout.strip()
-    except (OSError, subprocess.SubprocessError):
-        return ""
-
-
-def gdb_version(gdb: Path) -> str:
-    try:
-        out = subprocess.run([str(gdb), "--version"], capture_output=True, text=True, timeout=15)
-        return out.stdout.splitlines()[0].strip()
-    except (OSError, subprocess.SubprocessError, IndexError):
-        return "unknown"
-
-
-def ts(t: dt.datetime) -> str:
-    return t.strftime("%Y-%m-%d %H:%M:%S")
 
 
 def inputs_row(case: Case) -> str:
@@ -517,14 +498,14 @@ def write_report(path: Path, cases: list[Case], info: RunInfo, args: argparse.Na
           f"| Duration | {elapsed:.1f} s |",
           f"| Host | {platform.system()} {platform.release()} ({platform.machine()}) |",
           f"| Python | {platform.python_version()} |",
-          f"| GDB | {gdb_version(args.gdb)} |",
-          f"| GDB server | J-Link GDB server from `debug_server.bat`, localhost:{args.port} |",
-          "| Target | NXP S32K344 bench board, SWD |",
+          f"| GDB (ELF symbol queries only) | {gdb_version(args.gdb)} |",
+          f"| J-Link | {info.bench} |",
+          f"| Target | {args.device} bench board, SWD {args.speed} kHz |",
           (f"| ELF | `{elf.relative_to(REPO) if elf.is_relative_to(REPO) else elf}`, "
            f"{elf_stat.st_size} bytes, built "
            f"{ts(dt.datetime.fromtimestamp(elf_stat.st_mtime, dt.timezone.utc))}, "
            f"sha256 {elf_hash} |" if elf_stat else f"| ELF | `{elf}` missing |"),
-          f"| Flash on target | `compare-sections .pflash`: {info.flash_match} |",
+          f"| Flash on target | `.pflash` read back and compared: {info.flash_match} |",
           f"| Repo commit | {commit}{dirty} |",
           f"| Settle time per step | {args.settle:.2f} s ({args.settle / 0.1:.0f} runs of the "
           f"100 ms task) |", ""]
@@ -538,12 +519,15 @@ def write_report(path: Path, cases: list[Case], info: RunInfo, args: argparse.Na
     L += [f"| {r} | {n} |" for r, n in counts.items() if n]
     L += ["", f"Verdict: {verdict}", ""]
 
+    ready = f"{info.ready_s:.1f} s" if info.ready_s is not None else "not reached"
     L += ["## Preconditions and health", "",
           "| Check | Expected | Actual | Result |", "|---|---|---|---|",
           f"| Flash matches the ELF | matched | {info.flash_match} | "
           f"{'PASS' if info.flash_match == 'matched' else 'FAIL'} |",
           f"| Override hook compiled in | sizeof = 12 | {info.ovr_size} | "
           f"{'PASS' if info.ovr_size == 12 else 'FAIL'} |",
+          f"| SOP inputs valid after reset | within {READY_TIMEOUT_S:.0f} s | {ready} | "
+          f"{'PASS' if info.ready_s is not None else 'FAIL'} |",
           f"| Firmware runs | g_LedCounter changes | {info.led_samples} | "
           f"{'PASS' if info.running else 'FAIL'} |",
           f"| No HardFault before the run | HFSR = 0, CFSR = 0 | "
@@ -560,7 +544,7 @@ def write_report(path: Path, cases: list[Case], info: RunInfo, args: argparse.Na
     if info.measured:
         m, b = info.measured, info.baseline
         L += ["Measured inputs and published limits with the override off, before the first "
-              "case. HIL-SOP-18 and HIL-SOP-19 use these values.", "",
+              "case. The last two cases use these values.", "",
               "| Min cell mV | Max cell mV | Max temp 0.1 degC | SOC min 0.1 % | SOC max 0.1 % |",
               "|---|---|---|---|---|",
               f"| {m['min_mV']} | {m['max_mV']} | {m['temp_dC']} | {m['socmin']} | {m['socmax']} |",
@@ -574,10 +558,14 @@ def write_report(path: Path, cases: list[Case], info: RunInfo, args: argparse.Na
               f"InputsValid {b['inputs_valid']}.", ""]
 
     L += ["## Method", "",
-          "The test writes replacement inputs into `g_BmsSopTestOverride` and "
-          "`g_BmsSopMode` from a GDB session, then detaches so that the firmware runs. "
-          "After the settle time, a second GDB session reads `g_BmsSopData`. Each GDB "
-          "attach halts the core for a short time.", "",
+          "The script connects through pylink-square, reads the `.pflash` section back and "
+          "compares it with the ELF, then resets the MCU. The connect fills the application "
+          "RAM with 0xDEADBEEF, so the reset is required. It waits until "
+          "`g_BmsSopData.InputsValid` is 1.", "",
+          "For each case it writes `g_BmsSopMode` and the whole `g_BmsSopTestOverride` "
+          "struct, waits the settle time, and reads `g_BmsSopData`. Every read and write uses "
+          "J-Link background memory access while the core runs. Variable addresses and "
+          "sizes come from the ELF through GDB, which never connects to the board.", "",
           "The override replaces the inputs inside `Bms_Sop_MainFunction()` only. "
           "`Battery_Monitor`, `Bms_Soc` and the SOC saved to NVM keep the measured values.", "",
           "The expected values come from the placeholder maps and derate windows in "
@@ -616,13 +604,11 @@ def write_report(path: Path, cases: list[Case], info: RunInfo, args: argparse.Na
           "- The test does not read the CAN frame `0x30C` (SP-08).",
           "- The maps and derate windows are placeholder calibration. The test checks the "
           "arithmetic and the gating, not that a limit is safe for a real cell.",
-          "- Each GDB attach halts the core, which delays the scheduler during the read "
-          "and the write.",
-          "- Do not use the jlink-mcp memory tools on this board. Each new J-Link "
-          "connection runs the S32K344 J-Link script, which fills the application RAM "
-          "with 0xDEADBEEF.",
-          "- Core register reads through this GDB server return 0xDEADBEEF. The health "
-          "checks use `g_LedCounter` and the HardFault capture variables instead.",
+          "- Every run resets the MCU, because the J-Link connect clears the RAM. The test "
+          "cannot inspect a board that is already running. Do not use the jlink-mcp memory "
+          "tools on a running board for the same reason.",
+          "- The override struct is written while the firmware runs, so one 100 ms cycle can "
+          "see a partly written set. The settle time covers six cycles.",
           "- Set `BMS_SOP_TEST_OVERRIDE` to `0U` in `Bms_Sop.h` before any build that "
           "goes on a vehicle.", ""]
 
@@ -636,9 +622,7 @@ def write_report(path: Path, cases: list[Case], info: RunInfo, args: argparse.Na
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--elf", type=Path, default=DEFAULT_ELF)
-    parser.add_argument("--gdb", type=Path, default=DEFAULT_GDB)
-    parser.add_argument("--port", type=int, default=2331)
+    add_target_args(parser)
     parser.add_argument("--settle", type=float, default=0.6,
                         help="seconds the firmware runs after each write (default 0.6)")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
@@ -649,11 +633,10 @@ def main() -> int:
     setup_error = None
 
     try:
-        if not args.gdb.exists():
-            raise SetupError(f"GDB not found: {args.gdb}. Set S32DS_ROOT or pass --gdb.")
-        if not args.elf.exists():
-            raise SetupError(f"ELF not found: {args.elf}. Run build.bat first.")
-        run_cases(Target(args.gdb, args.elf, args.port), cases, args.settle, info)
+        check_host(args)
+        print("Connecting and resetting the MCU ...", flush=True)
+        with Bench(args) as bench:
+            run_cases(bench, args, cases, info)
     except SetupError as exc:
         setup_error = str(exc)
         print(f"\nSETUP ERROR: {setup_error}", file=sys.stderr)
