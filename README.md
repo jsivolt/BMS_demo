@@ -102,6 +102,9 @@ src/
   drivers/
     Bms_Gpio.*              SIUL2 DIO abstraction (logical pin IDs)
     Bms_Led.*               Active-low LED helpers
+  power/
+    Bms_PowerManager.*      Boot-reason classification (cold vs STANDBY wake) + RUN->STANDBY entry:
+                            PIT stop, standby clock config, WKPU wake source, Power_Ip_SetMode
   safety/
     Fault_Manager.*         32-bit fault masks per pack + system, critical-fault mask, latched fault history
   storage/
@@ -123,10 +126,18 @@ Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_
 
 ## 3. Startup and scheduling
 
-`main()` initialises, in order: clocks → pins → LED off → interrupt controller → PIT0 → ADC (with
+`main()` initialises, in order: clocks → power → pins → LED off → interrupt controller → PIT0 → ADC (with
 calibration) → NTC → CAN0/CAN1/CAN2 → CAN5 (XCP transport, `Xcp_Can_Init`) → LPSPI1 → fault manager →
 contactors → state machine → application → vAFE → vPACK → battery monitor → NVM (scans data flash) →
 SOC estimator → SOP limits → scheduler → PIT start. Any init failure traps with LED1 red on.
+
+`Power_Ip_GetResetReason()` is read straight after `Power_Ip_Init()` and handed to
+`Bms_PowerManager_Init()`, which classifies the boot as cold or as a `STANDBY` wake (reset reason 28,
+`MCU_WAKEUP_REASON`); `main()` then enters RUN mode. A `STANDBY` wake **restarts the MCU**, so no
+application code runs after `Power_Ip_SetMode(STANDBY)` — the reset-reason value, the WKPU wake channel
+and the standby clock/mode configuration indices all live inside `Bms_PowerManager`. Sleep is requested
+with `Bms_PowerManager_RequestSleep()` (flag only) and served from the 10 ms task by
+`Bms_PowerManager_MainFunction()`.
 
 The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`, which increments a pending-tick count; all work
 runs from the main loop. `Bms_Scheduler_MainFunction` atomically captures and clears the pending count,
@@ -139,12 +150,22 @@ first per call) are exposed for inspection (e.g. via the XCP/debugger tooling in
 
 | Task | Period | Contents |
 | --- | --- | --- |
-| `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, **XCP CAN5 poll (`Xcp_Can_MainFunction`)**, contactor state machine, 1 Hz LED blink |
+| `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, **XCP CAN5 poll (`Xcp_Can_MainFunction`)**, contactor state machine, 1 Hz LED blink, power manager sleep handling (`Bms_PowerManager_MainFunction`) |
 | `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, SOC integration, SOP limits, state machine, TX of 0x300–0x30C, 0x310–0x313 and 0x400 |
 | `Bms_MainFunction_1000ms` | 1000 ms | SOC persistence (`Bms_Soc_1sFunction`, saves to NVM when due/changed) |
 
 XCP is polled from the 10 ms task (not 100 ms) since a real XCP master/DAQ tool expects lower latency
 than the other CAN traffic.
+
+`Bms_PowerManager_MainFunction()` is **the last statement of the 10 ms task and must stay there**: it
+can stop the PIT, switch the clock and enter Standby, so no ADC / contactor / CAN / GPIO or scheduler
+work may follow it. The split of responsibilities is:
+
+| Module | Role |
+| --- | --- |
+| `Bms_StateMachine.c` | decides *whether* to sleep — `Bms_PowerManager_RequestSleep()` (flag only) |
+| `Bms_PowerManager.c` | decides *how* to sleep — PIT stop, standby clock, WKPU arm, `Power_Ip_SetMode` |
+| `main.c` 10 ms task | the safe execution entry point |
 
 ---
 
@@ -166,6 +187,20 @@ Entering `ACTIVE` requests all three packs to close; leaving it requests all pac
 is latched — the underlying condition must be gone *and* an explicit ClearFault command received.
 LED3 (PTA31) is on while `ACTIVE`.
 
+While in `STANDBY` with no enable request, the supervisor counts consecutive 100 ms cycles in which
+`Bms_Contactor_AreAllOff()` reports `TRUE` (every pack reports `BMS_CONTACTOR_OFF` **and** NEG/PRE/POS
+are all de-asserted). After `BMS_STATE_SLEEP_DELAY_CYCLES` cycles — 50 × 100 ms = **5 s** — it calls
+`Bms_PowerManager_RequestSleep()`. The `g_BmsStandbyCycles` counter is reset by any enable request, any
+critical fault, and by any cycle where a contactor is not yet confirmed OFF. The request is only a
+flag; `Bms_PowerManager_MainFunction()` performs the PIT stop, the standby clock switch and
+`Power_Ip_SetMode(STANDBY)` from the 10 ms task (§3), and the wake is a reset-style restart.
+
+> **Bring-up note:** that 5 s dwell (on top of the INIT settle window) is what keeps the board
+> reachable for XCP/HIL right after boot — the unit sleeps ~5 s after the contactors reach a confirmed
+> OFF state and then only wakes on PTB26/WKPU[41]. Lower `BMS_STATE_SLEEP_DELAY_CYCLES` to test the
+> sleep path faster; a "recent CAN activity" guard is the next step if the board must stay awake
+> indefinitely.
+
 ---
 
 ## 5. Contactor / precharge control
@@ -176,7 +211,12 @@ Each pack has three outputs: **negative**, **precharge**, **positive**.
 OFF -> NEG_ON -> PRECHARGE -> POS_ON -> RUN
                                           \
         FAULT <-- critical/pack fault      -> OPENING -> OFF
-```
+``` `Bms_Contactor_GetState()` / `Bms_Contactor_GetOutputs()`
+expose one pack at a time.
+
+`Bms_Contactor_AreAllOff()` is the gate the state machine uses before requesting MCU Standby: it
+requires all three packs to report `BMS_CONTACTOR_OFF` *and* all three outputs (NEG/PRE/POS) to be
+de-asserted, so a stale state variable alone can never let the MCU sleep with the HV bus live.
 
 | Constant | Value | Meaning |
 | --- | --- | --- |

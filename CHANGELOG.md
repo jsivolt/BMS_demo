@@ -6,6 +6,34 @@ tags, so entries are grouped by date/topic instead of a version number.
 
 ## [Unreleased]
 
+- **New `Bms_Contactor_AreAllOff()`; `STANDBY` requests MCU sleep after a 5 s dwell.**
+  `Bms_Contactor.h/.c` gained a single API that returns `TRUE` only when every pack reports
+  `BMS_CONTACTOR_OFF` **and** all three outputs (NEG/PRE/POS) are de-asserted — the state variable
+  alone is intentionally not trusted before sleeping with a live HV bus. `Bms_StateMachine` `STANDBY`
+  counts consecutive 100 ms cycles in which that check passes and calls
+  `Bms_PowerManager_RequestSleep()` once it reaches the new `BMS_STATE_SLEEP_DELAY_CYCLES` (50 cycles
+  = 5 s); the counter is `g_BmsStandbyCycles`, reset by any enable request, any critical fault, any
+  cycle where a contactor is not yet confirmed OFF, and unconditionally at the top of both the ACTIVE
+  and FAULT cases (defensive: neither state is ever sleep-eligible, so a future edge into them cannot
+  inherit a stale dwell time). The request is only a flag — the 10 ms task's
+  `Bms_PowerManager_MainFunction()` performs the actual STANDBY entry. Net effect: a unit with no CAN
+  enable request sleeps ~5 s after the contactors reach a confirmed OFF state and then only wakes on
+  PTB26/WKPU[41].
+- **New module `Bms_PowerManager` (`src/power/`); the temporary 5-second STANDBY bring-up test is gone.**
+  The manager owns the whole MCU-side RUN→STANDBY path (PIT stop, standby clock config index,
+  WKPU wake source, `Power_Ip_SetMode`) and the boot-reason classification, so `main.c` no longer knows
+  the reset-reason constant (28), the WKPU channel, or the standby clock/mode config indices.
+  `main()` now only calls `Power_Ip_Init` → `Power_Ip_GetResetReason` → `Bms_PowerManager_Init` →
+  RUN mode; the 10 ms task calls `Bms_PowerManager_MainFunction()` — pinned as its **last** statement,
+  so no ADC/contactor/CAN/GPIO work can run after a Standby commit — which consumes a sleep request
+  queued by `Bms_PowerManager_RequestSleep()`.
+- **STANDBY is modelled as a reset-style wake path.** Verified on hardware: STANDBY wake → MCU restart →
+  `main()` → `Power_Ip_GetResetReason() == 28`. Execution therefore never continues after
+  `Power_Ip_SetMode()` — the old "wake and keep running" LED indication below that call was removed.
+- Build: `src/power` wired into both `Debug_FLASH` and `Release_RAM` (`sources.mk`, `makefile`,
+  `subdir.mk`, `.args`). No new include path is needed — `main.c` reaches the header as
+  `"power/Bms_PowerManager.h"`, like the other `src/` subfolders. `sil/build.py` is unchanged:
+  `Bms_PowerManager` is hardware-bound and stays out of the SIL scope, like `main.c` and `src/drivers/`.
 - **`src/battery/SOP_DESIGN.md` (draft, not yet implemented).** Design proposal for two new modules,
   pending review: `Bms_Sop` (Pack 1 discharge/regen/charge current limits — smaller of a static
   SOC-by-temperature table and a dynamic 2-RC equivalent-circuit-model prediction, trimmed by a

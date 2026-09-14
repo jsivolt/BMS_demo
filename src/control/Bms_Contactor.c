@@ -476,6 +476,34 @@ Bms_ContactorOutputType Bms_Contactor_GetOutputs(Bms_PackIdType packId)
 
 /* ---------------------------------------------------------- */
 
+boolean Bms_Contactor_AreAllOff(void)
+{
+    uint8 pack;
+
+    for (pack = 0U;
+         pack < BMS_PACK_COUNT;
+         pack++)
+    {
+        if (g_Contactor[pack].state !=
+            BMS_CONTACTOR_OFF)
+        {
+            return FALSE;
+        }
+
+        if ((g_Contactor[pack].output.negative == TRUE) ||
+            (g_Contactor[pack].output.positive == TRUE) ||
+            (g_Contactor[pack].output.precharge == TRUE))
+        {
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+
+/* ---------------------------------------------------------- */
+
 void Bms_Contactor_SetPackVoltage(
         Bms_PackIdType packId,
         float voltage)

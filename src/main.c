@@ -69,6 +69,7 @@
 
 #include "safety/Fault_Manager.h"
 #include "control/Bms_Contactor.h"
+#include "power/Bms_PowerManager.h"
 
 /* ================================================================================================
  * PIT configuration
@@ -134,18 +135,6 @@
 static uint32 g_LedCounter = 0U;
 
 static boolean g_LedOn = FALSE;
-
-/* Temporary standby test */
-static uint32 g_StandbyDelayTicks = 0U;
-static boolean g_StandbyEntered = FALSE;
-
-/*
- * Reset reason value used to detect a Standby wake-up.
- *
- * 28U matches the NXP reference project configuration:
- * McuConf_McuResetReasonConf_MCU_WAKEUP_REASON.
- */
-#define MCU_WAKEUP_REASON   ((Power_Ip_ResetType)28U)
 
 /* Fault registers captured by HardFault_Handler for post-mortem debugging */
 volatile uint32 g_HardFault_HFSR  = 0U;
@@ -264,83 +253,25 @@ static void Bms_MainFunction_10ms(void)
         }
     }
 
-    /* ============================================================================================
-     * Temporary STANDBY test
+    /*
+     * Sleep / STANDBY handling.
      *
-     * Wait 5 seconds after scheduler starts:
-     * 500 x 10 ms = 5 seconds
+     * MUST BE THE LAST THING IN THIS TASK.
      *
-     * Then stop PIT and enter STANDBY.
-     * KEY1 / PTB26 / WKPU[41] should wake the MCU.
-     * ========================================================================================== */
-
-    if (g_StandbyEntered == FALSE)
-    {
-        g_StandbyDelayTicks++;
-
-        if (g_StandbyDelayTicks >= 500U)
-        {
-            g_StandbyEntered = TRUE;
-
-            /*
-             * Stop PIT before changing the clock and entering Standby.
-             */
-            Pit_Ip_StopChannel(
-                PIT_INSTANCE,
-                PIT_CHANNEL
-            );
-
-            /*
-             * Switch from normal PLL clock configuration
-             * to the FIRC 48 MHz configuration.
-             *
-             * ClockConfig1:
-             * CORE_CLK      = 48 MHz
-             * AIPS_PLAT_CLK = 48 MHz
-             * AIPS_SLOW_CLK = 24 MHz
-             * PLL           = OFF
-             */
-            (void)Clock_Ip_Init(
-                &Clock_Ip_aClockConfig[1U]
-            );
-
-            /*
-             * Configure WKPU again immediately before Standby.
-             *
-             * Your generated configuration uses:
-             * PTB26 -> WKPU[41] -> HW channel 45
-             */
-            (void)Wkpu_Ip_Init(
-                0U,
-                &Wkpu_Ip_Config_PB
-            );
-
-            /*
-             * Arm the configured WKPU channel as wake-up source.
-             */
-            Wkpu_Ip_EnableInterrupt(
-                0U,
-                Wkpu_Ip_ChannelConfig_PB[0].hwChannel
-            );
-
-            /* Enter normal STANDBY */
-            Power_Ip_SetMode(
-                &Power_Ip_aModeConfigPB[1U]
-            );
-
-            /* If KEY1 successfully wakes the MCU, execution continues here. */
-            Siul2_Dio_Ip_WritePin(
-                LED_RED_PORT,
-                LED_RED_PIN,
-                0U
-            );
-
-            while (1)
-            {
-                /* Wake success indication: RED LED stays ON */
-            }
-        }
-    }
+     * Responsibility split:
+     *
+     *   Bms_StateMachine.c   decides *whether* to sleep
+     *                        (Bms_PowerManager_RequestSleep() = flag only)
+     *   Bms_PowerManager.c   decides *how* to sleep
+     *                        (PIT stop, standby clock, WKPU arm,
+     *                         Power_Ip_SetMode)
+     *   main.c / this task   is the safe execution entry point
+     *
+     * Once Bms_PowerManager_MainFunction() commits, the CPU is on its way
+     * to Standby, so no ADC / contactor / CAN / GPIO / scheduler work may
+     * run after it. That is why this call is the last statement here.
+     */
+    Bms_PowerManager_MainFunction();
 }
 
 
@@ -458,14 +389,14 @@ int main(void)
      */
     resetReason = Power_Ip_GetResetReason();
 
-    if (resetReason == MCU_WAKEUP_REASON)
-    {
-        /*
-         * Wake-up from Standby:
-         * do not automatically enter Standby again after 5 seconds.
-         */
-        g_StandbyEntered = TRUE;
-    }
+    /*
+     * Classify the boot reason. The numeric reset reason value, the WKPU
+     * channel and the Standby clock/mode configuration are all owned by
+     * Bms_PowerManager.
+     */
+    Bms_PowerManager_Init(
+        resetReason
+    );
 
     /* ============================================================================================
      * 3. Enter configured RUN mode

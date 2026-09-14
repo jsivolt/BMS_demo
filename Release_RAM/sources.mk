@@ -34,6 +34,7 @@ src/communication/xcp \
 src/control \
 src/drivers \
 src \
+src/power \
 src/safety \
 src/storage \
 

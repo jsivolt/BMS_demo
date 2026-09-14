@@ -55,6 +55,15 @@ Bms_ContactorStateType Bms_Contactor_GetState(Bms_PackIdType packId);
 
 Bms_ContactorOutputType Bms_Contactor_GetOutputs(Bms_PackIdType packId);
 
+/*
+ * TRUE only when every pack reports BMS_CONTACTOR_OFF *and* all three
+ * outputs (NEG / PRE / POS) are de-asserted.
+ *
+ * The state alone is not trusted before entering MCU Standby: the outputs
+ * are what actually hold the HV bus, so both must agree.
+ */
+boolean Bms_Contactor_AreAllOff(void);
+
 
 /*
  * Temporary test interface.

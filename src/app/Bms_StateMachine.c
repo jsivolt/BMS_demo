@@ -1,5 +1,6 @@
 #include "Bms_StateMachine.h"
 #include "../control/Bms_Contactor.h"
+#include "../power/Bms_PowerManager.h"
 
 #include "Siul2_Dio_Ip.h"
 #include "Siul2_Dio_Ip_Cfg.h"
@@ -23,6 +24,19 @@
 
 
 /*
+ * Logical STANDBY dwell before the MCU is allowed to sleep, in 100 ms
+ * MainFunction cycles.
+ *
+ * 50 x 100 ms = 5 seconds.
+ *
+ * Keeps the board alive and reachable for a short window after every
+ * enable/disable/fault transition, instead of sleeping within ~200 ms of
+ * entering STANDBY.
+ */
+#define BMS_STATE_SLEEP_DELAY_CYCLES   (50U)
+
+
+/*
  * Temporary external CAN requests.
  *
  * Later these can be replaced with getter APIs.
@@ -38,6 +52,13 @@ extern volatile boolean g_BmsClearFaultRequest;
 static volatile Bms_StateType g_BmsState = BMS_STATE_INIT;
 
 static uint32 g_BmsInitCycles = 0U;
+
+/*
+ * Consecutive STANDBY cycles during which every contactor has been
+ * confirmed OFF with no enable request. Reset on any transition, and on
+ * any cycle where a contactor is still not OFF.
+ */
+static uint32 g_BmsStandbyCycles = 0U;
 
 volatile uint8 g_DebugBmsState = (uint8)BMS_STATE_INIT;
 
@@ -58,6 +79,7 @@ void Bms_StateMachine_Init(void)
     g_BmsState = BMS_STATE_INIT;
 
     g_BmsInitCycles = 0U;
+    g_BmsStandbyCycles = 0U;
 }
 
 
@@ -170,6 +192,8 @@ void Bms_StateMachine_MainFunction(void)
 
             if (FaultManager_HasCriticalFault() == TRUE)
             {
+                g_BmsStandbyCycles = 0U;
+
                 /*
                  * Do not allow an old enable request to remain pending.
                  */
@@ -179,6 +203,8 @@ void Bms_StateMachine_MainFunction(void)
             }
             else if (g_BmsEnableRequest == TRUE)
             {
+                g_BmsStandbyCycles = 0U;
+
                 /*
                  * Enable request accepted.
                  */
@@ -197,8 +223,33 @@ void Bms_StateMachine_MainFunction(void)
             else
             {
                 /*
-                 * Stay in STANDBY.
+                 * Stay in logical STANDBY first.
+                 *
+                 * Only enter MCU Standby if:
+                 * 1. All contactors are confirmed OFF.
+                 * 2. No enable request arrives.
+                 * 3. This condition remains true for 5 seconds.
                  */
+                if (Bms_Contactor_AreAllOff() == TRUE)
+                {
+                    g_BmsStandbyCycles++;
+
+                    if (g_BmsStandbyCycles >=
+                        BMS_STATE_SLEEP_DELAY_CYCLES)
+                    {
+                        g_BmsStandbyCycles = 0U;
+
+                        Bms_PowerManager_RequestSleep();
+                    }
+                }
+                else
+                {
+                    /*
+                     * Contactor still opening / not safe yet.
+                     * Restart the delay.
+                     */
+                    g_BmsStandbyCycles = 0U;
+                }
             }
 
             break;
@@ -212,6 +263,15 @@ void Bms_StateMachine_MainFunction(void)
          */
         case BMS_STATE_ACTIVE:
         {
+            /*
+             * ACTIVE is not eligible for sleep.
+             *
+             * Always clear any previous STANDBY dwell time here rather than
+             * relying on the STANDBY -> ACTIVE transition, so a future edge
+             * into ACTIVE from another state cannot inherit a stale count.
+             */
+            g_BmsStandbyCycles = 0U;
+
             /*
              * Critical fault has the highest priority.
              *
@@ -273,6 +333,14 @@ void Bms_StateMachine_MainFunction(void)
          */
         case BMS_STATE_FAULT:
         {
+            /*
+             * FAULT is not eligible for sleep.
+             *
+             * Clear the STANDBY dwell time defensively, so leaving FAULT for
+             * STANDBY always starts a fresh 5 s window.
+             */
+            g_BmsStandbyCycles = 0U;
+
             /*
              * Do not leave FAULT automatically.
              *
