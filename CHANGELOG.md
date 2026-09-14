@@ -6,6 +6,19 @@ tags, so entries are grouped by date/topic instead of a version number.
 
 ## [Unreleased]
 
+- **PEmicro probe support: 5 new `*_pemicro.bat` scripts** (`flash_pemicro.bat`,
+  `debug_server_pemicro.bat`, `debug_reset_pemicro.bat`, `debug_live_pemicro.bat`,
+  `fault_snapshot_pemicro.bat`), parallel to the existing SEGGER `*.bat` tooling (unchanged), for users
+  debugging/flashing with a PEmicro Multilink Universal FX instead of a J-Link. Drive
+  `pegdbserver_console.exe` (device `NXP_S32K3xx_S32K344`, GDB port 7224). `flash_pemicro.bat`
+  programs directly through pegdbserver's own flash mode (no gdb `load`); `debug_reset_pemicro.bat`
+  always sends an explicit `monitor reset` since pegdbserver only auto-resets once at its own process
+  startup, not per GDB connect like SEGGER; `debug_live_pemicro.bat`/`fault_snapshot_pemicro.bat` use
+  GDB's own `continue&`/`interrupt` since PEmicro has no `monitor halt`/`monitor go`.
+  `fault_snapshot_pemicro.bat` splits its resume/pause/capture into 3 separate gdb invocations (a
+  single chained invocation reliably hit a GDB async race). Known open issue: captured snapshots have
+  shown `PC = 0x0` with an empty backtrace — not yet root-caused. README §10 documents all 5 scripts.
+
 - **`src/battery/SOP_DESIGN.md` (draft, not yet implemented).** Design proposal for two new modules,
   pending review: `Bms_Sop` (Pack 1 discharge/regen/charge current limits — smaller of a static
   SOC-by-temperature table and a dynamic 2-RC equivalent-circuit-model prediction, trimmed by a
