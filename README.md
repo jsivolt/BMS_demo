@@ -117,6 +117,8 @@ hil/          Hardware-in-the-loop SOP tests on the S32K344 board, with reports 
 
 Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_reset.bat ·
                debug_live.bat · fault_snapshot.bat · fault_decode.gdb  (see §1 and §10)
+               PEmicro probe alternatives: *_pemicro.bat variants of the 5 debug/flash
+               scripts above (see §10)
 ```
 
 ---
@@ -508,6 +510,35 @@ it runs `monitor go` → host delay → `monitor halt` → **detach → reconnec
 server before reading anything — the reconnect forces gdb to re-read all state from scratch and,
 crucially, does **not** reset the core (reset only happens on a server process's very first client
 connection). Note a fresh `.bat` run still starts a new server process, so it costs that one-time reset.
+
+### PEmicro probe alternative (`*_pemicro.bat`)
+
+If a **PEmicro Multilink Universal FX** probe is used instead of a SEGGER J-Link, use the parallel
+`flash_pemicro.bat` / `debug_server_pemicro.bat` / `debug_reset_pemicro.bat` / `debug_live_pemicro.bat` /
+`fault_snapshot_pemicro.bat` scripts instead. The SEGGER scripts above are unchanged and still assume a
+J-Link probe; the PEmicro ones drive `pegdbserver_console.exe` (device `NXP_S32K3xx_S32K344`, interface
+`USBMULTILINK`, GDB port 7224 / MI port 6224) from the S32DS-bundled PEmicro plugin instead of
+`JLinkGDBServerCL.exe`.
+
+Key differences from the SEGGER flow above:
+- `flash_pemicro.bat` programs directly through `pegdbserver_console.exe`'s own flash mode
+  (`-flashobjectfile` / `-quitafterprogramming` / `-runafterprogramming`) — no gdb `load` involved.
+- `pegdbserver_console.exe` only resets the target once, **at its own process startup** (not per GDB
+  client connect like SEGGER), so `debug_reset_pemicro.bat` always sends an explicit `monitor reset`
+  rather than relying on connect-time behaviour. Run `debug_server_pemicro.bat attach` to start the
+  shared server with `-attachonly` (no reset at all, SWD speed dropped to 1000 kHz) for attaching to an
+  already-running board, e.g. right after a STANDBY wake.
+- PEmicro's `monitor` command set is much smaller than SEGGER's — only `monitor reset` is recognised;
+  there is no `monitor halt` / `monitor go`. Pause/resume in `debug_live_pemicro.bat` and
+  `fault_snapshot_pemicro.bat` therefore always uses GDB's own `continue&` / `interrupt`, never a raw
+  `monitor` pass-through.
+- `fault_snapshot_pemicro.bat` runs its resume/pause/capture sequence as three **separate** gdb
+  invocations (with a plain `timeout` between them, not gdb's `shell`) instead of one, because chaining
+  `continue&` / `interrupt` in a single non-interactive `-batch` invocation reliably fails on this
+  hardware (`shell` blocks GDB's own event loop, so the `interrupt` stop-reply never gets processed).
+  **Known caveat**: even with that fix, captured snapshots have shown `PC = 0x0` with an empty backtrace
+  in testing — treat that specific output as an unreliable capture, not as ground truth, until it's
+  root-caused.
 
 ---
 
