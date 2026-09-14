@@ -139,6 +139,14 @@ static boolean g_LedOn = FALSE;
 static uint32 g_StandbyDelayTicks = 0U;
 static boolean g_StandbyEntered = FALSE;
 
+/*
+ * Reset reason value used to detect a Standby wake-up.
+ *
+ * 28U matches the NXP reference project configuration:
+ * McuConf_McuResetReasonConf_MCU_WAKEUP_REASON.
+ */
+#define MCU_WAKEUP_REASON   ((Power_Ip_ResetType)28U)
+
 /* Fault registers captured by HardFault_Handler for post-mortem debugging */
 volatile uint32 g_HardFault_HFSR  = 0U;
 volatile uint32 g_HardFault_CFSR  = 0U;
@@ -315,11 +323,12 @@ static void Bms_MainFunction_10ms(void)
                 Wkpu_Ip_ChannelConfig_PB[0].hwChannel
             );
 
-            /* TEMP TEST: do NOT enter Standby yet */
-            // Power_Ip_SetMode(
-            //     &Power_Ip_aModeConfigPB[1U]
-            // );
+            /* Enter normal STANDBY */
+            Power_Ip_SetMode(
+                &Power_Ip_aModeConfigPB[1U]
+            );
 
+            /* If KEY1 successfully wakes the MCU, execution continues here. */
             Siul2_Dio_Ip_WritePin(
                 LED_RED_PORT,
                 LED_RED_PIN,
@@ -328,7 +337,7 @@ static void Bms_MainFunction_10ms(void)
 
             while (1)
             {
-                /* Stay awake on FIRC 48 MHz */
+                /* Wake success indication: RED LED stays ON */
             }
         }
     }
@@ -424,6 +433,7 @@ static const Bms_Scheduler_TaskEntryType Bms_Scheduler_TaskTable[] =
 int main(void)
 {
     Pit_Ip_StatusType pitStatus;
+    Power_Ip_ResetType resetReason;
 
     /* ============================================================================================
      * 1. Initialize normal RUN clock configuration
@@ -440,6 +450,22 @@ int main(void)
     Power_Ip_Init(
         &Power_Ip_HwIPsConfigPB
     );
+
+    /*
+     * Detect whether this boot is caused by Standby wakeup.
+     * Power_Ip_GetResetReason() should be called after Power_Ip_Init()
+     * and before setting RUN mode.
+     */
+    resetReason = Power_Ip_GetResetReason();
+
+    if (resetReason == MCU_WAKEUP_REASON)
+    {
+        /*
+         * Wake-up from Standby:
+         * do not automatically enter Standby again after 5 seconds.
+         */
+        g_StandbyEntered = TRUE;
+    }
 
     /* ============================================================================================
      * 3. Enter configured RUN mode
