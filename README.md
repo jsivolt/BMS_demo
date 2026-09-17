@@ -3,9 +3,10 @@
 A bare-metal (no-OS) Battery Management System demo for the **NXP S32K344** (Cortex-M7), built on the
 **S32K3 RTD 7.0.1** low-level IP drivers. It monitors three battery packs, decodes 16 cell voltages
 from a CAN-based "virtual AFE", decodes pack current/voltage from a CAN-based "virtual ADBMS2950"
-pack monitor, runs a precharge/contactor state machine per pack, estimates Pack 1 state-of-charge by
-Coulomb counting (persisted to data flash), computes Pack 1 current limits (state of power), tracks
-faults, and publishes everything over CAN.
+pack monitor, runs a precharge/contactor state machine for three packs (only Pack 1 has relays wired,
+and precharge completion is timer-simulated — see §5), estimates Pack 1 state-of-charge by Coulomb
+counting (persisted to data flash), computes Pack 1 current limits (state of power), tracks faults,
+and publishes the measurements, state, SOC, SOP limits and fault masks over CAN0.
 
 ---
 
@@ -39,16 +40,40 @@ selective clean instead:
 ```
 
 `clean.bat` deletes only the actual build artifacts (`*.o *.d *.elf *.map *.siz`) and leaves the
-`.args`/`.mk` files intact. If the `.args` files are ever lost anyway, recover in S32DS: right-click the
-project → Refresh, then Project → Clean… (with "start a build immediately") for the affected config.
+`.args`/`.mk` files intact. Unlike `build.bat` it hardcodes the S32DS 3.6.10 install path, so it needs
+a one-line edit if S32DS moves or another version is installed. If the `.args` files are ever lost
+anyway, recover in S32DS: right-click the project → Refresh, then Project → Clean… (with "start a
+build immediately") for the affected config.
+
+The generated `makefile`/`subdir.mk` files also `-include ../makefile.defs` and
+`../makefile.targets`; neither file is in this repository (the `-include` makes that silent).
 
 `build.bat` invokes `make` through the S32DS MSYS bash, since `make`/`arm-none-eabi-*` are not on the
-plain Windows `PATH`. To run `make` directly yourself, use the same MSYS bash with the toolchain
-prepended to `PATH`:
+plain Windows `PATH`. It locates the installation itself: `S32DS_ROOT` if you have set it, otherwise
+the newest `C:\NXP\S32DS.*\S32DS` that contains a `build_tools` folder. It then discovers the newest
+`build_tools\gcc_v*\gcc-*-arm32-eabi\bin` inside it — no version number is hardcoded — converts both
+paths with `cygpath -u`, and builds with `-j%NUMBER_OF_PROCESSORS%`. Nothing is pinned to one machine,
+so the script survives an S32DS upgrade or a repo that has been copied elsewhere:
 
 ```powershell
-& "C:\NXP\S32DS.3.6.10\S32DS\build_tools\msys32\usr\bin\bash.exe" -lc 'export PATH="/c/NXP/S32DS.3.6.10/S32DS/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin:$PATH" && cd /c/S32K344/workspace/BMS_demo/Debug_FLASH && make -j28 all'
+set S32DS_ROOT=D:\path\to\S32DS      # optional; omit to auto-detect
+.\build.bat
 ```
+
+To drive `make` in that MSYS bash yourself, substitute your own install paths in the example below
+(the `/c/...` form is MSYS notation; `build.bat` derives it at run time with `cygpath`):
+
+```powershell
+& "<S32DS>\build_tools\msys32\usr\bin\bash.exe" -lc 'export PATH="/c/NXP/S32DS.3.6.10/S32DS/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin:$PATH" && cd /c/S32K344/workspace/BMS_demo/Debug_FLASH && make all'
+```
+
+Add `-j<N>` to parallelise; `build.bat` passes `-j%NUMBER_OF_PROCESSORS%`.
+
+One caveat the auto-detection does not cover: the per-folder `.args` response files carry absolute
+paths baked in — the four SDK include roots and a `--sysroot` pinned to the `gcc_v10.2` folder under
+`C:\NXP\S32DS.3.6.10`. The project therefore builds where `build.bat` finds that S32DS layout; a
+different install root, S32DS version or RTD SDK location means updating the project's include/sysroot
+settings in S32DS and rebuilding so the `.args` files are regenerated.
 
 Flash/debug launch configurations for SEGGER are in `Project_Settings/Debugger/` (use these from S32DS for
 interactive debugging). To flash from the command line instead (J-Link probe connected, board powered):
@@ -58,8 +83,12 @@ interactive debugging). To flash from the command line instead (J-Link probe con
 ```
 
 `flash.bat` drives the S32DS-bundled `JLinkGDBServerCL.exe` + `arm-none-eabi-gdb.exe` non-interactively
-(no separate SEGGER J-Link software install needed). It currently supports `Debug_FLASH` only — `Release_RAM`
-needs a different load sequence and isn't wired up yet.
+(no separate SEGGER J-Link software install needed): it starts its own server at 1000 kHz with
+`-singlerun -strict -timeout 8000 -nogui`, then flashes with `monitor reset` → `load` → `monitor reset`
+→ `monitor go` → `detach`. It currently supports `Debug_FLASH` only — `Release_RAM` needs a different
+load sequence and isn't wired up yet. Every debug/flash script here hardcodes its absolute
+`C:\NXP\S32DS.3.6.10\...` paths (GDB server, `.jlinkscript`, gdb, and for PEmicro the versioned plugin
+folder), so a different S32DS install needs those lines edited.
 
 ---
 
@@ -69,10 +98,10 @@ needs a different load sequence and isn't wired up yet.
 src/
   main.c                    Startup, peripheral init, scheduler task table
   app/
-    Bms_App.*               Thin application wrapper around the battery monitor
+    Bms_App.*               Thin application wrapper — forwards to BatteryMonitor_Init() / _MainFunction()
     Bms_Scheduler.*         Table-driven cooperative scheduler (max 8 tasks)
     Bms_StateMachine.*      INIT / STANDBY / ACTIVE / FAULT supervisor
-    Bms_Adc.*               ADC_SAR wrapper (unit 0 = bus V, unit 1 = pack V + NTC)
+    Bms_Adc.*               ADC_SAR wrapper (instance 0 = pack V + NTC + pot, instance 1 = bus V)
   battery/
     Battery_Monitor.*       Aggregates cell/pack/current/temperature data, applies thresholds
     Bms_BattCfg.*           Battery data: capacity, OCV curve, cell safety envelope, SOP limit maps
@@ -97,28 +126,35 @@ src/
     xcp/Xcp_Can.*           CAN5 transport layer for XCP (own FlexCAN instance, polled RX, TX responses)
     xcp/Xcp_Cfg.h           XCP CAN5 IDs/baudrate + protocol constants + RAM whitelist
   control/
-    Bms_Contactor.*         Per-pack contactor + precharge state machine
-    Bms_Contactor_Cfg.h     Precharge timing / thresholds
+    Bms_Contactor.*         Per-pack contactor + precharge state machine (only Pack 1 has relay
+                            outputs; simulation mode is defined in the .c)
+    Bms_Contactor_Cfg.h     Task period, precharge timing, Pack 1 relay pins / drive polarity
   drivers/
-    Bms_Gpio.*              SIUL2 DIO abstraction (logical pin IDs)
-    Bms_Led.*               Active-low LED helpers
+    Bms_Gpio.*              SIUL2 DIO abstraction — shadow-state stub, no hardware access yet
+    Bms_Led.*               Active-low LED helpers (red PTA29, green PTA30, blue PTA31, yellow PTB18)
   safety/
     Fault_Manager.*         32-bit fault masks per pack + system, critical-fault mask, latched fault history
   storage/
     Bms_Nvm.*               SOC persistence in data flash (C40_Ip), sequence/checksum-guarded records
 
 board/        Generated pin mux (SIUL2 / TSPC)
-generate/     Generated RTD configs: Clock, ADC, FlexCAN, PIT, LPSPI, IntCtrl, OsIf
-RTD/          NXP Real-Time Drivers source + headers
-DBC/          BMS_demo.dbc  — CAN database for PCAN / CANalyzer
+generate/     Generated RTD configs: Clock, ADC, FlexCAN, PIT, LPSPI, IntCtrl, OsIf, C40 (data
+              flash), SIUL2 port / IGF, cache, plus the device and module headers
+RTD/          NXP Real-Time Drivers: include/ (IP driver headers) + src/ (implementation)
+DBC/          BMS_demo.dbc + BMS_demo.sym — CAN database for PCAN / CANalyzer
 Project_Settings/  Linker scripts, startup code, debugger launches
-sil/          Software-in-the-loop test platform: same src/ code, native build, pytest (see §15)
+sil/          Software-in-the-loop test platform: tests/ suites, python/ ctypes harness, fakes/ for
+              the RTD driver layer, per-feature reports/ (see §15)
 hil/          Hardware-in-the-loop SOP tests on the S32K344 board, with reports (see §16)
+BMS_demo.mex  Config-tool project (see §12); ClockYaml.txt / ClockConfigurationMappings.txt are the
+              clock YAML inputs it was generated from
 
 Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_reset.bat ·
                debug_live.bat · fault_snapshot.bat · fault_decode.gdb  (see §1 and §10)
                PEmicro probe alternatives: *_pemicro.bat variants of the 5 debug/flash
                scripts above (see §10)
+Root docs:     README.md · CHANGELOG.md · the design notes under src/battery/
+Build output:  Debug_FLASH/ and Release_RAM/ (CDT configs, git-tracked makefiles included)
 ```
 
 ---
@@ -128,7 +164,10 @@ Root tooling:  build.bat · clean.bat · flash.bat · debug_server.bat · debug_
 `main()` initialises, in order: clocks → pins → LED off → interrupt controller → PIT0 → ADC (with
 calibration) → NTC → CAN0/CAN1/CAN2 → CAN5 (XCP transport, `Xcp_Can_Init`) → LPSPI1 → fault manager →
 contactors → state machine → application → vAFE → vPACK → battery monitor → NVM (scans data flash) →
-SOC estimator → SOP limits → scheduler → PIT start. Any init failure traps with LED1 red on.
+SOC estimator → SOP limits → scheduler → PIT start. A failure in a checked init call (ADC,
+CAN0/1/2, CAN5, LPSPI1, PIT start) traps with LED1 red on; the remaining calls are not checked.
+`BatteryMonitor_Init()` runs twice on the way — once inside `Bms_App_Init()` and once directly in
+`main()` — the second call simply initialises the same state again.
 
 The PIT ISR only calls `Bms_Scheduler_TickFromIsr()`, which increments a pending-tick count; all work
 runs from the main loop. `Bms_Scheduler_MainFunction` atomically captures and clears the pending count,
@@ -141,9 +180,9 @@ first per call) are exposed for inspection (e.g. via the XCP/debugger tooling in
 
 | Task | Period | Contents |
 | --- | --- | --- |
-| `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main, **XCP CAN5 poll (`Xcp_Can_MainFunction`)**, contactor state machine, 1 Hz LED blink |
-| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor, SOC integration, SOP limits, state machine, TX of 0x300–0x30C, 0x310–0x313 and 0x400 |
-| `Bms_MainFunction_1000ms` | 1000 ms | SOC persistence (`Bms_Soc_1sFunction`, saves to NVM when due/changed) |
+| `Bms_MainFunction_10ms` | 10 ms | ADC acquisition, app main — which itself calls `BatteryMonitor_MainFunction()`, so the whole battery monitor runs here too — **XCP CAN5 poll (`Xcp_Can_MainFunction`)**, pack-voltage feed to the contactor machine (`Bms_Contactor_SetPackVoltage`), contactor state machine, 1 Hz LED blink |
+| `Bms_MainFunction_100ms` | 100 ms | NTC, CAN RX poll, vPACK comm-health check, battery monitor (again), SOC integration, SOP limits, state machine, TX of 0x300–0x30C, 0x310–0x313 and 0x400 |
+| `Bms_MainFunction_1000ms` | 1000 ms | SOC persistence (`Bms_Soc_1sFunction`: writes to NVM once the save period has elapsed, and only if an estimate moved) |
 
 XCP is polled from the 10 ms task (not 100 ms) since a real XCP master/DAQ tool expects lower latency
 than the other CAN traffic.
@@ -155,8 +194,8 @@ than the other CAN traffic.
 ```mermaid
 stateDiagram-v2
     [*] --> INIT
-    INIT --> FAULT: critical fault present
-    INIT --> STANDBY: no critical fault
+    INIT --> FAULT: critical fault present for 2 s
+    INIT --> STANDBY: no fault, or one that clears within 2 s
     STANDBY --> ACTIVE: Enable command (0x201 = 0x01)
     STANDBY --> FAULT: critical fault
     ACTIVE --> STANDBY: Disable command (0x201 = 0x02)
@@ -164,32 +203,50 @@ stateDiagram-v2
     FAULT --> STANDBY: fault cleared AND ClearFault command (0x201 = 0x03)
 ```
 
+A critical fault has to persist before it latches: `INIT` waits `BMS_STATE_INIT_SETTLE_CYCLES`
+(20 × 100 ms = **2 s**) because the AFE, vPACK and NTC all report invalid data until their first
+measurement cycle completes, and a fault that clears inside that window falls through to `STANDBY`.
 Entering `ACTIVE` requests all three packs to close; leaving it requests all packs to open. `FAULT`
-is latched — the underlying condition must be gone *and* an explicit ClearFault command received.
-LED3 (PTA31) is on while `ACTIVE`.
+is latched — the underlying condition must be gone *and* an explicit ClearFault command received
+(a ClearFault is only honoured in `FAULT`; `STANDBY` and `ACTIVE` discard it each cycle). An
+unexpected state fails safe to `FAULT`, and the live state is mirrored in `g_DebugBmsState` for the
+debugger. LED3 (PTA31, `BMS_LED_BLUE` in `Bms_Led.c`) is on while `ACTIVE`.
 
 ---
 
 ## 5. Contactor / precharge control
 
-Each pack has three outputs: **negative**, **precharge**, **positive**.
+Only **Pack 1** has relays wired (PTC23 negative, PTC24 precharge, PTC25 positive); Packs 2 and 3 run
+the same state machine but write no outputs. The relay outputs are active-high (`1` = closed) — the
+opposite polarity to the LEDs.
 
 ```
 OFF -> NEG_ON -> PRECHARGE -> POS_ON -> RUN
-                                          \
-        FAULT <-- critical/pack fault      -> OPENING -> OFF
+                                       \
+        FAULT <-- critical/pack fault   -> OFF
 ```
+
+An open request has priority in every state and drops the pack straight to `OFF`.
+`BMS_CONTACTOR_OPENING` exists in the state enum but is never entered.
 
 | Constant | Value | Meaning |
 | --- | --- | --- |
+| `BMS_CONTACTOR_TASK_PERIOD_MS` | 10 ms | State machine execution period |
 | `BMS_CONTACTOR_NEG_DELAY_MS` | 100 ms | Settle after closing the negative contactor |
-| `BMS_PRECHARGE_TIMEOUT_MS` | 2000 ms | Max precharge duration |
-| `BMS_PRECHARGE_COMPLETE_RATIO` | 0.90 | Bus V must reach 90 % of pack V |
+| `BMS_PRECHARGE_TIMEOUT_MS` | 2000 ms | Max precharge duration (compile-out below) |
+| `BMS_PRECHARGE_COMPLETE_RATIO` | 0.90 | Bus V must reach 90 % of pack V (inert today — nothing feeds the bus voltage) |
 | `BMS_CONTACTOR_POS_DELAY_MS` | 100 ms | Settle before opening precharge |
-| `BMS_CONTACTOR_SIMULATION_MODE` | 1 | Skips the bus-voltage check, uses a fixed 100 ms precharge |
+| `BMS_CONTACTOR_OUTPUT_ACTIVE_LEVEL` | 1 | Relay drive polarity: 1 = active high |
+| `BMS_CONTACTOR_SIMULATION_MODE` | 1 | Defined in `Bms_Contactor.c`, not in the header. Precharge completes on a fixed 100 ms timer instead of a bus-voltage judgement |
 
-A critical or pack fault drives the pack to `FAULT` with all outputs off; it stays there until the
-fault clears and an open request is received.
+All of the above except `BMS_CONTACTOR_SIMULATION_MODE` live in `Bms_Contactor_Cfg.h`. With
+simulation mode `1` (today's setting) the whole bus-voltage branch is compiled out, so
+`FAULT_PRECHARGE_TIMEOUT` cannot be raised and `Bms_Contactor_SetBusVoltage()` has no caller. Both
+are prerequisites before real HV is connected.
+
+A critical or pack fault drives the pack to `FAULT` with all outputs off. It leaves `FAULT` as soon as
+no critical pack or system fault is present — no open request is needed, and one that was pending when
+the fault hit has already been discarded.
 
 ---
 
@@ -199,6 +256,11 @@ Faults are bits in a 32-bit mask, tracked per pack (`FAULT_PACK_1..3`) and syste
 live mask, `Fault_Manager` also keeps a latched "last fault" history mask per pack/system that is
 only cleared explicitly (see `FaultManager_GetLastPackFaults` / `FaultManager_GetLastSystemFaults`),
 reported on CAN 0x309/0x30A.
+
+Each bit is raised in one of the two masks. **System mask**: `FAULT_CELL_OV`, `FAULT_CELL_UV`,
+`FAULT_CELL_IMBALANCE`, `FAULT_TEMP_DELTA`, `FAULT_AFE_COMM`, the `FAULT_VPACK_*` group and
+`FAULT_CAN_TIMEOUT`. **Per-pack mask**: `FAULT_OVER_TEMP`, `FAULT_UNDER_TEMP`, `FAULT_TEMP_SENSOR`,
+`FAULT_PACK_CHARGE_OC`, `FAULT_PACK_DISCHARGE_OC` and `FAULT_PACK1_VOLTAGE_TIMEOUT`.
 
 | Bit | Fault | Bit | Fault |
 | --- | --- | --- | --- |
@@ -214,12 +276,19 @@ reported on CAN 0x309/0x30A.
 | 9 | `FAULT_PRECHARGE_TIMEOUT` | 20 | `FAULT_PACK_DISCHARGE_OC` |
 | 10 | `FAULT_CONTACTOR_FEEDBACK` | 21 | `FAULT_PACK_CHARGE_OC` |
 
+Six of these bits are not raised by any code path yet — `FAULT_PACK_OV` (0), `FAULT_PACK_UV` (1),
+`FAULT_SPI_TIMEOUT` (8), `FAULT_CONTACTOR_FEEDBACK` (10), `FAULT_CONTACTOR_WELD` (11) and
+`FAULT_OVER_CURRENT` (12), four of which sit inside `FAULT_CRITICAL_MASK`. They are reserved for
+sensing that is not wired up, so a bench test has to force them through the `FaultManager_Set*` API
+(see §10) rather than by provoking the hardware.
+
 `FAULT_CRITICAL_MASK` = pack OV/UV, cell OV/UV, over-temp, temp sensor, AFE comm, precharge timeout,
 contactor feedback, contactor weld, over-current, vPACK comm timeout/alive error/device fault, Pack 1
 voltage timeout, and pack discharge/charge over-current. Any critical fault opens the contactors and
-forces the supervisor into `FAULT`.
+forces the supervisor into `FAULT`. `FAULT_CAN_TIMEOUT` is not critical and clears itself again on the
+next successful CAN0 send.
 
-### Detection thresholds (hysteretic, `Bms_BattCfg.c`)
+### Detection thresholds (hysteretic)
 
 | Condition | Set | Clear |
 | --- | --- | --- |
@@ -231,6 +300,11 @@ forces the supervisor into `FAULT`.
 | Cell imbalance | 300 mV | 200 mV |
 | Pack charge over-current | 80.0 A | 70.0 A |
 | Pack discharge over-current | −100.0 A | −90.0 A |
+
+The rows come from two places: the six cell/temperature rows from `Bms_BattCfg.c`
+(`g_BmsBattCfgCellLimits`), the two over-current rows from `Battery_Monitor.c`. The over-temperature
+pair cannot fire as configured — `Bms_Ntc` invalidates its reading above 125.0 °C, so a real
+over-temperature surfaces as `FAULT_TEMP_SENSOR` first (`PROJECT_PLAN.md` finding F2).
 
 Current sign convention (`Battery_Monitor.c`, from the vPACK/ADBMS2950 simulation): positive = charge,
 negative = discharge.
@@ -244,22 +318,26 @@ negative = discharge.
   voltage frames `0x401..0x404`, each carrying four `uint16` little-endian values at 1 mV/bit.
   `Bms_Vafe` only accepts the voltage frames while a cycle is active and sets `DataValid` once all
   four frames of one cycle have arrived (an incomplete previous cycle is discarded), then recomputes
-  min/max/delta and the min/max cell indices. The header counter is exposed as
-  `g_BmsVafeData.MeasurementCounter` with `HeaderValid` set when a header has been received.
-- **Pack voltages** — Pack 1 comes from the CAN2 vPACK voltage frame (`0x411`); Pack 2/Pack 3 remain
+  min/max/delta and the min/max cell indices. `HeaderValid` is set as soon as a header arrives;
+  `g_BmsVafeData.MeasurementCounter` is published only once that cycle's four voltage frames have all
+  been accepted.
+- **Pack voltages** — Pack 1 comes from the CAN2 vPACK voltage frame (`0x411`), refreshed only while
+  both `Bms_Adc_IsPackValid()` and `g_BmsVpackData.VoltageValid` are true; Pack 2/Pack 3 remain
   ADC1 channels, 14-bit, 3.3 V reference.
 - **Pack current / power** — decoded over CAN2 from the virtual ADBMS2950 (`Bms_Vpack`): current
   frame `0x410` (current + shunt voltage), voltage frame `0x411` (pack + bus voltage), each with an
   alive counter checked for timeout/rollover (`BMS_VPACK_TIMEOUT_TICKS` = 1000 ms). `Battery_Monitor`
   derives `PackPower_W = PackCurrent_mA * PackV1 / 1000`.
 - **State of charge** — `Bms_Soc` Coulomb-counts Pack 1 current (100 ms sample period) into three
-  estimators, saving to data flash at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s) or sooner if it
-  changes by more than `BMS_SOC_SAVE_DELTA_X10` (0.1 %) — see §13.
+  estimators, saving to data flash no more than once every `BMS_SOC_SAVE_PERIOD_MS` (60 s), and then
+  only if an estimate has moved by at least `BMS_SOC_SAVE_DELTA_X10` (0.1 %) — see §13.
 - **State of power** — `Bms_Sop` computes the Pack 1 discharge, regen and charge current limits from
   SOC, cell voltage and temperature every 100 ms — see §14.
 - **Temperatures** — three NTCs on ADC1, Beta equation (`R25 = 10 kΩ`, `Beta = 3435 K`,
   series 10 kΩ), reported in 0.1 °C over −40.0 … 125.0 °C.
-- **Bus voltages** — ADC0 channels P0/P1/P3/P4 (bus 1/2/3 + spare), used for precharge completion.
+- **Bus voltages** — ADC0 channels P0/P1/P3/P4 (bus 1/2/3 + spare), sampled but **not** wired into
+  precharge: `Bms_Contactor_SetBusVoltage()` has no caller, so precharge completion is timer-based
+  while simulation mode is on (§5).
 
 ---
 
@@ -267,8 +345,16 @@ negative = discharge.
 
 CAN0 runs at **500 kbit/s**; CAN1 (virtual AFE) and CAN2 (virtual ADBMS2950 pack monitor) run at
 **1 Mbit/s**. TX is `SendBlocking` with a 2 ms timeout on MB0; a failed send aborts the transfer and sets
-`FAULT_CAN_TIMEOUT` (not critical). RX is polled from the 100 ms task.
-Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding.
+`FAULT_CAN_TIMEOUT` (not critical) — but only for frames sent with `raiseFault = TRUE`, which excludes
+the CAN1 0x400 test frame, and the bit is cleared again by the next successful send. RX is polled from
+the 100 ms task.
+
+Import `DBC/BMS_demo.dbc` into PCAN-Explorer/CANalyzer for decoding. The frame names below are the
+`Bms_Can_Cfg.h` macro names; the DBC uses its own message names, which differ in places:
+`BMS_Pack_Status` (0x301), `BMS_Contactor_Status` (0x302), `BMS_Pack12_Faults` (0x303),
+`BMS_Pack3_System_Faults` (0x304), `BMS_Pack_Current` (0x306), `Pack_Power_Status` (0x307),
+`SOC_Status` (0x308), `BMS_LastFaultStatus12` (0x309), `BMS_LastFaultStatus3System` (0x30A) and
+`SOC_CellBased` (0x30B).
 
 ### CAN0 transmit (every 100 ms)
 
@@ -392,7 +478,7 @@ valid (see §14).
 | 0x402 | RX (MB2) | Cells 5–8 |
 | 0x403 | RX (MB3) | Cells 9–12 |
 | 0x404 | RX (MB4) | Cells 13–16 |
-| 0x405 | RX (MB5) | `vAFE_Measurement_Header` — starts a new AFE measurement cycle; byte 0 = rolling counter, byte 1 = AFE status |
+| 0x405 | RX (MB5) | `vAFE_Measurement_Header` — starts a new AFE measurement cycle; byte 0 = rolling counter, byte 1 = AFE status (ignored by the decoder) |
 
 ### CAN2 (virtual ADBMS2950 pack monitor, vPACK)
 
@@ -429,11 +515,17 @@ raise `FAULT_VPACK_DEVICE_FAULT`. Signal layout beyond what `Bms_Vpack.c` decode
 | PTC26 / PTC27 | CAN5_RX / CAN5_TX | XCP CAN (development/calibration, separate from CAN0-2) |
 | PTA18/19/20/21 | LPSPI1 SOUT/SCK/SIN/PCS0 | SPI |
 | PTD1, PTD0, PTE15, PTE16 | ADC0_P0/P1/P3/P4 | Bus1/2/3 + spare voltage |
+| PTC23 / PTC24 / PTC25 | Pack 1 negative / precharge / positive relay | Active-high (`1` = closed); Packs 2/3 have no relays |
 | PTA29 | LED1_RED | 1 Hz heartbeat, solid on init failure |
 | PTA30 | LED2_GREEN | Controlled over CAN 0x200 |
-| PTA31 | LED3 | On while ACTIVE |
+| PTA31 | LED3 (`BMS_LED_BLUE` in `Bms_Led.c`) | On while ACTIVE |
+| PTB18 | `BMS_LED_YELLOW` | Writable through `Bms_Led_*`, not used today |
+| PTA0 | GPIO 0 | Configured bidirectional; no application use |
 
-All LEDs are active-low (0 = on).
+All LEDs are active-low (0 = on); the contactor relays are the opposite, active-high. The pin map
+itself is defined in `board/Siul2_Port_Ip_Cfg.c` and driven from `Bms_Led.c`, `Bms_StateMachine.c`,
+`Bms_Can.c` and `Bms_Contactor_Cfg.h` — `Bms_Gpio.*` is a shadow-state stub and cannot be used to
+trace any of it.
 
 ---
 
@@ -490,9 +582,12 @@ continue&              # resume
 
 ### `fault_decode.gdb` — GDB helper commands
 
-Sourced by `debug_live.bat` (and `fault_snapshot.bat`). Pure GDB command language — the S32DS-bundled
-gdb has **no Python support**, so this is a hand-written bit-table mirror of the `FAULT_*` `#define`s
-in `src/safety/Fault_Manager.h` and must be kept in sync manually if fault bits change.
+Sourced by `debug_live.bat`, `fault_snapshot.bat` and both PEmicro variants below. Pure GDB command
+language — the `arm-none-eabi-gdb.exe` the scripts use has **no Python support** (`python print(1)`
+answers "Python scripting is not supported"; a Python-enabled `arm-none-eabi-gdb-py.exe` ships in the
+same folder, but the scripts do not use it) — so this is a hand-written bit-table mirror of the
+`FAULT_*` `#define`s in `src/safety/Fault_Manager.h` and must be kept in sync manually if fault bits
+change. It currently decodes all 22 defined bits.
 
 | Command | Purpose |
 | --- | --- |
@@ -509,7 +604,9 @@ GDB server per run (no `debug_server.bat` needed) and writes `fault_snapshot_<yy
 it runs `monitor go` → host delay → `monitor halt` → **detach → reconnect** to the same still-running
 server before reading anything — the reconnect forces gdb to re-read all state from scratch and,
 crucially, does **not** reset the core (reset only happens on a server process's very first client
-connection). Note a fresh `.bat` run still starts a new server process, so it costs that one-time reset.
+connection). The run window is `RUN_SECONDS` (2 s, via `shell ping -n 2`), and the server it started is
+cleaned up at the end with `taskkill /FI "WINDOWTITLE eq JLinkGDBServer"`. Note a fresh `.bat` run
+still starts a new server process, so it costs that one-time reset.
 
 ### PEmicro probe alternative (`*_pemicro.bat`)
 
@@ -522,7 +619,8 @@ J-Link probe; the PEmicro ones drive `pegdbserver_console.exe` (device `NXP_S32K
 
 Key differences from the SEGGER flow above:
 - `flash_pemicro.bat` programs directly through `pegdbserver_console.exe`'s own flash mode
-  (`-flashobjectfile` / `-quitafterprogramming` / `-runafterprogramming`) — no gdb `load` involved.
+  (`-flashobjectfile` / `-programmingtype=0` / `-quitafterprogramming` / `-runafterprogramming`) — no
+  gdb `load` involved. It runs the server at 5000 kHz on `-port=USB1`.
 - `pegdbserver_console.exe` only resets the target once, **at its own process startup** (not per GDB
   client connect like SEGGER), so `debug_reset_pemicro.bat` always sends an explicit `monitor reset`
   rather than relying on connect-time behaviour. Run `debug_server_pemicro.bat attach` to start the
@@ -536,9 +634,11 @@ Key differences from the SEGGER flow above:
   invocations (with a plain `timeout` between them, not gdb's `shell`) instead of one, because chaining
   `continue&` / `interrupt` in a single non-interactive `-batch` invocation reliably fails on this
   hardware (`shell` blocks GDB's own event loop, so the `interrupt` stop-reply never gets processed).
-  **Known caveat**: even with that fix, captured snapshots have shown `PC = 0x0` with an empty backtrace
-  in testing — treat that specific output as an unreliable capture, not as ground truth, until it's
-  root-caused.
+  **Known caveat**: the PEmicro capture path is not trustworthy yet — treat its output as an unreliable
+  capture, not as ground truth, until it is root-caused. The one committed sample,
+  `fault_snapshot_20260901_131014.txt`, predates the three-invocation fix and shows a still-running
+  target (`PC = Selected thread is running.`, then "Cannot execute this command while the target is
+  running") instead of a real PC and backtrace.
 
 ---
 
@@ -551,9 +651,9 @@ development/calibration tool (e.g. a DAQ/measurement-and-calibration master), no
 
 | Item | Value |
 | --- | --- |
-| Bus speed | 1 Mbit/s |
-| Command CAN ID | `0x600` (`XCP_CAN_CFG_RX_ID`) |
-| Response CAN ID | `0x601` (`XCP_CAN_CFG_TX_ID`) |
+| Bus speed | 1 Mbit/s, set by the generated `FlexCAN_Config5` (same timing as CAN1/CAN2). `XCP_CAN_CFG_BAUDRATE_BPS` is informational and referenced nowhere |
+| Command CAN ID | `0x600` (`XCP_CAN_CFG_RX_ID`), received on MB0 |
+| Response CAN ID | `0x601` (`XCP_CAN_CFG_TX_ID`), sent on MB1 |
 | Max CTO/DTO | 8 bytes (classical CAN) |
 | Protocol / transport version | 1.0 / 1.0 (BCD `0x10`/`0x10`) |
 
@@ -571,10 +671,21 @@ development/calibration tool (e.g. a DAQ/measurement-and-calibration master), no
 Reads (`UPLOAD`/`SHORT_UPLOAD`) are allowed anywhere in a whitelisted SRAM range
 (`XCP_CFG_VALID_RAM_START`..`XCP_CFG_VALID_RAM_END`, currently `0x20400000`-`0x2047FFFF`); addresses
 outside it get an `ERR_OUT_OF_RANGE` (`0xFE 0x22`) error response. Writes (`DOWNLOAD`) are further
-restricted to a single first-bring-up test variable, `g_BmsXcpTestCalibration` — this whitelist is
-expected to grow as real calibration parameters are added. Debug counters/state
-(`g_BmsXcpConnected`, `g_BmsXcpConnectCount`, `g_BmsXcpMta`, `g_BmsXcpUploadCount`,
-`g_BmsXcpDownloadCount`, etc.) are left non-static so they can be watched directly in S32DS Expressions.
+restricted to two variables: the first-bring-up test word `g_BmsXcpTestCalibration` and
+`g_BmsSopMode`, the hand-set SOP operating mode of §14. This whitelist is expected to grow as real
+calibration parameters are added.
+
+Anything else is **silently dropped**. An unsupported command code, or a syntactically invalid one
+(`SET_MTA` with a short frame, `UPLOAD` with a count of 0 or more than 7, `SHORT_UPLOAD` with a
+non-zero extension, `DOWNLOAD` with a count of 0 or more than 6) produces no response at all, so a
+master sees a timeout instead of `ERR_CMD_UNKNOWN`. Only an out-of-whitelist address gets a reply.
+
+Debug counters/state (`g_BmsXcpConnected`, `g_BmsXcpConnectCount`, `g_BmsXcpMta`, `g_BmsXcpMtaExt`,
+`g_BmsXcpSetMtaCount`, `g_BmsXcpUploadCount`, `g_BmsXcpDownloadCount`,
+`g_BmsXcpDownloadEnteredCount`, `g_BmsXcpDownloadWritable`, `g_BmsXcpTestCalibration`) and the CAN5
+mirrors (`g_BmsCan5InitStatus`, `g_BmsCan5RxStatus`, `g_BmsCan5TxStatus`, `g_BmsCan5RxCount`,
+`g_BmsCan5RxId`, `g_BmsCan5RxDlc`, `g_BmsCan5RxData`) are left non-static so they can be watched
+directly in S32DS Expressions.
 
 ---
 
@@ -582,36 +693,48 @@ expected to grow as real calibration parameters are added. Debug counters/state
 
 Open `BMS_demo.mex` with the S32 Configuration Tools inside S32DS, edit clocks/pins/peripherals, and
 regenerate. Do not hand-edit anything under `generate/` or `board/` — those files are overwritten.
+Those two folders are the only config-tool output (`ClockYaml.txt` / `ClockConfigurationMappings.txt`
+are the clock YAML inputs behind them); `RTD/`, `Project_Settings/` and the `Debug_FLASH`/`Release_RAM`
+build configs are not affected by a regeneration. Because adding or removing a generated file changes
+the CDT build, do a Refresh + rebuild in S32DS afterwards so `subdir.mk` and the per-folder `.args`
+files pick it up — plain `make` cannot.
 
 ---
 
 ## 13. State-of-charge (SOC) estimation
 
 `Bms_Soc` Coulomb-counts Pack 1 current into three independent estimators — weakest cell (`Min`),
-strongest cell (`Max`), and cell average (`Avg`) — each against `BMS_SOC_PACK1_CAPACITY_MAH`
-(100 Ah, placeholder). The reported pack SOC blends `Min`/`Max`, weighted by how close `Avg` sits to
-empty or full (near-empty converges to the weak cell, near-full to the strong cell).
+strongest cell (`Max`), and cell average (`Avg`) — each against the nominal capacity from
+`Bms_BattCfg_GetNominalCapacity_mAh()` (`BMS_BATTCFG_PACK1_CAPACITY_MAH`, 100 Ah, placeholder). The
+reported pack SOC blends `Min`/`Max`, weighted by how close `Avg` sits to empty or full (near-empty
+converges to the weak cell, near-full to the strong cell).
 
-Initialization tries three sources in order, recorded as `InitSource` on CAN 0x308:
+Initialization tries three sources in order, recorded as `InitSource` on CAN 0x308 (byte 2,
+bits 3:1 — the enum value carries straight through: 0 = default, 1 = OCV, 2 = NVM, 3 = pending):
 
 | Tier | Source | Condition |
 | --- | --- | --- |
 | 1 (`OCV`) | 6-point OCV lookup table, per estimator's own cell voltage | Elapsed sleep time ready and ≥ `BMS_SOC_OCV_RESET_SLEEP_THRESHOLD_S` (8 h, placeholder), and `CellVoltageValid` |
 | 2 (`NVM`) | Last value persisted to data flash | Tier 1 not taken, a valid record exists |
-| 3 (`Default`) | `BMS_SOC_INITIAL_PCT_X10` (50.0 %) | Neither above available |
+| 3 (`Default`, enum 0) | `BMS_SOC_INITIAL_PCT_X10` (50.0 %) | Neither above available |
 
 Tier 1's two inputs — sleep time and cell voltage — are never both ready at boot (the scheduler that
-polls CAN hasn't started yet), so `Bms_Soc_Init()` defers: it marks the estimators unseeded
-(`InitSource = Pending`, no integration) and `Bms_Soc_MainFunctionPack()` resolves the wait once both
-inputs arrive, or after `g_BmsSocOcvWaitTimeout_ms` (500 ms, calibratable) expires — falling through to
-NVM, then the default. Elapsed sleep time comes from `Bms_SleepTime`, a small provider module (no RTC
-on target yet, so it currently reports 0 s) kept separate for the same reason `Bms_Adc`/`Bms_Ntc` are:
-so a real timekeeping source, or a test double, can replace it without touching the estimator.
+polls CAN hasn't started yet), so the estimator has a deferred path: `Bms_Soc_Init()` marks the
+estimators unseeded (`InitSource = Pending`, no integration) and `Bms_Soc_MainFunctionPack()` resolves
+the wait once both inputs arrive, or after `g_BmsSocOcvWaitTimeout_ms` (500 ms, calibratable)
+expires — falling through to NVM, then the default. With today's `Bms_SleepTime` provider that path is
+not taken: it reports ready-with-0-s from the first call, so tier 1 is skipped at once and every boot
+restores from NVM (the HIL trace in §16 shows no `Pending` sample). Elapsed sleep time comes from
+`Bms_SleepTime`, a small provider module kept separate for the same reason `Bms_Adc`/`Bms_Ntc` are: so
+a real timekeeping source, or a test double, can replace it without touching the estimator.
 
-SOC is saved to data flash via `Bms_Nvm` at most once every `BMS_SOC_SAVE_PERIOD_MS` (60 s), or sooner
-if it moves by more than `BMS_SOC_SAVE_DELTA_X10` (0.1 %). Full design, known limitations (OCV table
-not characterized, no per-cell capacity data, float precision floor, etc.) in
-[`src/battery/SOC_DESIGN.md`](src/battery/SOC_DESIGN.md).
+SOC is saved to data flash via `Bms_Nvm` no more than once every `BMS_SOC_SAVE_PERIOD_MS` (60 s), and
+then only if some estimate has moved by at least `BMS_SOC_SAVE_DELTA_X10` (0.1 %) — the delta avoids a
+pointless write, it never brings one forward. Full design and known limitations (OCV table not
+characterized, no per-cell capacity data, float precision floor, estimators that can never diverge) in
+[`src/battery/SOC_DESIGN.md`](src/battery/SOC_DESIGN.md), which also carries the one open defect,
+§5.11: a stuck vPACK alive counter leaves `PackCurrentValid[0]` true while the current value freezes.
+The SIL suite pins that defect with a strict xfail (§15).
 
 ---
 
@@ -637,11 +760,17 @@ state; every limit is recomputed each 100 ms from the present inputs.
 
 Each ramp is linear from its start (no derate) to its end (limit 0), and every end sits inside the
 matching fault threshold. `g_BmsSopData` also keeps each map value and derate factor, plus the
-`DerateActiveTLow` and `InputsValid` flags, for XCP or a debugger.
+`DerateActiveTLow` and `InputsValid` flags, for XCP or a debugger — `DerateActiveTLow` is not part of
+the 0x30C payload (byte 6 carries VLow/VHigh/THigh only).
+
+The high-temperature row is moot for the same reason as the over-temperature fault in §6: `Bms_Ntc`
+invalidates its reading above 125.0 °C, so a real sensor cannot drive the 45.0 → 60.0 °C ramp any more
+than it can reach the 200.0 °C trip (`PROJECT_PLAN.md` finding F2).
 
 The operating mode is `g_BmsSopMode` (0 = Discharge, 1 = Charge), an XCP-writable stand-in until a
-mode-provider component exists. `g_BmsSopTestOverride` lets a bench test replace any input; it is
-compiled in while `BMS_SOP_TEST_OVERRIDE` is `1U` and must be `0U` for a vehicle build.
+mode-provider component exists — it is one of the two addresses `DOWNLOAD` accepts (§11).
+`g_BmsSopTestOverride` lets a bench test replace any input; it is compiled in while
+`BMS_SOP_TEST_OVERRIDE` is `1U`, which is its current setting, and must be `0U` for a vehicle build.
 
 **The limit maps and derate windows are placeholders**, not datasheet ratings. Full design, validation
 plan and known limitations in [`src/battery/SOP_DESIGN.md`](src/battery/SOP_DESIGN.md).
@@ -663,8 +792,11 @@ cd sil && python -m pytest   # run the suite
 ```
 
 Needs a host C compiler (MinGW-w64 GCC) and `pytest`; see [`sil/README.md`](sil/README.md) for setup,
-layout, and how to write a new test. Test reports are generated per feature under `sil/reports/`, rolled
-up in [`sil/TEST_REPORT.md`](sil/TEST_REPORT.md).
+layout, and how to write a new test. Reports are generated per feature under `sil/reports/` and rolled
+up in [`sil/TEST_REPORT.md`](sil/TEST_REPORT.md): **93 cases across 4 features** — Lib_Interp 20,
+persistence 6, SOC 27, SOP 40 — currently 92 pass, 1 strict xfail (the open SOC defect §5.11) and no
+skips. The tree is `tests/` (pytest suites), `python/` (ctypes harness), `fakes/` (RTD driver doubles
+plus the C40 data-flash model) and `reports/`.
 
 ---
 
@@ -686,11 +818,15 @@ python hil/sop_hil.py
 python hil/sop_init_hil.py
 ```
 
-Needs the SEGGER J-Link software (`JLink_x64.dll`) and no J-Link GDB server running, since the probe
-serves one tool at a time. `hil/hil_common.py` holds the shared J-Link session, flash check and ELF
-symbol lookup (through the S32DS gdb, offline); `hil/plot_sop_trace.py` turns the CSV into the plot.
-HSS (High-Speed Sampling) is the engine behind SEGGER J-Scope; pylink has no wrapper for it, so
-`hil_common.py` calls the four DLL functions directly.
+Prerequisites: `BMS_SOP_TEST_OVERRIDE` must be `1U` (it is today — it is the override hook `sop_hil.py`
+drives), and `Debug_FLASH/BMS_demo.elf` must be on disk and match the image actually flashed, which
+both scripts verify before writing anything. You also need the SEGGER J-Link software (`JLink_x64.dll`)
+and no J-Link GDB server running, since the probe serves one tool at a time. `hil/hil_common.py` holds
+the shared J-Link session, flash check and ELF symbol lookup (through the S32DS gdb, offline);
+`hil/plot_sop_trace.py` turns the CSV into the plot, and the generated HTML loads `plotly.js` from
+cdnjs, so the browser needs network access — `sop_init_hil.py` calls the plot script itself, it is not
+a separate step. HSS (High-Speed Sampling) is the engine behind SEGGER J-Scope; pylink has no wrapper
+for it, so `hil_common.py` calls the four DLL functions directly.
 
 **Every new J-Link connection with device S32K344 fills the application RAM with 0xDEADBEEF**, which
 corrupts the running firmware. Both scripts reset the MCU right after they connect.

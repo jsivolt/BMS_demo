@@ -784,8 +784,12 @@ static void BatteryMonitor_UpdateTemperatureFaults(void)
              * ========================================================
              * Over-temperature hysteresis
              *
-             * SET   >= 60.0°C
-             * CLEAR <= 55.0°C
+             * Thresholds are calibratable and come from Bms_BattCfg:
+             * TemperatureMax_dC / TemperatureMaxClear_dC, currently
+             * 200.0 / 195.0 degC. In practice this fault does not
+             * trigger: Bms_Ntc invalidates its reading above 125.0
+             * degC, so a real over-temperature is reported as
+             * FAULT_TEMP_SENSOR instead (PROJECT_PLAN.md finding F2).
              * ========================================================
              */
             if (FaultManager_IsPackFaultActive(
@@ -868,8 +872,9 @@ static void BatteryMonitor_UpdateTemperatureFaults(void)
      * ================================================================
      * Pack-to-pack temperature delta hysteresis
      *
-     * SET   >= 15.0°C
-     * CLEAR <= 10.0°C
+     * Thresholds are calibratable and come from Bms_BattCfg:
+     * TemperatureDeltaMax_dC / TemperatureDeltaMaxClear_dC,
+     * currently 50.0 / 10.0 degC.
      * ================================================================
      *
      * Only evaluate the delta fault when all three NTC sensors

@@ -6,6 +6,60 @@ tags, so entries are grouped by date/topic instead of a version number.
 
 ## [Unreleased]
 
+- **New: `hil/regression/` — Phase 1 automated regression framework.** One command
+  (`python hil/regression/run_regression.py --smoke`) runs the project's own build, the existing SIL
+  suite, and an orchestrated HIL smoke scenario on the S32K344 bench, then writes
+  `hil/regression/reports/regression_latest.{md,json}`. 18 cases: `REG-BUILD-001`, `REG-SIL-001`,
+  `REG-FLASH-001`, `REG-BOOT-001`, `REG-SCHED-001`, `REG-MEAS-001/002`, `REG-CAN-001/002`,
+  `REG-SM-001/002/003`, `REG-CONTACTOR-001`, `REG-FAULT-001/002/003`, `REG-XCP-001/002`.
+  Four outcomes are kept strictly apart — PASS, FAIL (the capability was available and the DUT
+  behaved differently), SKIP (a prerequisite is missing or was not selected), and INFRA ERROR (a
+  configured capability would not open). Exit codes: 0 all requested tests pass, 1 a DUT failure,
+  2 an incomplete run; a DUT failure outranks an infrastructure error. Not yet covered, and stated
+  as such in every report: Pack 1 physical relay GPIO, real Vbus/Vpack precharge, TLF35584, a real
+  AFE, sleep/wake, XCP DOWNLOAD. See `hil/regression/README.md`.
+- **New: `hil/regression/FIRMWARE_FINDINGS.md`.** Fourteen OPEN findings (D1–D14) recorded while
+  building the framework — behaviour that is inconsistent with the documentation or with another part
+  of the source. **None of them has been fixed.** The highest-impact entry is D2: `Bms_Vafe` sets
+  `DataValid` once and never expires it, and has no AFE-cycle timeout, so losing CAN1 does not
+  invalidate cell data and cannot raise `FAULT_AFE_COMM` after the first good cycle.
+- **CAN transport abstraction over `python-can`.** `hil/regression/can_config.json` maps each logical
+  BMS bus (CAN0/CAN1/CAN2/CAN5) to a physical channel independently, so a bench with fewer adapters
+  than buses runs in stages (`--bus CAN0`, then `--bus CAN1 --bus CAN2`). A bus that is not selected
+  or not plugged in SKIPs; one that exists but will not open is an infrastructure error. The framework
+  passively sniffs CAN1/CAN2 before taking them over and refuses to transmit `0x401-0x405`/`0x410/0x411`
+  if another transmitter already owns those ids. Add `python-can` with
+  `pip install -r hil/regression/requirements.txt`; the SIL suite's dependencies are unchanged.
+- **`hil/hil_common.py` extended additively only.** Added `Bench.read_until()`, `Bench.sample()` and
+  `elf_identity()`. `hil/sop_hil.py` and `hil/sop_init_hil.py` are unmodified and still work; their
+  behaviour is unchanged.
+- **`.gitignore`**: `hil/regression/reports/` is ignored. The framework source, its configuration
+  defaults, its README and its host-side test suite are tracked; a run's reports are runtime artifacts.
+- **Documentation pass: `README.md` corrected against the code.** The README had drifted from what the
+  sources actually do. Corrected: the `build.bat` fallback command (it auto-detects the S32DS root and
+  the newest `gcc_v*` toolchain and builds with `-j%NUMBER_OF_PROCESSORS%`, where the README hardcoded
+  `gcc_v10.2` and `-j28`); `clean.bat`'s hardcoded 3.6.10 path; the contactor `FAULT` exit condition (a
+  cleared fault is enough — no open request is required) and the unreachable `BMS_CONTACTOR_OPENING`
+  state; the claim that bus voltage drives precharge completion (nothing calls
+  `Bms_Contactor_SetBusVoltage()`); the SOC save rule (the 0.1 % delta only suppresses a write after the
+  60 s period, it never brings one forward); the SOC capacity macro (now
+  `Bms_BattCfg_GetNominalCapacity_mAh()`; `BMS_SOC_PACK1_CAPACITY_MAH` is gone); the XCP `DOWNLOAD`
+  whitelist (two variables, not one); the `MeasurementCounter` publish point; and the CAN-frame vs DBC
+  message-name mismatch. Added the missing current-state facts: the battery monitor also runs on the
+  10 ms task (via `Bms_App_MainFunction`), only Pack 1 has contactor hardware, simulation mode compiles
+  `FAULT_PRECHARGE_TIMEOUT` out, six fault bits are defined but raised by no code path, the 200.0 °C
+  over-temperature trip is unreachable (F2), CAN5's bit rate comes from the generated FlexCAN config and
+  unknown XCP commands are silently dropped, the deferred SOC init is not entered with today's
+  `Bms_SleepTime` double, and the SIL/HIL prerequisites (93 SIL cases with 1 strict xfail;
+  `BMS_SOP_TEST_OVERRIDE == 1U` and a flashed image matching `Debug_FLASH/BMS_demo.elf` for HIL). The
+  pin map gained the Pack 1 relay pins, the yellow LED and PTA0. (`README.md`)
+- **Three stale source comments corrected** so they describe the code rather than contradict it:
+  `Battery_Monitor.h` said `PackPower_W` was "positive = discharge" and `Bms_Can.c` repeated the same
+  sign error for pack current (both are charge-positive), and `Battery_Monitor.c` still documented the
+  over-temperature pair as 60.0/55.0 °C and the pack ΔT pair as 15.0/10.0 °C where the calibratable
+  values are 200.0/195.0 °C and 50.0/10.0 °C. Comments only, no behaviour change.
+  (`src/battery/Battery_Monitor.h`, `src/battery/Battery_Monitor.c`, `src/communication/Bms_Can.c`)
+
 - **PEmicro probe support: 5 new `*_pemicro.bat` scripts** (`flash_pemicro.bat`,
   `debug_server_pemicro.bat`, `debug_reset_pemicro.bat`, `debug_live_pemicro.bat`,
   `fault_snapshot_pemicro.bat`), parallel to the existing SEGGER `*.bat` tooling (unchanged), for users
