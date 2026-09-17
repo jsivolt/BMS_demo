@@ -1,0 +1,38 @@
+{
+  "_comment": [
+    "Logical BMS bus -> physical CAN channel mapping.",
+    "Edit the 'channel' values to match how the bench is wired today. A PCAN-USB channel",
+    "is physically attached to exactly one bus, so only the buses selected with --bus are",
+    "expected to be live in a given run. Buses that are not selected are reported as",
+    "'not selected' and any test needing them is SKIPPED, never failed.",
+    "Use --can0/--can1/--can2/--can5 to override a single entry for one run, e.g.",
+    "--can1 pcan:PCAN_USBBUS1:1000000"
+  ],
+  "buses": {
+    "CAN0": {
+      "interface": "pcan",
+      "channel": "PCAN_USBBUS1",
+      "bitrate": 500000,
+      "label": "host BMS interface (control + observation)"
+    },
+    "CAN1": {
+      "interface": "pcan",
+      "channel": "PCAN_USBBUS2",
+      "bitrate": 1000000,
+      "label": "virtual AFE (cell voltages)"
+    },
+    "CAN2": {
+      "interface": "pcan",
+      "channel": "PCAN_USBBUS3",
+      "bitrate": 1000000,
+      "label": "virtual pack monitor / ADBMS2950 (current + voltage)"
+    },
+    "CAN5": {
+      "interface": "pcan",
+      "channel": "PCAN_USBBUS4",
+      "bitrate": 1000000,
+      "label": "XCP slave"
+    }
+  },
+  "receive_own_messages": false
+}

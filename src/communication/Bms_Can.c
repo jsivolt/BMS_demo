@@ -226,8 +226,8 @@ static void Bms_Can_PackUint32LE(
  *
  * 100 mA = 0.1 A = 1 raw count
  *
- * Positive = discharge
- * Negative = charge
+ * Same sign convention as Battery_Monitor: positive = charge,
+ * negative = discharge.
  */
 static sint16 Bms_Can_CurrentToRaw(sint32 current_mA)
 {

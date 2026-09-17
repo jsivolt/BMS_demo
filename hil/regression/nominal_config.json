@@ -1,0 +1,50 @@
+{
+  "_comment": [
+    "Baseline values and timing policy for the Phase 1 smoke regression.",
+    "Frame builders read the 'nominal' and 'stimulus' sections - test modules must not",
+    "hard-code cell or pack values. 'fault_injection' holds the deliberate out-of-range",
+    "stimulus used by REG-FAULT-001/002 so future boundary testing only edits this file."
+  ],
+  "nominal": {
+    "cell_voltage_mv": 3700,
+    "pack_voltage_mv": 59200,
+    "bus_voltage_mv": 59000,
+    "pack_current_ma": 0,
+    "shunt_voltage_uv": 0,
+    "vpack_status": 0,
+    "temperature_c": 25,
+    "_temperature_note": "Reserved. There is no CAN path for temperature in this firmware: pack temperatures come from the on-board NTCs on ADC1, so this value is NOT injected in V1."
+  },
+  "stimulus": {
+    "period_ms": 50,
+    "_period_note": "CAN1/CAN2 RX is polled from the 100 ms task and reads all five vAFE mailboxes per pass. A 50 ms burst period leaves margin so every vAFE cycle publishes once per 100 ms pass."
+  },
+  "timing": {
+    "can0_expected_period_ms": 100,
+    "can0_period_tolerance_ms": 50,
+    "can0_burst_threshold_ms": 40,
+    "can0_min_coverage_ratio": 0.8,
+    "can_collect_s": 4.0
+  },
+  "timeouts": {
+    "boot_s": 8.0,
+    "identity_s": 5.0,
+    "measurement_s": 5.0,
+    "state_s": 6.0,
+    "contactor_s": 6.0,
+    "fault_s": 6.0,
+    "can5_s": 3.0,
+    "quiet_bus_s": 2.0
+  },
+  "fault_injection": {
+    "cell_index": 0,
+    "cell_ov_mv": 4260,
+    "cell_ov_hold_mv": 4200,
+    "cell_ov_clear_mv": 4140
+  },
+  "expectations": {
+    "cell_ov_bit": 2,
+    "cell_imbalance_bit": 15,
+    "critical_mask": 4145759
+  }
+}

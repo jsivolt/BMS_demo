@@ -18,11 +18,13 @@ from __future__ import annotations
 import argparse
 import ctypes
 import datetime as dt
+import hashlib
 import os
 import re
 import struct
 import subprocess
 import tempfile
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -137,6 +139,25 @@ def elf_section(gdb: Path, elf: Path, name: str) -> tuple[int, bytes]:
         dump = Path(tmp) / "section.bin"
         gdb_offline(gdb, elf, [f"dump binary memory {dump.as_posix()} {start} {end}"])
         return start, dump.read_bytes()
+
+
+def elf_identity(elf: Path) -> dict:
+    """Size, SHA256 and mtime of the ELF file on the host.
+
+    This describes the build artifact only. It is not evidence of what the MCU is
+    running - use Bench.verify_flash() for that, and keep the two apart in reports.
+    """
+    if not elf.is_file():
+        return {"path": str(elf), "exists": False, "size": 0, "sha256": "", "mtime_utc": ""}
+    blob = elf.read_bytes()
+    stamp = dt.datetime.fromtimestamp(elf.stat().st_mtime, tz=dt.timezone.utc)
+    return {
+        "path": str(elf),
+        "exists": True,
+        "size": len(blob),
+        "sha256": hashlib.sha256(blob).hexdigest(),
+        "mtime_utc": ts(stamp),
+    }
 
 
 @dataclass
@@ -254,6 +275,36 @@ class Bench:
         """Reads every block while the core runs. Blocks are read one after the other."""
         data = b"".join(self.read(addr, length) for addr, length in layout.blocks)
         return layout.decode(data)
+
+    def read_until(self, layout: Layout, predicate, timeout_s: float,
+                   period_s: float = 0.02) -> tuple[dict[str, int | float], float, list]:
+        """Polls a layout while the core runs until ``predicate(values)`` is true.
+
+        Returns ``(last_values, elapsed_s, samples)`` where ``samples`` is every
+        ``(elapsed_s, values)`` reading taken, so a caller can report the transitions
+        it actually observed instead of only the final value. It never raises on
+        timeout: the caller decides whether the last reading is a failure.
+        """
+        started = time.monotonic()
+        samples: list[tuple[float, dict[str, int | float]]] = []
+        while True:
+            values = self.read_layout(layout)
+            elapsed = time.monotonic() - started
+            samples.append((elapsed, values))
+            if predicate(values) or elapsed >= timeout_s:
+                return values, elapsed, samples
+            time.sleep(period_s)
+
+    def sample(self, layout: Layout, duration_s: float, period_s: float = 0.01) -> list:
+        """Collects ``(elapsed_s, values)`` while the core runs for a fixed window."""
+        started = time.monotonic()
+        samples: list[tuple[float, dict[str, int | float]]] = []
+        while True:
+            elapsed = time.monotonic() - started
+            if elapsed > duration_s:
+                return samples
+            samples.append((elapsed, self.read_layout(layout)))
+            time.sleep(period_s)
 
     def verify_flash(self, gdb: Path, elf: Path, section: str = ".pflash") -> str:
         addr, image = elf_section(gdb, elf, section)

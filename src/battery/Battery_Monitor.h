@@ -51,8 +51,10 @@ typedef struct
      *
      * Unit: W
      *
-     * Positive = discharge power
-     * Negative = charge power
+     * Positive = charge power
+     * Negative = discharge power
+     *
+     * Same sign as PackCurrent_mA: power is PackV * I.
      */
     float PackPower_W[BATTERY_MONITOR_PACK_COUNT];
 

@@ -1,0 +1,14 @@
+# Runtime dependencies for the BMS_demo HIL regression framework (hil/regression).
+#
+# These are deliberately kept separate from the SIL suite, which needs only a host C
+# compiler and pytest.  Install into the workspace virtual environment:
+#
+#   .venv\Scripts\python.exe -m pip install -r hil\regression\requirements.txt
+#
+# python-can      CAN transport (the regression layer is backend-agnostic; the bench
+#                 currently uses interface="pcan" with PEAK PCAN-USB adapters)
+# pylink-square   SEGGER J-Link access, shared with hil/hil_common.py
+# pytest          host-side unit tests for this framework (python -m pytest hil/regression)
+python-can>=4.3,<5
+pylink-square>=1.0
+pytest>=8.0

@@ -35,3 +35,9 @@ Thumbs.db
 /sil/build/
 __pycache__/
 .pytest_cache/
+
+# HIL regression runtime artifacts: the framework source, its configuration defaults,
+# its README and its own test suite are tracked - the reports a run produces are not.
+# A committed golden/baseline report would be a separate, explicit decision.
+/hil/regression/reports/
+/hil/regression/.pytest_cache/
